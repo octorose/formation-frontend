@@ -5,7 +5,7 @@ import "@/css/satoshi.css";
 import "@/css/style.css";
 import React, { useEffect, useState } from "react";
 import Loader from "@/Components/common/Loader";
-
+import DefaultLayout from "./Components/Layout/DefaultLayout";
 export default function RootLayout({
   children,
 }: Readonly<{
