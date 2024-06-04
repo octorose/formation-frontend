@@ -27,7 +27,8 @@
     "declarations.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "src/app/**/*.tsx" // Add the correct path to include the missing file
   ],
   "exclude": ["node_modules"]
 }
