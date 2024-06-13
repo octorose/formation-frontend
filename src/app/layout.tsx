@@ -6,6 +6,7 @@ import "@/css/style.css";
 import React, { useEffect, useState } from "react";
 import Loader from "@/Components/common/Loader";
 import DefaultLayout from "./Components/Layout/DefaultLayout";
+import { UserProvider } from "./Context/UserContext";
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -24,7 +25,7 @@ export default function RootLayout({
     <html lang="en">
       <body suppressHydrationWarning={true}>
         <div className="dark:bg-boxdark-2 dark:text-bodydark">
-          {loading ? <Loader /> : children}
+          <UserProvider>{loading ? <Loader /> : children}</UserProvider>
         </div>
       </body>
     </html>
