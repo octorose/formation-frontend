@@ -9,8 +9,8 @@ export default function Cards({Module}: {Module: any[]}) {
   return (
     <div>
       <div className="flex text-graydark  justify-between ">
-        {Module.map((module: any) => (
-          <div className="w-1/3">
+        {Module.map((module: any, index:number) => (
+          <div className="w-1/3" key={index}>
             <CardContainer className="inter-var">
               <CardBody className="bg-zinc-100 relative group/card shadow-card  dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2] border-black/[0.1] w-auto sm:w-[30rem] h-auto rounded-xl p-6 border  ">
                 <CardItem
