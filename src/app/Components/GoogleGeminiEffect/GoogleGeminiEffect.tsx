@@ -30,7 +30,7 @@ export const GoogleGeminiEffect = ({
       </p>
       <div className="w-full h-[890px] -top-60 md:-top-40  flex items-center justify-center bg-red-transparent absolute ">
         <button onClick={()=>{
-         window.location.href = "/Dashboard";
+         window.location.href = "/Signin";
         }} className="  border-2 border-slate-800 font-bold bg-white rounded-full md:px-4 md:py-2 px-2 py-1 md:mt-24 mt-8 z-30 md:text-lg text-black text-sm  w-1/5 mx-auto ">
           Get Started
         </button>
