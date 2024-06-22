@@ -1,0 +1,180 @@
+.container {
+    width: 870px;
+    margin: auto;
+    margin-top: 150px;
+    background: white;
+    color: #0d084d;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    border-radius: 10px;
+    padding: 40px 50px;
+}
+
+.container hr {
+    height: 5px;
+    border: none;
+    background: #ee5108;
+}
+
+.container h2 {
+    font-size: 20px;
+    font-weight: 550;
+}
+
+.container ul li {
+    display: flex;
+    align-items: center;
+    height: 25px;
+    padding-left: 10px;
+    border: 1px solid  #080350;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-size: px;
+    cursor: pointer;
+}
+
+.container button {
+    margin: auto;
+    width: 150px;
+    height: 55px;
+    background: #110636;
+    color: #fff;
+    font-size: 22px;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.index {
+    margin: auto;
+    font-size: 20px;
+}
+
+.correct {
+    background: #dffff2;
+    border-color: #00d397;
+}
+
+.wrong {
+    background: #FFEBEB;
+    border-color: #FF4A4A;
+}
+.quiz-input-container {
+    margin-bottom: 2px; /* Ajoute de l'espace en bas de la div */
+}
+
+.quiz-input-container input {
+    margin-right: 10px; /* Ajoute de l'espace à droite du champ de saisie */
+}
+.timer-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    margin-bottom: 20px; /* Ajoute de l'espace en bas de la boîte */
+}
+
+.timer-bar {
+    width: 100%;
+    height: 8px;
+    background-color: #ddd;
+    border-radius: 5px;
+    margin-top: 8px; /* Ajoute un espace entre l'icône de l'horloge et la barre de temps */
+}
+
+.timer-bar-inner {
+    height: 100%;
+    background-color: #4caf50; /* Couleur de la barre de temps */
+    border-radius: 5px;
+}
+
+.timer {
+    font-size: 20px;
+    margin-top: 8px; /* Ajoute un espace entre la barre de temps et le texte du minuteur */
+}
+.error-message {
+    background-color: #eeeeee; /* Couleur de fond */
+    color: rgb(226, 25, 25); /* Couleur du texte */
+    padding: 20px; /* Remplissage */
+    border-radius: 8px; /* Bordure arrondie */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Ombre */
+    text-align: center; /* Alignement du texte */
+    font-size: 18px; /* Taille de la police */
+}
+
+.error-message::before {
+    content: "⚠️"; /* Emoji d'avertissement */
+    display: block; /* Affichage en tant que bloc */
+    font-size: 36px; /* Taille de l'icône */
+    margin-bottom: 10px; /* Marge en bas */
+}
+.selected {
+    background-color: #d3d3d3; /* Par exemple, gris clair */
+}
+.quiz-options li {
+    cursor: pointer;
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.quiz-options li.selected {
+    border: 2px solid blue; /* Change the border color as needed */
+    background-color: #f0f8ff; /* Optional: change background color for more emphasis */
+}
+
+.error-message {
+    color: red;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+.quiz-options li {
+    cursor: pointer;
+}
+
+.quiz-options .selected {
+    border: 1px solid blue; /* ou une autre couleur de votre choix */
+}
+.image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0; /* Optionnel : pour ajouter un espace autour de l'image */
+    
+}
+
+.image-container img {
+    max-width: 100%;
+    height: auto; /* Pour s'assurer que l'image reste proportionnelle */
+}
+
+.checkbox-grid {
+    display: flex;
+    flex-wrap: wrap; /* Permet de passer à la ligne si nécessaire */
+}
+
+.checkbox-label {
+    margin-right: 20px; /* Espacement entre les cases à cocher */
+}
+
+.checkbox-input {
+    width: 20px; /* Largeur de la case à cocher */
+    height: 20px; /* Hauteur de la case à cocher */
+    /* Autres styles personnalisés */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
