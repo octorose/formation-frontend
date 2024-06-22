@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import ResponsivePagination from "react-responsive-pagination";
 import "@/css/pagination.css";
+
 import useAlert from "@/Hooks/useAlert";
 import Modal from "@/Components/GlobalModal/Modal";
 import { EditIcon, TrashIcon } from "lucide-react";
 import Loader from "@/Components/Loaders/Loader";
 import Swal from "sweetalert2";
 import { refreshToken } from "@/utils/RefreshToken";
+import PhaseRenderer from "../phaserenderer/PhaseRenderer";
 
 interface Agent {
   address: string;
@@ -51,22 +53,25 @@ const TableHeader: React.FC<TableHeaderProps> = ({
   const isFirst = index === 0;
   const isLast = index === totalHeaders - 1;
 
-  const classNames = `py-3.5 pl-4 pr-3 text-center font-medium text-sm text-neutral-500
-  ${isFirst ? "rounded-l-xl" : ""}
-  ${isLast ? "rounded-r-xl" : ""}`;
+  const classNames = `py-3.5 pl-4 pr-3 text-center text-white dark:text-black font-medium text-lg bg-black dark:bg-white text-neutral-500
+  ${isFirst ? "rounded-tl-xl" : ""}
+  ${isLast ? "rounded-tr-xl" : ""}`;
 
   return <th className={classNames}>{header}</th>;
 };
 
-function normalizeHeader(header: string) {
-  return header.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
-}
 
-function CustomTable({ headers }: { headers: string[] }) {
-  const perpage = 10;
+function CustomTable({
+  headers,
+  searchResults,
+}: {
+  headers: string[];
+  searchResults: any;
+}) {
+  
+  const perpage = 5;
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-  const [phase, setPhase] = useState(1);
   const [editMode, setEditMode] = useState(Array(15).fill(false));
   const [data2, setData] = useState<CandidateData[]>();
   const [CandidateNameToDelete, setCandidateNameToDelete] = useState();
@@ -75,7 +80,15 @@ function CustomTable({ headers }: { headers: string[] }) {
   const totalPages = Math.ceil((data2 as any)?.count / perpage);
   const { alert, setAlert } = useAlert();
   const { alert: alert2, setAlert: setAlert2 } = useAlert();
-
+  const handleEdit = (index: any) => {
+    const updatedEditMode = [...editMode];
+    if (updatedEditMode[index]) {
+      updatedEditMode[index] = false;
+    } else {
+      updatedEditMode[index] = true;
+    }
+    setEditMode(updatedEditMode);
+  };
   const Toast = Swal.mixin({
     toast: true,
     position: "top-end",
@@ -89,23 +102,32 @@ function CustomTable({ headers }: { headers: string[] }) {
   });
 
   const DeleteCandidate = async (Candidate: any) => {
+    // console.log(Candidate);
+
     //@ts-ignore
-    if (CandidateNameToDelete?.Nom === Candidate.Nom) {
+    if (CandidateNameToDelete?.Nom === Candidate.agent.nom) {
+      // console.log("aywa");
+
       try {
-        const response = await fetch(`/api/Candidates?id=${Candidate._id}`, {
-          method: "DELETE",
-        });
+        const response = await fetch(
+          `http://localhost:8000/api/delete_personnel/${Candidate.id}`,
+          {
+            method: "DELETE",
+          }
+        );
         if (!response.ok) {
           throw new Error("Failed to delete candidate");
         }
-        const data = await response.json();
+        // const data = await response.json();
+        fetchData();
+        setAlert2((prev) => ({ ...prev, isOpen: false }));
       } catch (error) {
         console.error(error);
       }
     } else {
       Toast.fire({
-        icon: "warning",
-        title: "Invalid PR Id",
+        icon: "error",
+        title: "Invalid Candidate name",
       });
     }
   };
@@ -120,49 +142,59 @@ function CustomTable({ headers }: { headers: string[] }) {
     }));
   };
 
- const fetchData = async () => {
-   try {
-     setIsLoading(true);
-     const response = await fetch(`http://localhost:8000/api/personnel/`, {
-       headers: {
-         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-       },
-     });
-     if (!response.ok) {
-       if (response.status === 401) {
-         // Token expired, try to refresh token
-         const refreshResponse = await refreshToken(localStorage.getItem("refresh_token"));
-         if (refreshResponse.ok) {
-           // If refresh successful, retry original request
-           localStorage.setItem("access_token", refreshResponse.access);
-           //@ts-ignore
+  const fetchData = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(
+        `http://localhost:8000/api/personnel/?page=${currentPage}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        }
+      );
+      if (!response.ok) {
+        if (response.status === 401) {
+          // Token expired, try to refresh token
+          const refreshResponse = await refreshToken(
+            localStorage.getItem("refresh_token")
+          );
+          if (refreshResponse.ok) {
+            // If refresh successful, retry original request
+            localStorage.setItem("access_token", refreshResponse.access);
+            //@ts-ignore
 
-           const retryResponse = await fetch(`http://localhost:8000/api/personnel/`, {
-             headers: {
-               Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-             },
-           });
-           if (retryResponse.ok) {
-             const fetchedData = await retryResponse.json();
-             setData(fetchedData);
-           } else {
-             throw new Error("Failed to fetch data after token refresh");
-           }
-         } else {
-           throw new Error("Failed to refresh token");
-         }
-       } else {
-         throw new Error("Failed to fetch data");
-       }
-     } else {
-       const fetchedData = await response.json();
-       setData(fetchedData);
-     }
-     setIsLoading(false);
-   } catch (error) {
-     console.error(error);
-   }
- };
+            const retryResponse = await fetch(
+              `http://localhost:8000/api/personnel/?page=${currentPage}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem(
+                    "access_token"
+                  )}`,
+                },
+              }
+            );
+            if (retryResponse.ok) {
+              const fetchedData = await retryResponse.json();
+              setData(fetchedData);
+            } else {
+              throw new Error("Failed to fetch data after token refresh");
+            }
+          } else {
+            throw new Error("Failed to refresh token");
+          }
+        } else {
+          throw new Error("Failed to fetch data");
+        }
+      } else {
+        const fetchedData = await response.json();
+        setData(fetchedData);
+      }
+      setIsLoading(false);
+    } catch (error) {
+      console.error(error);
+    }
+  };
   function formatDate(dateString: string) {
     const date = new Date(dateString);
     const day = date.getDate().toString().padStart(2, "0");
@@ -170,36 +202,53 @@ function CustomTable({ headers }: { headers: string[] }) {
     const year = date.getFullYear().toString().slice(-2);
     return `${day}/${month}/${year}`;
   }
+  const updateCandidate = async (Candidate: any) => {
+    console.log(Candidate);
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/update_personnel/${Candidate.id}/`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(Candidate),
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to update candidate");
+      }
+      // const data = await response.json();
+      fetchData();
+      setAlert((prev) => ({ ...prev, isOpen: false }));
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   useEffect(() => {
     fetched = fetchData();
   }, [currentPage]);
-
-  const normalizedHeaders = headers?.map(normalizeHeader);
-
-  //@ts-ignore
-  const filteredData = data2?.data?.map((item: any) =>
-    normalizedHeaders.reduce((obj: any, header: string) => {
-      const key = Object.keys(item).find((k) => normalizeHeader(k) === header);
-      if (key) {
-        obj[header] = item[key];
-      }
-      return obj;
-    }, {})
-  );
-  console.log(filteredData);
+  const PersonalInfo = {
+    nom: CandidatetoEdit?.agent?.nom,
+    prenom: CandidatetoEdit?.agent?.prenom,
+    cin: CandidatetoEdit?.agent?.cin,
+    date_naissance: CandidatetoEdit?.agent?.date_naissance,
+    // date_joined: CandidatetoEdit?.agent?.date_joined,
+    etat: CandidatetoEdit?.etat,
+  };
 
   return (
     <div className="w-full">
       {!isLoading ? (
         <div>
-          <div className="flex justify-center">
-            <table className=" ">
-              <thead className="rounded-t-xl rounded-b-xl">
+          <div className=" flex justify-center">
+            <table className="w-9/12 ">
+              <thead className="rounded-t-xl   rounded-b-xl">
                 <tr
                   className="rounded-lg h-12 flex-shrink-0 bg-ft-gray-dark-blue rounded-t-xl rounded-b-xl"
                   onClick={() => {
-                    console.log(data2);
+                    // console.log(data2);
                   }}
                 >
                   {headers?.map((header, index) => (
@@ -213,47 +262,192 @@ function CustomTable({ headers }: { headers: string[] }) {
                 </tr>
               </thead>
               <tbody>
-                {data2 &&
+                {searchResults !== undefined && searchResults.length > 0 ? (
                   //@ts-ignore
-                  data2?.results?.map((item: any) => (
+                  searchResults?.map((item: any) => (
                     <tr
                       key={item.id}
-                      className="p-2 text-center rounded-t-lg rounded-b-lg border-b-2 text-sm hover:border-ft-lt/30 cursor-pointer text-neutral-900"
+                      className=" p-2 py-5 text-center rounded-t-lg rounded-b-lg border-b-2 text-base  cursor-pointer text-neutral-900"
                     >
-                      <td className="">{item.agent["nom"]}</td>
-                      <td className="">{item.agent["prenom"]}</td>
-                      <td className="">{item.agent["cin"]}</td>
-                      <td className="">{item.agent["numerotel"]}</td>
-                      <td className="">
+                      <td
+                        className=""
+                        onClick={() => {
+                          // console.log(item);
+                          setAlert((prev) => ({ ...prev, isOpen: true }));
+                          setCandidatetoEdit(item);
+                        }}
+                      >
+                        {item.agent["nom"]}
+                      </td>
+                      <td
+                        className=""
+                        onClick={() => {
+                          // console.log(item);
+                          setAlert((prev) => ({ ...prev, isOpen: true }));
+                          setCandidatetoEdit(item);
+                        }}
+                      >
+                        {item.agent["prenom"]}
+                      </td>
+                      <td
+                        className=""
+                        onClick={() => {
+                          // console.log(item);
+                          setAlert((prev) => ({ ...prev, isOpen: true }));
+                          setCandidatetoEdit(item);
+                        }}
+                      >
+                        {item.agent["cin"]}
+                      </td>
+                      <td
+                        className=""
+                        onClick={() => {
+                          // console.log(item);
+                          setAlert((prev) => ({ ...prev, isOpen: true }));
+                          setCandidatetoEdit(item);
+                        }}
+                      >
+                        {item.agent["numerotel"]}
+                      </td>
+                      <td
+                        className=""
+                        onClick={() => {
+                          // console.log(item);
+                          setAlert((prev) => ({ ...prev, isOpen: true }));
+                          setCandidatetoEdit(item);
+                        }}
+                      >
                         {formatDate(item.agent["date_naissance"])}
                       </td>
-                      <td className="">
+                      <td
+                        className=""
+                        onClick={() => {
+                          // console.log(item);
+                          setAlert((prev) => ({ ...prev, isOpen: true }));
+                          setCandidatetoEdit(item);
+                        }}
+                      >
                         {formatDate(item.agent["date_joined"])}
                       </td>
-                      <td className="">{item.etat}</td>
-
-                      <td className="flex justify-center">
-                        <button
-                          className="mr-2"
-                          onClick={() => {
-                            setCandidatetoEdit(item);
-                            setAlert((prev) => ({ ...prev, isOpen: true }));
-                          }}
-                        ></button>
-                        <button
-                          onClick={() => {
-                            setCandidatetoEdit(item);
-                            setAlert2((prev) => ({ ...prev, isOpen: true }));
-                          }}
-                        >
-                          <TrashIcon
-                            size={20}
-                            className="w-4 h-4 text-red-500 cursor-pointer hover:animate-bounce "
-                          />
-                        </button>
+                      <td
+                        className=""
+                        onClick={() => {
+                          // console.log(item);
+                          setAlert((prev) => ({ ...prev, isOpen: true }));
+                          setCandidatetoEdit(item);
+                        }}
+                      >
+                        {item.etat}
                       </td>
+
+                      <button
+                        onClick={() => {
+                          setCandidatetoEdit(item);
+                          setAlert2((prev) => ({ ...prev, isOpen: true }));
+                        }}
+                      >
+                        <TrashIcon
+                          size={20}
+                          className="w-4 h-4 text-red-500 cursor-pointer hover:animate-bounce "
+                        />
+                      </button>
                     </tr>
-                  ))}
+                  ))
+                ) : (
+                  <>
+                    {data2 &&
+                      //@ts-ignore
+                      data2?.results?.map((item: any) => (
+                        <tr
+                          key={item.id}
+                          className=" text-center rounded-t-lg rounded-b-lg border-b-2 text-lg  cursor-pointer text-neutral-900"
+                        >
+                          <td
+                            className=""
+                            onClick={() => {
+                              // console.log(item);
+                              setAlert((prev) => ({ ...prev, isOpen: true }));
+                              setCandidatetoEdit(item);
+                            }}
+                          >
+                            {item.agent["nom"]}
+                          </td>
+                          <td
+                            className=""
+                            onClick={() => {
+                              // console.log(item);
+                              setAlert((prev) => ({ ...prev, isOpen: true }));
+                              setCandidatetoEdit(item);
+                            }}
+                          >
+                            {item.agent["prenom"]}
+                          </td>
+                          <td
+                            className=""
+                            onClick={() => {
+                              // console.log(item);
+                              setAlert((prev) => ({ ...prev, isOpen: true }));
+                              setCandidatetoEdit(item);
+                            }}
+                          >
+                            {item.agent["cin"]}
+                          </td>
+                          <td
+                            className=""
+                            onClick={() => {
+                              
+                              setAlert((prev) => ({ ...prev, isOpen: true }));
+                              setCandidatetoEdit(item);
+                            }}
+                          >
+                            {item.agent["numerotel"]}
+                          </td>
+                          <td
+                            className=""
+                            onClick={() => {
+                              // console.log(item);
+                              setAlert((prev) => ({ ...prev, isOpen: true }));
+                              setCandidatetoEdit(item);
+                            }}
+                          >
+                            {formatDate(item.agent["date_naissance"])}
+                          </td>
+                          <td
+                            className=""
+                            onClick={() => {
+                              // console.log(item);
+                              setAlert((prev) => ({ ...prev, isOpen: true }));
+                              setCandidatetoEdit(item);
+                            }}
+                          >
+                            {formatDate(item.agent["date_joined"])}
+                          </td>
+                          <td
+                            className=""
+                            onClick={() => {
+                              // console.log(item);
+                              setAlert((prev) => ({ ...prev, isOpen: true }));
+                              setCandidatetoEdit(item);
+                            }}
+                          >
+                            {item.etat}
+                          </td>
+
+                          <button
+                            onClick={() => {
+                              setCandidatetoEdit(item);
+                              setAlert2((prev) => ({ ...prev, isOpen: true }));
+                            }}
+                          >
+                            <TrashIcon
+                              size={20}
+                              className="w-4 h-4 text-red-500 cursor-pointer hover:animate-bounce "
+                            />
+                          </button>
+                        </tr>
+                      ))}
+                  </>
+                )}
               </tbody>
             </table>
           </div>
@@ -264,28 +458,38 @@ function CustomTable({ headers }: { headers: string[] }) {
           />
         </div>
       ) : (
-        <>ERROR</>
+        <Loader />
       )}
       <Modal
         isOpen={alert.isOpen}
         onSubmit={() => {
-          console.log(CandidatetoEdit);
+          // console.log(CandidatetoEdit);
+          
+          updateCandidate(CandidatetoEdit);
         }}
         onCancel={() => {
           setAlert((prev) => ({ ...prev, isOpen: false }));
         }}
         alertTitle={
-          "Edit " + CandidatetoEdit?.Nom + " Details" || "Candidate" + "Details"
+          "Edit " + CandidatetoEdit?.agent?.nom + " Details" ||
+          "Candidate" + "Details"
         }
         alertDescription={"Edit "}
-        submitBtnName={phase === 3 ? "Submit" : "Next"}
+        submitBtnName={"Submit"}
         cancelBtnName="Cancel"
         type="success"
         onClose={() => {
           setAlert((prev) => ({ ...prev, isOpen: false }));
-          setPhase(1);
         }}
-      ></Modal>
+      >
+        <PhaseRenderer
+          fields={PersonalInfo}
+          editMode={editMode}
+          handleEdit={handleEdit}
+          CandidatetoEdit={CandidatetoEdit}
+          setCandidatetoEdit={setCandidatetoEdit}
+        />
+      </Modal>
       <Modal
         isOpen={alert2.isOpen}
         onSubmit={() => DeleteCandidate(CandidatetoEdit)}
@@ -295,7 +499,7 @@ function CustomTable({ headers }: { headers: string[] }) {
         alertTitle={"Delete Candidate"}
         alertDescription={
           `If You are sure type the Candidates Name "` +
-          CandidatetoEdit.Nom +
+          CandidatetoEdit?.agent?.nom +
           `" to confirm your request`
         }
         submitBtnName={"Delete"}

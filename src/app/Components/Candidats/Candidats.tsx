@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import CustomTable from "../CustomTable/CustomTable";
 import CardBarChart from "../ui/charts/CardBarChart";
-import { SearchIcon } from "lucide-react";
+import { Search, SearchIcon } from "lucide-react";
 import { refreshToken } from "@/utils/RefreshToken";
-
+import Loader from "@/Components/Loaders/Loader";
+import DataCard from "../3DCard/DataCard";
+import SearchComponent from "../SearchComponent/Search";
 function Candidats() {
   interface PersonnelType {
     candidat: number;
@@ -82,6 +84,31 @@ function Candidats() {
 
     fetchData();
   }, []);
+  const getPersonnelSum = (data:any, etat:any) => {
+    const found = data.find((item:any) => item.etat === etat);
+    return found ? found.sum_personnel : 0;
+  };
+    const totalCandidates = getPersonnelSum(personnelSumByEtat, "Candidate");
+    const totalInFormation = getPersonnelSum(
+      personnelSumByEtat,
+      "En Formation"
+    );
+    const totalOperators = getPersonnelSum(personnelSumByEtat, "Operateur");
+    const [searchResults, setSearchResults] = useState<any[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
+
+    const handleSearchResults = (results: any[]) => {
+      setSearchResults(results);
+    };
+
+    const handleLoading = (isLoading: boolean) => {
+      setLoading(isLoading);
+    };
+
+    const handleError = (error: string | null) => {
+      setError(error);
+    };
 
   // Calculate the sum of personnel count for the current month with etat = "Candidat"
   console.log(personnelSumByEtat);
@@ -89,87 +116,14 @@ function Candidats() {
   return (
     <div>
       <div className="w-full  overflow-hidden   rounded-2xl p-10 text-xl md:text-4xl font-bold text-white bg-gradient-to-br from-white to-slate-300">
-        <div className="flex flex-row justify-between text-graydark">
-          <p>Candidats</p>
-          <div className="border border-1 rounded-2xl p-1 text-sm flex flex-row bg-transparent items-center">
-            <input
-              type="text"
-              placeholder={"Search for "}
-              className="bg-transparent"
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  const searchquery = e.currentTarget.value;
-                }
-              }}
-            />
-            <SearchIcon
-              className="h-5 w-5 mx-3 text-blue-950"
-              onClick={(e: any) => console.log(e)}
-            />
-          </div>
-        </div>
-        <div className="flex text-graydark my-5">
-          <div className=" h-70 w-1/2 flex-col gap-3 rounded-lg shadow-lg  justify-between">
-            <div className="flex rounded-xl  gap-1 h-1/2 w-full justify-center items-center">
-              <div className="h-full w-1/2 px-5 flex flex-col justify-center">
-                <h1>12</h1>
-                <p className="text-slate-400 font-thin text-[20px]">
-                  New Groups
-                </p>
-              </div>
-              <div className="bg-black h-[60%] w-1"></div>
-              <div className="h-full w-1/2 px-5 flex flex-col justify-center">
-                <h1>
-                  {
-                    personnelSumByEtat[1] !== undefined
-                    // @ts-ignore
-                      ? personnelSumByEtat[1].sum_personnel
-                      : "0"
-                  }
-                </h1>
-                <p className="text-slate-400 font-thin text-[20px]">
-                  Total Candidats
-                </p>
-              </div>
-            </div>
-            <div className="bg-black h-1 mx-auto w-11/12"></div>
-            <div className="flex  gap-1 h-1/2 w-full justify-center items-center">
-              <div className="h-full w-1/2 px-5 flex flex-col justify-center">
-                <h1>
-                  {
-                    personnelSumByEtat[1] !== undefined
-                    // @ts-ignore
-                      ? personnelSumByEtat[1].sum_personnel
-                      : "0"
-                  }
-                </h1>
-                <p className="text-slate-400 font-thin text-[20px]">
-                  Totale En Formation
-                </p>
-              </div>
-              <div className="bg-black h-[60%] w-1"></div>
-              <div className="h-full w-1/2 px-5 flex flex-col justify-center">
-                <h1>
-                  {
-                    personnelSumByEtat[2] !== undefined
-                    // @ts-ignore
-                      ? personnelSumByEtat[2].sum_personnel
-                      : "0"
-                  }
-                </h1>
-                <p className="text-slate-400 font-thin text-[20px]">
-                  Totale Operateurs
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="h-70 w-1/2">
-            {personnelData.length > 0 ? (
-              <CardBarChart personnelData={personnelData} />
-            ) : (
-              <p>Loading...</p>
-            )}
-          </div>
+        <div className="flex flex-row justify-between mb-5 text-graydark">
+          <p>Personnel</p>
+          {/* <SearchComponent
+            onResults={handleSearchResults}
+            onLoading={handleLoading}
+            onError={handleError}
+            endpoint="/api/personnel-search"
+          /> */}
         </div>
         <CustomTable
           headers={[
@@ -180,7 +134,9 @@ function Candidats() {
             "Date_Naissance",
             "Date_Creation",
             "Status",
+            "",
           ]}
+          searchResults={searchResults}
         />
       </div>
     </div>
