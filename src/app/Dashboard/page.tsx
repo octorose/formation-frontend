@@ -71,13 +71,12 @@ const Home = () => {
             activeTabClassName="bg-blue-200 dark:bg-blue-800 border-5 text-black dark:text-white"
           />
         ) : role == "Superviseur" ? (
-          <>fiw</>
+          <>supervisor view</>
         ) : role == "ResponsableFormation" ? (
-          <>fiw</>
+          <>Responsable view</>
         ) : (
           <></>
         )}
-      
       </div>
     </DefaultLayout>
   );
