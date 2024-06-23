@@ -1,12 +1,24 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { getUserNameFromToken } from "@/utils/getUserNameFromToken";
+import { getRoleFromToken } from "@/utils/getRoleFromToken";
+import { useUser } from "@/Context/UserContext";
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-
+  const user = getUserNameFromToken();
   const trigger = useRef<any>(null);
   const dropdown = useRef<any>(null);
+  const { role } = useUser();
+  const LogOut = () => {
+    // Clear authentication tokens
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+
+    // Redirect to login page
+    window.location.href = "/Signin";
+  };
 
   // close on click outside
   useEffect(() => {
@@ -44,9 +56,9 @@ const DropdownUser = () => {
       >
         <span className="hidden text-right lg:block">
           <span className="block text-sm font-medium text-black dark:text-white">
-           Hatim Allouch
+            {user}
           </span>
-          <span className="block text-xs">Position</span>
+          <span className="block text-xs">{getRoleFromToken()}</span>
         </span>
 
         <span className="h-12 w-12 rounded-full">
@@ -54,7 +66,9 @@ const DropdownUser = () => {
             width={112}
             height={112}
             src={
-              "https://ui-avatars.com/api/?name=Hatim+Allouchi&size=160&background=random"
+              "https://ui-avatars.com/api/?name=" +
+              user +
+              "i&size=160&background=random"
             }
             style={{
               width: "auto",
@@ -164,7 +178,10 @@ const DropdownUser = () => {
             </Link>
           </li>
         </ul>
-        <button className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base">
+        <button
+          onClick={() => LogOut()}
+          className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
+        >
           <svg
             className="fill-current"
             width="22"

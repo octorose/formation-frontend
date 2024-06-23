@@ -77,9 +77,9 @@ export default function Modal({
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
               <Dialog.Panel className="relative transform overflow-x-auto rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
-                <div className="absolute top-4 text-gray-400 right-16 hover:text-red-600 hover:cursor-pointer h-1 w-1" onMouseEnter={()=>{setType("error")}} onMouseLeave={()=>{setType(type)}} >
+                {/* <div className="absolute top-4 text-gray-400 right-16 hover:text-red-600 hover:cursor-pointer h-1 w-1" onMouseEnter={()=>{setType("error")}} onMouseLeave={()=>{setType(type)}} >
                   <TrashIcon />
-                </div>
+                </div> */}
                 <div className="absolute top-0 right-0 hidden pt-4 pr-4 sm:block">
                   <button
                     type="button"
@@ -137,14 +137,14 @@ export default function Modal({
                 </div>
                 <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
                   <button
-                    disabled={disableSubmitBtn}
+                    disabled={false}
                     type="button"
                     className={classNames(
-                      "min-w-[90px] inline-flex w-full justify-center rounded-md border border-transparent px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-700 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed",
+                      "min-w-[90px] inline-flex w-full justify-center  text-black rounded-md border border-transparent px-4 py-2 text-base font-medium  shadow-sm hover:bg-red-700 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed",
                       isLoading
-                        ? "bg-ft-ts/70"
+                        ? "bg-boxdark"
                         : typo === "error"
-                        ? "bg-red-600"
+                        ? "bg-red hover:bg-white hover:text-red"
                         : typo === "success"
                         ? "bg-green-600"
                         : typo === "warning"
