@@ -5,6 +5,8 @@ import './Quiz.css';
 import { FaRegClock } from 'react-icons/fa';
 import dynamic from 'next/dynamic';
 import CheckboxGridQuestion from './CheckboxGridQuestion';
+import Image from "src/app/images/quiz/Qst22.png";
+
 
 const Quiz = () => {
     const [index, setIndex] = useState(0);
@@ -20,7 +22,18 @@ const Quiz = () => {
     const [selectedOptionIndex, setSelectedOptionIndex] = useState<null|Number>(null);
     const [answer, setAnswer] = useState(''); 
 
-
+    useEffect(() => {
+        // Retrieve stored values from localStorage
+        const storedIndex = localStorage.getItem('quizIndex');
+        const storedScore = localStorage.getItem('quizScore');
+        if (storedIndex !== null) {
+            setIndex(Number(storedIndex));
+        }
+        if (storedScore !== null) {
+            setScore(Number(storedScore));
+        }
+    }, []);
+    
     useEffect(() => {
         if (index === data.length) {
             setResult(true);
@@ -56,6 +69,9 @@ const Quiz = () => {
         setLock(false);
         setAnswerSelected(false);
         setSelectedOptionIndex(null);
+         // Store the current index and score in localStorage
+        localStorage.setItem('quizIndex', index.toString());
+        localStorage.setItem('quizScore', score.toString());
     }, [index]);
 
     const checkAns = (selectedOptionIndex:number) => {
