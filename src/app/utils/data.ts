@@ -3,7 +3,8 @@ export const data = [
         id:1,
         question: "Quelle est votre taille ?",
         ans: -1, // Pas de bonne réponse prédéfinie car la réponse sera saisie
-        type: 'input'
+        type: 'input',
+        hasInput: true,
     },
     {
         
@@ -17,6 +18,7 @@ export const data = [
         ans: 2,
         type: 'multiple-choice',
         image: "/assets/image/qst99.PNG",
+        hasInput: false,
     },
     {
         id:3,
@@ -27,7 +29,8 @@ export const data = [
         option4:"Jaune",
         option5:"autre",
         ans: 4,
-        type: 'multiple-choice'
+        type: 'multiple-choice',
+        hasInput: false,
     },
     {
         id:4,
@@ -38,7 +41,8 @@ export const data = [
         option4:"Jaune",
         option5:"autre",
         ans: 1,
-        type: 'multiple-choice'
+        type: 'multiple-choice',
+        hasInput: false,
     },
     {
         id:5,
@@ -49,7 +53,8 @@ export const data = [
         option4:"Jaune",
         option5:"autre",
         ans: 2,
-        type: 'multiple-choice'
+        type: 'multiple-choice',
+        hasInput: false,
     },
     {
         id:6,
@@ -60,7 +65,8 @@ export const data = [
         option4:"Jaune",
         option5:"autre",
         ans: 3,
-        type: 'multiple-choice'
+        type: 'multiple-choice',
+        hasInput: false,
     },
     {
         id:7,
@@ -71,7 +77,8 @@ export const data = [
         option4:"Jaune",
         option5:"autre",
         ans: 2,
-        type: 'multiple-choice'
+        type: 'multiple-choice',
+        hasInput: false,
     },
     {
         id:8,
@@ -82,7 +89,8 @@ export const data = [
         option4:"Jaune",
         option5:"autre",
         ans: 4,
-        type: 'multiple-choice'
+        type: 'multiple-choice',
+        hasInput: false,
     },
     {
         id:9,
@@ -93,7 +101,8 @@ export const data = [
         option4:"Jaune",
         option5:"autre",
         ans: 4,
-        type: 'multiple-choice'
+        type: 'multiple-choice',
+        hasInput: false,
     },
     {
         id:10,
@@ -104,7 +113,8 @@ export const data = [
         option4:"Jaune",
         option5:"autre",
         ans: 3,
-        type: 'multiple-choice'
+        type: 'multiple-choice',
+        hasInput: false,
     },
     {
         id:11,
@@ -115,7 +125,8 @@ export const data = [
         option4:"Jaune",
         option5:"autre",
         ans: 2,
-        type: 'multiple-choice'
+        type: 'multiple-choice',
+        hasInput: false,
     },
     {
         id:12,
@@ -126,7 +137,8 @@ export const data = [
         option4:"Jaune",
         option5:"autre",
         ans: 0,
-        type: 'multiple-choice'
+        type: 'multiple-choice',
+        hasInput: false,
     },
     {
         id:13,
@@ -137,7 +149,8 @@ export const data = [
         option4:"Jaune",
         option5:"autre",
         ans: 4,
-        type: 'multiple-choice'
+        type: 'multiple-choice',
+        hasInput: false,
     },
     {
         id:14,
@@ -148,7 +161,8 @@ export const data = [
         option4:"Jaune",
         option5:"autre",
         ans: 4,
-        type: 'multiple-choice'
+        type: 'multiple-choice',
+        hasInput: false,
     },
     {
         id:15,
@@ -159,7 +173,8 @@ export const data = [
         option4:"Jaune",
         option5:"autre",
         ans: 1,
-        type: 'multiple-choice'
+        type: 'multiple-choice',
+        hasInput: false,
     },
     {
         id:16,
@@ -170,7 +185,8 @@ export const data = [
         option4:"Jaune",
         option5:"autre",
         ans: 4,
-        type: 'multiple-choice'
+        type: 'multiple-choice',
+        hasInput: false,
     },
     {
         id:17,
@@ -181,7 +197,8 @@ export const data = [
         option4:"Jaune",
         option5:"autre",
         ans: 2,
-        type: 'multiple-choice'
+        type: 'multiple-choice',
+        hasInput: false,
     },
     {
         id:18,
@@ -192,7 +209,8 @@ export const data = [
         option4:"Jaune",
         option5:"autre",
         ans: 2,
-        type: 'multiple-choice'
+        type: 'multiple-choice',
+        hasInput: false,
     },
     {
         id:19,
@@ -203,7 +221,8 @@ export const data = [
         option4:"Jaune",
         option5:"autre",
         ans: 0,
-        type: 'multiple-choice'
+        type: 'multiple-choice',
+        hasInput: false,
     },
     
     {
@@ -215,7 +234,8 @@ export const data = [
             option4: "6",
             option5: "7",
             ans: 0 ,// The correct answer is option 3 ("5")
-            type: 'multiple-choice'
+            type: 'multiple-choice',
+            hasInput: false,
         },
     
     {
@@ -227,7 +247,8 @@ export const data = [
             option4: "6",
             option5: "7",
             ans: 3, // The correct answer is option 3 ("5")
-            type: 'multiple-choice'
+            type: 'multiple-choice',
+            hasInput: false,
     },
 
     {
@@ -238,8 +259,9 @@ export const data = [
         option3: "5",
         option4: "6",
         option5: "2",
-        ans: 4 ,// The correct answer is option 3 ("5")
-        type: 'multiple-choice'
+        ans: 4 ,
+        type: 'multiple-choice',
+        hasInput: false,
 },
 
 {
@@ -252,7 +274,8 @@ export const data = [
         option5:"18",
         ans: 2,
         image: "/assets/image/Qst22.PNG" ,// URL de l'image pour la question 23
-        type: 'multiple-choice'
+        type: 'multiple-choice',
+        hasInput: false,
 },
 
 {
@@ -265,7 +288,8 @@ export const data = [
     option5:"5",
     ans: 2,
     image: "/assets/image/qst33.PNG" ,  // URL de l'image pour la question 24
-    type: 'multiple-choice'
+    type: 'multiple-choice',
+    hasInput: false,
 },
 {
     id: 24,
@@ -277,7 +301,8 @@ export const data = [
     option5:"5",
     ans: 2,
     image: "/assets/image/qst44.PNG" ,// URL de l'image pour la question 24
-    type: 'multiple-choice'
+    type: 'multiple-choice',
+    hasInput: false,
     
 },
 {
@@ -290,7 +315,8 @@ export const data = [
     option5:"5",
     ans: 2,
     image: "/assets/image/qst55.PNG" ,// URL de l'image pour la question 25
-    type: 'multiple-choice'
+    type: 'multiple-choice',
+    hasInput: false,
 },
 {
     id: 26,
@@ -302,7 +328,8 @@ export const data = [
     option5:"5",
     ans: 2,
     image: "/assets/image/qst66.PNG" ,// URL de l'image pour la question 24
-    type: 'multiple-choice'
+    type: 'multiple-choice',
+    hasInput: false,
 },
 {
     id: 27,
@@ -314,7 +341,8 @@ export const data = [
     option5:"5",
     ans: 2,
     image: "/assets/image/qst77.PNG" ,// URL de l'image pour la question 24
-    type: 'multiple-choice'
+    type: 'multiple-choice',
+    hasInput: false,
 },
 {
     id: 28,
@@ -326,7 +354,8 @@ export const data = [
     option5:"5",
     ans: 2,
     image: "/assets/image/qst88.PNG" ,// URL de l'image pour la question 24
-    type: 'multiple-choice'
+    type: 'multiple-choice',
+    hasInput: false,
 },
 {
     id: 29,
@@ -338,16 +367,21 @@ export const data = [
     option5:"5",
     ans: 2,
     image: "/assets/image/qst99.PNG" ,// URL de l'image pour la question 24
-    type: 'multiple-choice'
+    type: 'multiple-choice',
+    hasInput: false,
 },
 {
     id: 30,
     question: "Pourquoi voulez-vous travailler avec Leoni ?",
-    type: 'input'
+    type: 'input',
+    hasInput: true,
+
 }, {
     id: 31,
     question: "Quel est votre objectif d'ici 3 ans ?",
-    type: 'input'
+    type: 'input',
+    hasInput: true,
+
 }, {
     id: 32,
     question: "Cochez avec (.) le maximum de cercles en 30 secondes",
@@ -357,7 +391,9 @@ export const data = [
         minCoches: 70,
         maxPoints: 4,
         minPoints: 1
-    }
+    },
+    hasInput: false,
+
 }
 
     ]
