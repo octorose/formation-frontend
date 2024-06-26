@@ -14,6 +14,7 @@ import SettingIcon from "../../../../public/assets/Icons/SettingIcon";
 import { get } from "http";
 import { getRoleFromToken } from "@/utils/getRoleFromToken";
 import HistoryIcon from "../../../../public/assets/Icons/HistoryIcon";
+import { GroupIcon } from "lucide-react";
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -211,7 +212,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                             }}
                           >
                             <CandidatIcon />
-                            Affectation 
+                            Affectation
                             <DynamicArrow open={open} />
                           </Link>
                           <div
@@ -372,6 +373,63 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               <li>
                                 <Link
                                   href="/#"
+                                  className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
+                                    pathname === "/#" && "text-white"
+                                  }`}
+                                >
+                                  Add Manually
+                                </Link>
+                              </li>
+                            </ul>
+                          </div>
+                        </React.Fragment>
+                      );
+                    }}
+                  </SidebarLinkGroup>
+                  <SidebarLinkGroup
+                    activeCondition={
+                      pathname === "/forms" || pathname.includes("forms")
+                    }
+                  >
+                    {(handleClick, open) => {
+                      return (
+                        <React.Fragment>
+                          <Link
+                            href="/calendar"
+                            className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                              pathname.includes("calendar") &&
+                              "bg-graydark dark:bg-meta-4"
+                            }`}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              sidebarExpanded
+                                ? handleClick()
+                                : setSidebarExpanded(true);
+                            }}
+                          >
+                            <GroupIcon />
+                            Superviseur
+                            <DynamicArrow open={open} />
+                          </Link>
+                          <div
+                            className={`translate transform overflow-hidden  ${
+                              !open && "hidden"
+                            }`}
+                          >
+                            <ul className="mb-5.5 mt-4 flex flex-col gap-2.5 pl-6">
+                              <li>
+                                <Link
+                                  href="/#"
+                                  className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
+                                    pathname === "/#" && "text-white"
+                                  }`}
+                                >
+                                  Details
+                                </Link>
+                              </li>
+                              <li>
+                                <Link
+                                  href="/AddSupervisor"
                                   className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
                                     pathname === "/#" && "text-white"
                                   }`}

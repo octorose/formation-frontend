@@ -57,9 +57,7 @@ const PersonalInfo = {
   const fetchData = async () => {
     const response: ApiResponse<Superviseur> = await fetchWithAuth(
       `${process.env.NEXT_PUBLIC_API_URL}${endpoint}?page=${currentPage}`
-    );
-    console.log("fetched");
-    
+    ); 
     setSupervisors(response.results);
     setTotalSupervisors(response.count);
   };
@@ -109,7 +107,6 @@ const PersonalInfo = {
         if (!response.ok) {
           throw new Error("Failed to delete candidate");
         }
-        // const data = await response.json();
         fetchData();
         setAlert2((prev) => ({ ...prev, isOpen: false }));
       } catch (error) {
