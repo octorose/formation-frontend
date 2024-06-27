@@ -3,6 +3,7 @@ import React from 'react';
 import DefaultLayout from '@/Components/Layout/DefaultLayout';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { PlusIcon } from 'lucide-react';
 
 const AddResponsableEcole = () => {
   const [formValues, setFormValues] = React.useState({
@@ -209,7 +210,8 @@ const AddResponsableEcole = () => {
                 />
               </div>
             </div>
-            <button type="submit" className="mt-6 w-full py-3 px-6 rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:bg-blue-700">Ajouter Responsable Ecole formation</button>
+            <button type="submit" className="bg-graydark mt-6 w-full py-3 dark:bg-gray-100 shadow-md flex items-center justify-center px-6 rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:bg-gray-700">  <PlusIcon />  Ajouter Responsable Ecole formation</button>
+
           </form>
         </div>
       </div>
