@@ -1,12 +1,12 @@
+import PersonnelForm from '@/Components/Forms/PersonnelForm'
 import DefaultLayout from '@/Components/Layout/DefaultLayout'
 import React from 'react'
 
 function page() {
   return (
-    <DefaultLayout importexport={false}>
-
-        <div>Adding Sups page</div>
-    </DefaultLayout>
+<>
+    <PersonnelForm />
+</>
   )
 }
 

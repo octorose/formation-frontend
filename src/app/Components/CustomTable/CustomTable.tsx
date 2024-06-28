@@ -9,6 +9,7 @@ import Loader from "@/Components/Loaders/Loader";
 import Swal from "sweetalert2";
 import { refreshToken } from "@/utils/RefreshToken";
 import PhaseRenderer from "../phaserenderer/PhaseRenderer";
+import { deleteWithAuth, fetchWithAuth, putWithAuth } from "@/utils/api";
 
 interface Agent {
   address: string;
@@ -102,19 +103,12 @@ function CustomTable({
   });
 
   const DeleteCandidate = async (Candidate: any) => {
-    // console.log(Candidate);
 
     //@ts-ignore
     if (CandidateNameToDelete?.Nom === Candidate.agent.nom) {
-      // console.log("aywa");
 
       try {
-        const response = await fetch(
-          `http://localhost:8000/api/delete_personnel/${Candidate.id}`,
-          {
-            method: "DELETE",
-          }
-        );
+        const response = await deleteWithAuth(`/api/delete_personnel/${Candidate.id}/`);
         if (!response.ok) {
           throw new Error("Failed to delete candidate");
         }
@@ -145,52 +139,12 @@ function CustomTable({
   const fetchData = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(
-        `http://localhost:8000/api/personnel/?page=${currentPage}`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-          },
-        }
-      );
-      if (!response.ok) {
-        if (response.status === 401) {
-          // Token expired, try to refresh token
-          const refreshResponse = await refreshToken(
-            localStorage.getItem("refresh_token")
-          );
-          if (refreshResponse.ok) {
-            // If refresh successful, retry original request
-            localStorage.setItem("access_token", refreshResponse.access);
-            //@ts-ignore
-
-            const retryResponse = await fetch(
-              `http://localhost:8000/api/personnel/?page=${currentPage}`,
-              {
-                headers: {
-                  Authorization: `Bearer ${localStorage.getItem(
-                    "access_token"
-                  )}`,
-                },
-              }
-            );
-            if (retryResponse.ok) {
-              const fetchedData = await retryResponse.json();
-              setData(fetchedData);
-            } else {
-              throw new Error("Failed to fetch data after token refresh");
-            }
-          } else {
-            throw new Error("Failed to refresh token");
-          }
-        } else {
-          throw new Error("Failed to fetch data");
-        }
-      } else {
-        const fetchedData = await response.json();
+        const fetchedData = await fetchWithAuth(
+          `/api/personnel/?page=${currentPage}`
+        );
         setData(fetchedData);
-      }
-      setIsLoading(false);
+        setIsLoading(false);
+
     } catch (error) {
       console.error(error);
     }
@@ -205,21 +159,10 @@ function CustomTable({
   const updateCandidate = async (Candidate: any) => {
     console.log(Candidate);
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/update_personnel/${Candidate.id}/`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(Candidate),
-        }
-      );
-      if (!response.ok) {
-        throw new Error("Failed to update candidate");
-      }
-      // const data = await response.json();
+      const response = await putWithAuth(`/api/update_personnel/${Candidate.id}/`, Candidate);
       fetchData();
+
+      // const data = await response.json();
       setAlert((prev) => ({ ...prev, isOpen: false }));
     } catch (error) {
       console.error(error);

@@ -180,7 +180,7 @@ const putWithAuth = async (
       headers: {
         ...options.headers,
         "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
+        "Authorization": `Bearer ${accessToken}`,
       },
       body: JSON.stringify(data),
     });
@@ -195,7 +195,7 @@ const putWithAuth = async (
         headers: {
           ...options.headers,
           "Content-Type": "application/json",
-          Authorization: `Bearer ${newAccessToken}`,
+          "Authorization": `Bearer ${newAccessToken}`,
         },
         body: JSON.stringify(data),
       });
