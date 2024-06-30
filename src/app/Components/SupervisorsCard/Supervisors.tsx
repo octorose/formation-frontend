@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 import CustomTable from '../CustomTable/CustomTable';
-import { SearchIcon } from 'lucide-react';
+import { Plus, SearchIcon } from 'lucide-react';
 import SupervisorsTable from '../CustomTable/SupervisorsTable';
 import SearchComponent from '../SearchComponent/Search';
+import GlobalButton from '../globalButton/globalButton';
 
 function Supervisors() {
       const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -34,10 +35,22 @@ function Supervisors() {
           </div>
         </div>
 
-        <SupervisorsTable 
-        endpoint="/api/supervisors"
-        searchResults={searchResults}
+        <SupervisorsTable
+          endpoint="/api/supervisors"
+          searchResults={searchResults}
         />
+      </div>
+      <div style={{ position: "fixed", bottom: "20px", right: "20px" }}>
+        <GlobalButton
+          onClick={() =>
+
+            (window.location.href = "/AddSupervisor")
+          }
+          className="bg-blue-950 w-14 h-14 rounded-full flex items-center justify-center shadow-xl text-white mr-10"
+          aria-label="add"
+        >
+          <Plus />
+        </GlobalButton>
       </div>
     </div>
   );

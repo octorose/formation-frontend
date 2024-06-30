@@ -40,13 +40,19 @@ const handleInputChange = (
         <div key={index} className="text-slate-900">
           <div>
             <h2 className="font-semibold">{key}</h2>
-            {editMode[index] ? (
+            {editMode[index] && key == "etat" ? (
+          <select value={flattenData(CandidatetoEdit)[key]} onChange={(e:any) => handleInputChange(e, key)} className="w-full">
+            <option value="En Formation">En Formation</option>
+            <option value="Candidat">Candidat</option>
+          </select>
+            ) : editMode[index] ? (
               <input
                 type="text"
-                onChange={(event) => handleInputChange(event, key)}
-                className="w-full p-2 border border-neutral-200 rounded-lg"
+                value={flattenData(CandidatetoEdit)[key]}
+                onChange={(e) => handleInputChange(e, key)}
+                className="w-full"
               />
-            ) : (
+            ):(
               <div className="flex flex-row items-center text-black justify-between">
                 <h2>
                   {flattenData(CandidatetoEdit)[key]?.toString().length > 10

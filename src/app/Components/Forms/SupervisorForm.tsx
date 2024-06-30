@@ -1,105 +1,105 @@
-"use client"
+"use client";
 
-import React, { use } from 'react'
-import DefaultLayout from '../Layout/DefaultLayout';
-import { PlusIcon } from 'lucide-react';
-import Swal from 'sweetalert2';
-import { postWithAuth } from '@/utils/api';
+import React, { use } from "react";
+import DefaultLayout from "../Layout/DefaultLayout";
+import { PlusIcon } from "lucide-react";
+import Swal from "sweetalert2";
+import { postWithAuth } from "@/utils/api";
 
-function PersonnelForm() {
-    const [formValues, setFormValues] = React.useState({
-      nom: "",
-      username: "",
-      prenom: "",
-      email: "",
-      password: "",
-      cin: "",
-      addresse: "",
-      numerotel: "",
-      date_naissance: "",
-    });
+function SupervisorForm() {
+  const [formValues, setFormValues] = React.useState({
+    nom: "",
+    username: "",
+    prenom: "",
+    email: "",
+    password: "",
+    cin: "",
+    addresse: "",
+    numerotel: "",
+    date_naissance: "",
+  });
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const { name, value } = e.target;
-      setFormValues((prevState) => ({
-        ...prevState,
-        [name]: value,
-      }));
-    };
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      try {
-        await postWithAuth("/api/create_personnel/", {
-          agent: {
-            username: formValues.username,
-            email: formValues.email,
-            password: formValues.password,
-            prenom: formValues.prenom,
-            nom: formValues.nom,
-            date_naissance: formValues.date_naissance,
-            addresse: formValues.addresse,
-            cin: formValues.cin,
-            numerotel: formValues.numerotel,
-            role: "Personnel",
-          },
-          etat: "Candidat",
-        });
-        
-        setFormValues({
-          nom: "",
-          username: "",
-          prenom: "",
-          email: "",
-          password: "",
-          cin: "",
-          addresse: "",
-          numerotel: "",
-          date_naissance: "",
-        });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormValues((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      await postWithAuth("/api/create_supervisor/", {
+        agent: {
+          username: formValues.username,
+          email: formValues.email,
+          password: formValues.password,
+          prenom: formValues.prenom,
+          nom: formValues.nom,
+          date_naissance: formValues.date_naissance,
+          addresse: formValues.addresse,
+          cin: formValues.cin,
+          numerotel: formValues.numerotel,
+          role: "Personnel",
+        },
+        etat: "Candidat",
+      });
 
-        const Toast = Swal.mixin({
-          toast: true,
-          position: "top-end",
-          iconColor: "green",
-          customClass: {
-            popup: "colored-toast",
-          },
-          showConfirmButton: false,
-          timer: 2000,
-          timerProgressBar: true,
-        });
+      setFormValues({
+        nom: "",
+        username: "",
+        prenom: "",
+        email: "",
+        password: "",
+        cin: "",
+        addresse: "",
+        numerotel: "",
+        date_naissance: "",
+      });
 
-        Toast.fire({
-          icon: "success",
-          title: "Personnel ajouté avec succès !",
-        });
-      } catch (error) {
-        console.error("Failed to add personnel", error);
+      const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        iconColor: "green",
+        customClass: {
+          popup: "colored-toast",
+        },
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+      });
 
-        const Toast = Swal.mixin({
-          toast: true,
-          position: "top-end",
-          iconColor: "red",
-          customClass: {
-            popup: "colored-toast",
-          },
-          showConfirmButton: false,
-          timer: 2000,
-          timerProgressBar: true,
-        });
+      Toast.fire({
+        icon: "success",
+        title: "Superviseur ajouté avec succès !",
+      });
+    } catch (error) {
+      console.error("Failed to add personnel", error);
 
-        Toast.fire({
-          icon: "error",
-          title: "Une erreur est survenue lors de l'ajout du personnel.",
-        });
-      }
-    };
+      const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        iconColor: "red",
+        customClass: {
+          popup: "colored-toast",
+        },
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+      });
+
+      Toast.fire({
+        icon: "error",
+        title: "Une erreur est survenue lors de l'ajout du Superviseur.",
+      });
+    }
+  };
   return (
     <DefaultLayout importexport={false}>
       <div className="flex items-center justify-center bg-gradient-to-br">
         <div className="w-full max-w-20xl p-10 bg-white shadow-lg rounded-lg">
           <h1 className="text-2xl font-bold text-center text-blue-800 mb-8">
-            Ajouter Personnel 
+            Ajouter Superviseur NONE FUNCTIONAL
           </h1>
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -131,20 +131,20 @@ function PersonnelForm() {
                   required
                 />
               </div>
-                <div className="form-group">
-                    <label htmlFor="username" className="block text-gray-700">
-                    Username
-                    </label>
-                    <input
-                    type="text"
-                    className="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
-                    id="username"
-                    name="username"
-                    value={formValues.username}
-                    onChange={handleChange}
-                    required
-                    />
-                </div>
+              <div className="form-group">
+                <label htmlFor="username" className="block text-gray-700">
+                  Username
+                </label>
+                <input
+                  type="text"
+                  className="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
+                  id="username"
+                  name="username"
+                  value={formValues.username}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
               <div className="form-group">
                 <label htmlFor="email" className="block text-gray-700">
                   Email
@@ -236,7 +236,7 @@ function PersonnelForm() {
               className="bg-graydark mt-6 w-full py-3 dark:bg-gray-100 shadow-md flex items-center justify-center px-6 rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:bg-gray-700"
             >
               {" "}
-              <PlusIcon /> Ajouter Personnel
+              <PlusIcon /> Ajouter Superviseur
             </button>
           </form>
         </div>
@@ -245,4 +245,4 @@ function PersonnelForm() {
   );
 }
 
-export default PersonnelForm
+export default SupervisorForm;

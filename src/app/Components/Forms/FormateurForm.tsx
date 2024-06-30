@@ -1,105 +1,118 @@
-"use client"
+"use client";
 
-import React, { use } from 'react'
-import DefaultLayout from '../Layout/DefaultLayout';
-import { PlusIcon } from 'lucide-react';
-import Swal from 'sweetalert2';
-import { postWithAuth } from '@/utils/api';
+import React, { use } from "react";
+import DefaultLayout from "../Layout/DefaultLayout";
+import { PlusIcon, Type } from "lucide-react";
+import Swal from "sweetalert2";
+import { postWithAuth } from "@/utils/api";
 
-function PersonnelForm() {
-    const [formValues, setFormValues] = React.useState({
-      nom: "",
-      username: "",
-      prenom: "",
-      email: "",
-      password: "",
-      cin: "",
-      addresse: "",
-      numerotel: "",
-      date_naissance: "",
-    });
+function FormateurForm() {
+  const [formValues, setFormValues] = React.useState({
+    nom: "",
+    username: "",
+    prenom: "",
+    email: "",
+    password: "",
+    cin: "",
+    addresse: "",
+    numerotel: "",
+    date_naissance: "",
+    isAffecteur: false,
+    Type: "Pratique",
+  });
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const { name, value } = e.target;
-      setFormValues((prevState) => ({
-        ...prevState,
-        [name]: value,
-      }));
-    };
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      try {
-        await postWithAuth("/api/create_personnel/", {
-          agent: {
-            username: formValues.username,
-            email: formValues.email,
-            password: formValues.password,
-            prenom: formValues.prenom,
-            nom: formValues.nom,
-            date_naissance: formValues.date_naissance,
-            addresse: formValues.addresse,
-            cin: formValues.cin,
-            numerotel: formValues.numerotel,
-            role: "Personnel",
-          },
-          etat: "Candidat",
-        });
-        
-        setFormValues({
-          nom: "",
-          username: "",
-          prenom: "",
-          email: "",
-          password: "",
-          cin: "",
-          addresse: "",
-          numerotel: "",
-          date_naissance: "",
-        });
+const handleChange = (
+  e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+) => {
+  const { name, value, type } = e.target as HTMLInputElement;
 
-        const Toast = Swal.mixin({
-          toast: true,
-          position: "top-end",
-          iconColor: "green",
-          customClass: {
-            popup: "colored-toast",
-          },
-          showConfirmButton: false,
-          timer: 2000,
-          timerProgressBar: true,
-        });
+  // Handle different input types
+  //@ts-ignore
+  const updatedValue = type === "checkbox" ? e.target.checked : value;
 
-        Toast.fire({
-          icon: "success",
-          title: "Personnel ajouté avec succès !",
-        });
-      } catch (error) {
-        console.error("Failed to add personnel", error);
+  setFormValues((prevState) => ({
+    ...prevState,
+    [name]: updatedValue,
+  }));
+};
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    // console.log(formValues);
+    try {
+      await postWithAuth("/api/create-formateurs/", {
+        agent: {
+          username: formValues.username,
+          email: formValues.email,
+          password: formValues.password,
+          prenom: formValues.prenom,
+          nom: formValues.nom,
+          date_naissance: formValues.date_naissance,
+          addresse: formValues.addresse,
+          cin: formValues.cin,
+          numerotel: formValues.numerotel,
+          role: "Formateur",
+        },
+        isAffecteur: formValues.isAffecteur,
+        Type: formValues.Type,
+      });
 
-        const Toast = Swal.mixin({
-          toast: true,
-          position: "top-end",
-          iconColor: "red",
-          customClass: {
-            popup: "colored-toast",
-          },
-          showConfirmButton: false,
-          timer: 2000,
-          timerProgressBar: true,
-        });
+      setFormValues({
+        nom: "",
+        username: "",
+        prenom: "",
+        email: "",
+        password: "",
+        cin: "",
+        addresse: "",
+        numerotel: "",
+        date_naissance: "",
+        isAffecteur: false,
+        Type: "Pratique",
+      });
 
-        Toast.fire({
-          icon: "error",
-          title: "Une erreur est survenue lors de l'ajout du personnel.",
-        });
-      }
-    };
+      const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        iconColor: "green",
+        customClass: {
+          popup: "colored-toast",
+        },
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+      });
+
+      Toast.fire({
+        icon: "success",
+        title: "Formateur ajouté avec succès !",
+      });
+    } catch (error) {
+      console.error("Failed to add formateur", error);
+
+      const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        iconColor: "red",
+        customClass: {
+          popup: "colored-toast",
+        },
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+      });
+
+      Toast.fire({
+        icon: "error",
+        title: "Une erreur est survenue lors de l'ajout du formateur.",
+      });
+    }
+  };
   return (
     <DefaultLayout importexport={false}>
       <div className="flex items-center justify-center bg-gradient-to-br">
         <div className="w-full max-w-20xl p-10 bg-white shadow-lg rounded-lg">
           <h1 className="text-2xl font-bold text-center text-blue-800 mb-8">
-            Ajouter Personnel 
+            Ajouter Formateur
           </h1>
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -131,20 +144,20 @@ function PersonnelForm() {
                   required
                 />
               </div>
-                <div className="form-group">
-                    <label htmlFor="username" className="block text-gray-700">
-                    Username
-                    </label>
-                    <input
-                    type="text"
-                    className="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
-                    id="username"
-                    name="username"
-                    value={formValues.username}
-                    onChange={handleChange}
-                    required
-                    />
-                </div>
+              <div className="form-group">
+                <label htmlFor="username" className="block text-gray-700">
+                  Username
+                </label>
+                <input
+                  type="text"
+                  className="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
+                  id="username"
+                  name="username"
+                  value={formValues.username}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
               <div className="form-group">
                 <label htmlFor="email" className="block text-gray-700">
                   Email
@@ -230,6 +243,35 @@ function PersonnelForm() {
                   required
                 />
               </div>
+              <div className="form-group">
+                <label htmlFor="addresse" className="block text-gray-700">
+                  Type
+                </label>
+                <select
+                  className="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
+                  id="Type"
+                  name="Type"
+                  value={formValues.Type}
+                  onChange={(e: any) => handleChange(e)}
+                  required
+                >
+                  <option value="Pratique">Pratique</option>
+                  <option value="Theorique">Theorique</option>
+                </select>
+              </div>
+              <div>
+                <label htmlFor="isAffecteur" className="ml-2 text-gray-700">
+                  Affecteur
+                </label>
+                <input
+                  type="checkbox"
+                  className=" block w-1/12 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
+                  id="isAffecteur"
+                  name="isAffecteur"
+                  checked={formValues.isAffecteur}
+                  onChange={(e) => handleChange(e)}
+                />
+              </div>
             </div>
             <button
               type="submit"
@@ -245,4 +287,4 @@ function PersonnelForm() {
   );
 }
 
-export default PersonnelForm
+export default FormateurForm;

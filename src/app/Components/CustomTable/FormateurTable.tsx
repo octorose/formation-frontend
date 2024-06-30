@@ -1,0 +1,467 @@
+import React, { useEffect, useState } from "react";
+import ResponsivePagination from "react-responsive-pagination";
+import "@/css/pagination.css";
+
+import useAlert from "@/Hooks/useAlert";
+import Modal from "@/Components/GlobalModal/Modal";
+import { EditIcon, TrashIcon } from "lucide-react";
+import Loader from "@/Components/Loaders/Loader";
+import Swal from "sweetalert2";
+import { refreshToken } from "@/utils/RefreshToken";
+import PhaseRenderer from "../phaserenderer/PhaseRenderer";
+import { deleteWithAuth, fetchWithAuth, putWithAuth } from "@/utils/api";
+
+interface Agent {
+  address: string;
+  cin: string;
+  date_joined: string;
+  date_naissance: string;
+  email: string;
+  first_name: string;
+  groups: any[];
+  id: number;
+  is_active: boolean;
+  is_staff: boolean;
+  is_superuser: boolean;
+  last_login: string;
+  last_name: string;
+  nom: string;
+  numertel: string;
+  prenom: string;
+  role: string;
+  temporary_session: boolean;
+  user_permissions: any[];
+  username: string | null;
+}
+
+interface FormateurData {
+  agent: Agent;
+  isAffecteur: boolean;
+  id: number;
+  Type : string;
+}
+
+interface TableHeaderProps {
+  header: string;
+  index: number;
+  totalHeaders: number;
+}
+
+const TableHeader: React.FC<TableHeaderProps> = ({
+  header,
+  index,
+  totalHeaders,
+}) => {
+  const isFirst = index === 0;
+  const isLast = index === totalHeaders - 1;
+
+  const classNames = `py-3.5 pl-4 pr-3 text-center text-white dark:text-black font-medium text-lg bg-black dark:bg-white text-neutral-500
+  ${isFirst ? "rounded-tl-xl" : ""}
+  ${isLast ? "rounded-tr-xl" : ""}`;
+
+  return <th className={classNames}>{header}</th>;
+};
+
+function FormateursTable({
+  headers,
+  searchResults,
+}: {
+  headers: string[];
+  searchResults: any;
+}) {
+  const perpage = 5;
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [editMode, setEditMode] = useState(Array(15).fill(false));
+  const [data2, setData] = useState<FormateurData[]>();
+  const [FormateurNameToDelete, setFormateurNameToDelete] = useState();
+  const [FormateurtoEdit, setFormateurtoEdit] = useState({} as any);
+  let fetched: any;
+  const totalPages = Math.ceil((data2 as any)?.count / perpage);
+  const { alert, setAlert } = useAlert();
+  const { alert: alert2, setAlert: setAlert2 } = useAlert();
+  const handleEdit = (index: any) => {
+    const updatedEditMode = [...editMode];
+    if (updatedEditMode[index]) {
+      updatedEditMode[index] = false;
+    } else {
+      updatedEditMode[index] = true;
+    }
+    setEditMode(updatedEditMode);
+  };
+  const Toast = Swal.mixin({
+    toast: true,
+    position: "top-end",
+    iconColor: "orange",
+    customClass: {
+      popup: "colored-toast",
+    },
+    showConfirmButton: false,
+    timer: 2000,
+    timerProgressBar: true,
+  });
+
+  const DeleteFormateur = async (Formateur: any) => {
+    //@ts-ignore
+    if (FormateurNameToDelete?.Nom === Formateur.agent.nom) {
+      try {
+        const response = await deleteWithAuth(
+          `/api/delete-formateurs/${Formateur.id}/`
+        );
+        if (!response.ok) {
+          throw new Error("Failed to delete Formateur");
+        }
+        // const data = await response.json();
+        fetchData();
+        setAlert2((prev) => ({ ...prev, isOpen: false }));
+      } catch (error) {
+        console.error(error);
+      }
+    } else {
+      Toast.fire({
+        icon: "error",
+        title: "Invalid Formateur name",
+      });
+    }
+  };
+
+  const handleDeleteInputChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    key: string
+  ) => {
+    setFormateurNameToDelete((prevFormateurNameToDelete: any) => ({
+      ...prevFormateurNameToDelete,
+      [key]: event.target.value,
+    }));
+  };
+
+  const fetchData = async () => {
+    try {
+      setIsLoading(true);
+      const fetchedData = await fetchWithAuth(
+        `/api/formateurs/?page=${currentPage}`
+      );
+      setData(fetchedData);
+      console.log(fetchedData);
+      
+      setIsLoading(false);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  function formatDate(dateString: string) {
+    const date = new Date(dateString);
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const year = date.getFullYear().toString().slice(-2);
+    return `${day}/${month}/${year}`;
+  }
+  const updateFormateur = async (Formateur: any) => {
+    console.log(Formateur);
+    try {
+      const response = await putWithAuth(
+        `/api/update-formateurs/${Formateur.id}/`,
+        Formateur
+      );
+      fetchData();
+
+      // const data = await response.json();
+      setAlert((prev) => ({ ...prev, isOpen: false }));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetched = fetchData();
+  }, [currentPage]);
+  const PersonalInfo = {
+    nom: FormateurtoEdit?.agent?.nom,
+    prenom: FormateurtoEdit?.agent?.prenom,
+    cin: FormateurtoEdit?.agent?.cin,
+    date_naissance: FormateurtoEdit?.agent?.date_naissance,
+    // date_joined: FormateurtoEdit?.agent?.date_joined,
+    etat: FormateurtoEdit?.etat,
+  };
+
+  return (
+    <div className="w-full">
+      {!isLoading ? (
+        <div>
+          <div className=" flex justify-center">
+            <table className="w-9/12 ">
+              <thead className="rounded-t-xl   rounded-b-xl">
+                <tr
+                  className="rounded-lg h-12 flex-shrink-0 bg-ft-gray-dark-blue rounded-t-xl rounded-b-xl"
+                  onClick={() => {
+                    // console.log(data2);
+                  }}
+                >
+                  {headers?.map((header, index) => (
+                    <TableHeader
+                      key={index}
+                      header={header}
+                      index={index}
+                      totalHeaders={headers.length}
+                    />
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {searchResults !== undefined && searchResults.length > 0 ? (
+                  //@ts-ignore
+                  searchResults?.map((item: any) => (
+                    <tr
+                      key={item.id}
+                      className=" p-2 py-5 text-center rounded-t-lg rounded-b-lg border-b-2 text-base  cursor-pointer text-neutral-900"
+                    >
+                      <td
+                        className=""
+                        onClick={() => {
+                          // console.log(item);
+                          setAlert((prev) => ({ ...prev, isOpen: true }));
+                          setFormateurtoEdit(item);
+                        }}
+                      >
+                        {item.agent["nom"]}
+                      </td>
+                      <td
+                        className=""
+                        onClick={() => {
+                          // console.log(item);
+                          setAlert((prev) => ({ ...prev, isOpen: true }));
+                          setFormateurtoEdit(item);
+                        }}
+                      >
+                        {item.agent["prenom"]}
+                      </td>
+                      <td
+                        className=""
+                        onClick={() => {
+                          // console.log(item);
+                          setAlert((prev) => ({ ...prev, isOpen: true }));
+                          setFormateurtoEdit(item);
+                        }}
+                      >
+                        {item.agent["cin"]}
+                      </td>
+                      <td
+                        className=""
+                        onClick={() => {
+                          // console.log(item);
+                          setAlert((prev) => ({ ...prev, isOpen: true }));
+                          setFormateurtoEdit(item);
+                        }}
+                      >
+                        {item.agent["numerotel"]}
+                      </td>
+                      <td
+                        className=""
+                        onClick={() => {
+                          // console.log(item);
+                          setAlert((prev) => ({ ...prev, isOpen: true }));
+                          setFormateurtoEdit(item);
+                        }}
+                      >
+                        {formatDate(item["Type"])}
+                      </td>
+                      <td
+                        className=""
+                        onClick={() => {
+                          // console.log(item);
+                          setAlert((prev) => ({ ...prev, isOpen: true }));
+                          setFormateurtoEdit(item);
+                        }}
+                      >
+                        {formatDate(item.agent["date_joined"])}
+                      </td>
+                      <td
+                        className=""
+                        onClick={() => {
+                          // console.log(item);
+                          setAlert((prev) => ({ ...prev, isOpen: true }));
+                          setFormateurtoEdit(item);
+                        }}
+                      >
+                        {item.etat}
+                      </td>
+
+                      <button
+                        onClick={() => {
+                          setFormateurtoEdit(item);
+                          setAlert2((prev) => ({ ...prev, isOpen: true }));
+                        }}
+                      >
+                        <TrashIcon
+                          size={20}
+                          className="w-4 h-4 text-red-500 cursor-pointer hover:animate-bounce "
+                        />
+                      </button>
+                    </tr>
+                  ))
+                ) : (
+                  <>
+                    {data2 &&
+                      //@ts-ignore
+                      data2?.results?.map((item: any) => (
+                        <tr
+                          key={item.id}
+                          className=" text-center rounded-t-lg rounded-b-lg border-b-2 text-lg  cursor-pointer text-neutral-900"
+                        >
+                          <td
+                            className=""
+                            onClick={() => {
+                              // console.log(item);
+                              setAlert((prev) => ({ ...prev, isOpen: true }));
+                              setFormateurtoEdit(item);
+                            }}
+                          >
+                            {item.agent["nom"]}
+                          </td>
+                          <td
+                            className=""
+                            onClick={() => {
+                              // console.log(item);
+                              setAlert((prev) => ({ ...prev, isOpen: true }));
+                              setFormateurtoEdit(item);
+                            }}
+                          >
+                            {item.agent["prenom"]}
+                          </td>
+                          <td
+                            className=""
+                            onClick={() => {
+                              // console.log(item);
+                              setAlert((prev) => ({ ...prev, isOpen: true }));
+                              setFormateurtoEdit(item);
+                            }}
+                          >
+                            {item.agent["cin"]}
+                          </td>
+                          <td
+                            className=""
+                            onClick={() => {
+                              setAlert((prev) => ({ ...prev, isOpen: true }));
+                              setFormateurtoEdit(item);
+                            }}
+                          >
+                            {item.agent["numerotel"]}
+                          </td>
+                          <td
+                            className=""
+                            onClick={() => {
+                              // console.log(item);
+                              setAlert((prev) => ({ ...prev, isOpen: true }));
+                              setFormateurtoEdit(item);
+                            }}
+                          >
+                            {item.Type}
+                          </td>
+                          <td
+                            className=""
+                            onClick={() => {
+                              // console.log(item);
+                              setAlert((prev) => ({ ...prev, isOpen: true }));
+                              setFormateurtoEdit(item);
+                            }}
+                          >
+                            {
+                                item.isAffecteur?<p className="text-green-600">Oui</p>:<p className="text-red-600">Non</p>
+                            }
+                          </td>
+
+
+                          <button
+                            onClick={() => {
+                              setFormateurtoEdit(item);
+                              setAlert2((prev) => ({ ...prev, isOpen: true }));
+                            }}
+                          >
+                            <TrashIcon
+                              size={20}
+                              className="w-4 h-4 text-red-500 cursor-pointer hover:animate-bounce "
+                            />
+                          </button>
+                        </tr>
+                      ))}
+                  </>
+                )}
+              </tbody>
+            </table>
+          </div>
+          <ResponsivePagination
+            current={currentPage}
+            total={totalPages}
+            onPageChange={(newPage) => setCurrentPage(newPage)}
+          />
+        </div>
+      ) : (
+        <Loader />
+      )}
+      <Modal
+        isOpen={alert.isOpen}
+        onSubmit={() => {
+          // console.log(FormateurtoEdit);
+
+          updateFormateur(FormateurtoEdit);
+        }}
+        onCancel={() => {
+          setAlert((prev) => ({ ...prev, isOpen: false }));
+        }}
+        alertTitle={
+          "Edit " + FormateurtoEdit?.agent?.nom + " Details" ||
+          "Formateur" + "Details"
+        }
+        alertDescription={"Edit "}
+        submitBtnName={"Submit"}
+        cancelBtnName="Cancel"
+        type="success"
+        onClose={() => {
+          setAlert((prev) => ({ ...prev, isOpen: false }));
+        }}
+      >
+        <PhaseRenderer
+          fields={PersonalInfo}
+          editMode={editMode}
+          handleEdit={handleEdit}
+          FormateurtoEdit={FormateurtoEdit}
+          setFormateurtoEdit={setFormateurtoEdit}
+        />
+      </Modal>
+      <Modal
+        isOpen={alert2.isOpen}
+        onSubmit={() => DeleteFormateur(FormateurtoEdit)}
+        onCancel={() => {
+          setAlert2((prev) => ({ ...prev, isOpen: false }));
+        }}
+        alertTitle={"Delete Formateur"}
+        alertDescription={
+          `If You are sure type the Formateurs Name "` +
+          FormateurtoEdit?.agent?.nom +
+          `" to confirm your request`
+        }
+        submitBtnName={"Delete"}
+        cancelBtnName="Cancel"
+        type="error"
+        onClose={() => {
+          setAlert2((prev) => ({ ...prev, isOpen: false }));
+        }}
+      >
+        <div className="grid grid-cols-2 gap-5 p-4">
+          <div className="text-slate-900">
+            <div>
+              <h2 className="font-semibold">Name</h2>
+              <input
+                type="text"
+                onChange={(event) => handleDeleteInputChange(event, "Nom")}
+                className="w-full p-2 border border-neutral-200 rounded-lg"
+              />
+            </div>
+          </div>
+        </div>
+      </Modal>
+    </div>
+  );
+}
+
+export default FormateursTable;
