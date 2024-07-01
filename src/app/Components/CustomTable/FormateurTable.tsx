@@ -108,9 +108,6 @@ function FormateursTable({
         const response = await deleteWithAuth(
           `/api/delete-formateurs/${Formateur.id}/`
         );
-        if (!response.ok) {
-          throw new Error("Failed to delete Formateur");
-        }
         // const data = await response.json();
         fetchData();
         setAlert2((prev) => ({ ...prev, isOpen: false }));
@@ -179,9 +176,9 @@ function FormateursTable({
     nom: FormateurtoEdit?.agent?.nom,
     prenom: FormateurtoEdit?.agent?.prenom,
     cin: FormateurtoEdit?.agent?.cin,
-    date_naissance: FormateurtoEdit?.agent?.date_naissance,
+    Type: FormateurtoEdit?.Type,
     // date_joined: FormateurtoEdit?.agent?.date_joined,
-    etat: FormateurtoEdit?.etat,
+    isAffecteur: FormateurtoEdit?.isAffecteur,
   };
 
   return (
@@ -313,7 +310,10 @@ function FormateursTable({
                             onClick={() => {
                               // console.log(item);
                               setAlert((prev) => ({ ...prev, isOpen: true }));
+
                               setFormateurtoEdit(item);
+                              console.log(FormateurtoEdit);
+                              
                             }}
                           >
                             {item.agent["nom"]}
@@ -365,11 +365,12 @@ function FormateursTable({
                               setFormateurtoEdit(item);
                             }}
                           >
-                            {
-                                item.isAffecteur?<p className="text-green-600">Oui</p>:<p className="text-red-600">Non</p>
-                            }
+                            {item.isAffecteur ? (
+                              <p className="text-green-600">Oui</p>
+                            ) : (
+                              <p className="text-red-600">Non</p>
+                            )}
                           </td>
-
 
                           <button
                             onClick={() => {
@@ -424,8 +425,8 @@ function FormateursTable({
           fields={PersonalInfo}
           editMode={editMode}
           handleEdit={handleEdit}
-          FormateurtoEdit={FormateurtoEdit}
-          setFormateurtoEdit={setFormateurtoEdit}
+          CandidatetoEdit={FormateurtoEdit}
+          setCandidatetoEdit={setFormateurtoEdit}
         />
       </Modal>
       <Modal
