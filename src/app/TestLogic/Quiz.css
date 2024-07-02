@@ -1,50 +1,87 @@
 .container {
-    width: 870px;
+    width: 100%;
+    max-width: 900px;
     margin: auto;
-    margin-top: 150px;
-    background: white;
-    color: #0d084d;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    border-radius: 10px;
-    padding: 40px 50px;
+    margin-top: 100px;
+    background: #f8f9fa;
+    color: #333;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .container hr {
-    height: 5px;
+    height: 3px;
     border: none;
-    background: #ee5108;
+    background: #007bff;
+    margin: 20px 0;
 }
 
 .container h2 {
-    font-size: 20px;
-    font-weight: 550;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 15px;
 }
 
 .container ul li {
-    display: flex;
-    align-items: center;
-    height: 25px;
-    padding-left: 10px;
-    border: 1px solid  #080350;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    font-size: px;
+    list-style-type: none;
+    padding: 12px 20px;
+    margin-bottom: 10px;
+    border-radius: 6px;
     cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.container ul li:hover {
+    background-color: #f0f0f0;
+}
+
+.container p {
+    margin-bottom: 10px;
+    line-height: 1.6;
 }
 
 .container button {
-    margin: auto;
-    width: 150px;
-    height: 55px;
-    background: #110636;
+    padding: 10px 20px;
+    background-color: #28a745;
     color: #fff;
-    font-size: 22px;
-    font-weight: 500;
-    border-radius: 8px;
+    border: none;
+    border-radius: 5px;
     cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
 }
+
+.container button:hover {
+    background-color: #218838;
+}
+
+.container .error-message {
+    color: #dc3545;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.container button {
+    margin: 20px auto; /* Ajouter de l'espace en haut et en bas */
+    width: 200px; /* Largeur modifiée */
+    height: 60px; /* Hauteur modifiée */
+    background: #052f58; /* Couleur de fond modifiée */
+    color: #ecf0f1; /* Couleur du texte modifiée */
+    font-size: 20px; /* Taille de la police modifiée */
+    font-weight: 600; /* Poids de la police modifié */
+    border-radius: 10px; /* Bordures arrondies modifiées */
+    border: 2px solid #ee940d; /* Ajouter une bordure */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Ajouter une ombre */
+    cursor: pointer;
+    transition: background 0.3s ease; /* Ajouter une transition pour l'effet de survol */
+}
+
+.container button:hover {
+    background: #34495e; /* Couleur de fond au survol */
+}
+
 
 .index {
     margin: auto;
@@ -117,15 +154,23 @@
 }
 .quiz-options li {
     cursor: pointer;
-    padding: 10px;
-    margin: 5px 0;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    padding: 15px; /* Augmenter le padding */
+    margin: 10px 0; /* Augmenter la marge entre les éléments */
+    border: 2px solid #ccc; /* Augmenter l'épaisseur de la bordure */
+    border-radius: 8px; /* Augmenter les bordures arrondies */
+    font-size: 18px; /* Augmenter la taille de la police */
+    transition: background-color 0.3s ease, border-color 0.3s ease; /* Ajouter une transition pour l'effet de survol */
+}
+
+.quiz-options li:hover {
+    border-color: #999; /* Changer la couleur de la bordure au survol */
+    background-color: #f9f9f9; /* Changer la couleur de fond au survol */
 }
 
 .quiz-options li.selected {
-    border: 2px solid blue; /* Change the border color as needed */
-    background-color: #f0f8ff; /* Optional: change background color for more emphasis */
+    border: 3px solid blue; /* Augmenter l'épaisseur de la bordure */
+    background-color: #e0f7ff; /* Changer la couleur de fond */
+    font-weight: bold; /* Rendre le texte en gras */
 }
 
 .error-message {
@@ -135,11 +180,18 @@
 }
 .quiz-options li {
     cursor: pointer;
-}
-
-.quiz-options .selected {
-    border: 1px solid blue; /* ou une autre couleur de votre choix */
-}
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .quiz-options li.selected {
+    border: 2px solid blue; /* Bordure plus épaisse pour l'option sélectionnée */
+    background-color: #f0f8ff; /* Couleur de fond pour l'option sélectionnée */
+    font-weight: bold; /* Texte en gras pour l'option sélectionnée */
+  }
+  
 .image-container {
     display: flex;
     justify-content: center;
@@ -154,19 +206,90 @@
 }
 
 .checkbox-grid {
-    display: flex;
-    flex-wrap: wrap; /* Permet de passer à la ligne si nécessaire */
+  display: flex;
+  flex-wrap: wrap; /* Permet de passer à la ligne si nécessaire */
+  margin-top: 20px; /* Marge supérieure entre les lignes de cases à cocher */
 }
 
 .checkbox-label {
-    margin-right: 20px; /* Espacement entre les cases à cocher */
+  margin-right: 15px; /* Espacement entre les cases à cocher */
+  margin-bottom: 10px; /* Espacement entre les lignes de cases à cocher */
 }
 
 .checkbox-input {
-    width: 20px; /* Largeur de la case à cocher */
-    height: 20px; /* Hauteur de la case à cocher */
-    /* Autres styles personnalisés */
+  width: 22px; /* Largeur de la case à cocher */
+  height: 22px; /* Hauteur de la case à cocher */
+  appearance: none; /* Supprime les styles par défaut des cases à cocher */
+  border: 2px solid #ccc; /* Bordure de la case à cocher */
+  border-radius: 4px; /* Coins arrondis de la case à cocher */
+  cursor: pointer; /* Curseur pointer au survol */
+  transition: background-color 0.3s, border-color 0.3s; /* Transition douce pour les effets */
 }
+
+.checkbox-input:checked {
+  background-color: #6c5ce7; /* Couleur de fond lorsque la case est cochée */
+  border-color: #6c5ce7; /* Couleur de la bordure lorsque la case est cochée */
+}
+
+.checkbox-input:focus {
+  outline: none; /* Supprime l'effet d'outline par défaut */
+  box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.3); /* Ombre légère au focus */
+}
+
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px; /* Ajoutez de l'espace au-dessus du bouton si nécessaire */
+  }
+  .language-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 12px 24px;
+    border-radius: 30px;
+    background-color: #6c5ce7; /* Couleur initiale */
+    color: #ffffff;
+    width: 160px;
+    text-align: center;
+    font-weight: bold;
+    box-shadow: 0 5px 20px rgba(108, 92, 231, 0.5);
+    transition: background-color 0.4s ease, box-shadow 0.4s ease, transform 0.3s ease;
+  }
+  
+  .language-toggle:hover {
+    background-color: #5a4dcf; /* Couleur au survol */
+    box-shadow: 0 8px 25px rgba(108, 92, 231, 0.75);
+    transform: scale(1.1);
+  }
+  
+  .language-toggle.fr {
+    background-color: #0984e3; /* Couleur pour le français */
+    box-shadow: 0 5px 20px rgba(9, 132, 227, 0.5);
+  }
+  
+  .language-toggle.fr:hover {
+    background-color: #0777c4; /* Couleur au survol pour le français */
+    box-shadow: 0 8px 25px rgba(9, 132, 227, 0.75);
+    transform: scale(1.1);
+  }
+  
+  .language-toggle.ar {
+    background-color: #00b894; /* Couleur pour l'arabe */
+    box-shadow: 0 5px 20px rgba(0, 184, 148, 0.5);
+  }
+  
+  .language-toggle.ar:hover {
+    background-color: #009973; /* Couleur au survol pour l'arabe */
+    box-shadow: 0 8px 25px rgba(0, 184, 148, 0.75);
+    transform: scale(1.1);
+  }
+  
+  
+  
+  
+  
 
 
 

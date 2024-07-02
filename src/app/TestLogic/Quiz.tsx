@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { data } from "@/utils/data";
 import "./Quiz.css";
 import { FaRegClock } from "react-icons/fa";
+import { FaLanguage } from "react-icons/fa";
 import image2 from "@/images/Qst22.png";
 import image3 from "@/images/qst33.png";
 import image4 from "@/images/qst44.png";
@@ -24,17 +25,27 @@ const Quiz = () => {
   const [checkedBoxes, setCheckedBoxes] = useState([0]);
   const [lock, setLock] = useState(false);
   const [score, setScore] = useState(() => {
-    const savedScore = localStorage.getItem('quizScore');
+  const savedScore = localStorage.getItem('quizScore');
     return savedScore !== null ? parseInt(savedScore, 10) : 0;
   });
   const [result, setResult] = useState(false);
   const [height, setHeight] = useState("");
   const [raison, setRaison] = useState("");
+  const [objectif, setObjectif] = useState("");
   const [timeLeft, setTimeLeft] = useState(60);
   const [errorMessage, setErrorMessage] = useState("");
   const [answerSelected, setAnswerSelected] = useState(false);
   const [selectedOptionIndex, setSelectedOptionIndex] = useState<null | number>(null);
   const [userAnswers, setUserAnswers] = useState([]);
+  const [language, setLanguage] = useState('fr'); // Ajout de l'état pour la langue
+
+  
+  const questions = language === 'fr' ? data.fr : data.ar;
+  const toggleLanguage = () => {
+    // Fonction pour changer la langue
+    setLanguage(language === 'fr' ? 'ar' : 'fr'); // Inverse entre 'fr' et 'ar'
+  };
+  
 
 
   useEffect(() => {
@@ -45,7 +56,7 @@ const Quiz = () => {
 
   useEffect(() => {
     // Gérer le déroulement du quiz et la fin du quiz
-    if (index === data.length) {
+    if (index === questions.length) {
       setResult(true);
     } else {
       setErrorMessage(""); // Réinitialiser le message d'erreur si on affiche une nouvelle question
@@ -74,7 +85,7 @@ const Quiz = () => {
       setAnswerSelected(true);
 
       
-      if (selectedOptionIndex === data[index].ans) {
+      if (selectedOptionIndex === questions[index].ans) {
         setScore((prevScore) => prevScore + 1);
       }
       setLock(true);
@@ -83,30 +94,34 @@ const Quiz = () => {
   };
 
   const next = () => {
-    // Vérifier si la question actuelle nécessite une réponse
-    if (index === 30 && raison.trim() === "") {
+    // Vérifier si la question actuelle nécessite une réponse textuelle (questions 30 et 31)
+    if ((index === 30 && raison.trim() === "") || (index === 31 && objectif.trim() === "")) {
         setErrorMessage('Veuillez entrer une réponse');
         return;
     }
-    if (index === 31 && raison.trim() === "") {
-      setErrorMessage('Veuillez entrer une réponse');
-      return;
-  }
+
+    // Vérifier si une réponse est sélectionnée pour toutes les autres questions sauf 30 et 31
+    if (!answerSelected && questions[index].ans !== -1 && index < questions.length - 1 && index !== 30 && index !== 31) {
+        setErrorMessage('Veuillez choisir une réponse');
+        return;
+    }
 
     // Si ce n'est pas la dernière question, passer à la question suivante
-    if (index < data.length - 1) {
+    if (index < questions.length - 1) {
         setIndex(index + 1);
-        setTimeLeft(60); // Réinitialiser le temps
+        setTimeLeft(20); // Réinitialiser le temps
         setAnswerSelected(false); // Réinitialiser l'état de la réponse sélectionnée
         setHeight(""); // Réinitialiser l'état de la réponse texte si nécessaire
         setRaison(""); // Réinitialiser l'état de la réponse textuelle
-        setLock(false); // Assurez-vous que `lock` est réinitialisé si nécessaire
+        setObjectif(""); // Réinitialiser l'état de la réponse textuelle
+        setLock(false); // Assurez que `lock` est réinitialisé si nécessaire
         setErrorMessage(''); // Effacer le message d'erreur
     } else {
         // Si c'est la dernière question, afficher le résultat
         setResult(true);
     }
 };
+
 
 
 
@@ -139,6 +154,21 @@ const Quiz = () => {
     setErrorMessage("Veuillez repondre"); // Efface tout message d'erreur précédent
 };
 
+const handleObjectifChange = (e:any) => {
+  const value = e.target.value;
+  setObjectif(value); // Met à jour la valeur dans le state
+  setErrorMessage("Veuillez repondre"); // Efface tout message d'erreur précédent
+};
+
+const changeLanguage = (lang: string) => {
+  setLanguage(lang);
+  setIndex(0);
+  setScore(0);
+  setResult(false);
+  setTimeLeft(60);
+  setErrorMessage("");
+};
+
 
   const toggleCheckbox = (index: number) => {
     if (checkedBoxes.includes(index)) {
@@ -151,19 +181,22 @@ const Quiz = () => {
   return (
     <div className="container">
       <h1>Test Logique</h1>
+      <div className={`language-toggle ${language === 'fr' ? 'fr' : 'ar'}`} onClick={toggleLanguage}>
+        <span>{language.toUpperCase()}</span> {/* Affichage de la langue sélectionnée */}
+      </div>
       <hr />
       {errorMessage && <div className="error-message">{errorMessage}</div>}
       {result ? (
         <>
           <h2>
-            You Scored {score} / {data.length}
+            You Scored {score} / {questions.length}
           </h2>
           <button onClick={reset}>Reset</button>
         </>
       ) : (
         <>
           <h2>
-            {index + 1}. {data[index].question}
+            {index + 1}. {questions[index].question}
           </h2>
           <div className="timer-box">
             <div className="timer-container">
@@ -926,56 +959,82 @@ const Quiz = () => {
           )}
           {index === 30 && (
             <div className="question-container">
-              <textarea
-                rows={4}
-                cols={50}
-                value={raison}
-                onChange={handleRaisonChange}
-                placeholder="Entrez votre réponse ici..."
-                style={{
-                  padding: "10px",
-                  fontSize: "16px",
-                  border: "1px solid #ccc",
-                  borderRadius: "5px",
-                  marginBottom: "10px",
-                }}
-              />
+            <textarea
+              rows={8} // Augmentez le nombre de lignes pour agrandir la zone de texte
+              cols={60} // Augmentez le nombre de colonnes pour agrandir la zone de texte
+              value={raison}
+              onChange={handleRaisonChange}
+              placeholder="Entrez votre réponse ici..."
+              style={{
+                padding: "15px", // Augmentez le padding pour plus d'espace intérieur
+                fontSize: "18px", // Augmentez la taille de la police pour une meilleure lisibilité
+                border: "1px solid #ccc",
+                borderRadius: "5px",
+                marginBottom: "20px", // Augmentez la marge inférieure pour plus d'espace
+              }}
+            />
+            <br></br>
+            <div style={{ display: "flex", justifyContent: "center" }}>
               <button
                 onClick={() => {
                   next();
                   console.log("hh");
                 }}
+                style={{
+                  width: "150px", // Ajustez la largeur du bouton si nécessaire
+                  height: "45px", // Ajustez la hauteur du bouton si nécessaire
+                  background: "#110636",
+                  color: "#fff",
+                  fontSize: "18px", // Ajustez la taille de la police du bouton si nécessaire
+                  fontWeight: "500",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                }}
               >
                 Next
               </button>
             </div>
+          </div>
+          
           )}
           {index === 31 && (
             <div className="question-container">
-              <textarea
-                rows={4}
-                cols={50}
-                value={raison}
-                onChange={handleRaisonChange}
-                placeholder="Entrez votre réponse ici..."
-                style={{
-                  padding: "10px",
-                  fontSize: "16px",
-                  border: "1px solid #ccc",
-                  borderRadius: "5px",
-                  marginBottom: "10px",
-                }}
-                
-              />
+            <textarea
+              rows={8} // Augmentez le nombre de lignes pour agrandir la zone de texte
+              cols={60} // Augmentez le nombre de colonnes pour agrandir la zone de texte
+              value={objectif}
+              onChange={handleObjectifChange}
+              placeholder="Entrez votre réponse ici..."
+              style={{
+                padding: "15px", // Augmentez le padding pour plus d'espace intérieur
+                fontSize: "18px", // Augmentez la taille de la police pour une meilleure lisibilité
+                border: "1px solid #ccc",
+                borderRadius: "5px",
+                marginBottom: "20px", // Augmentez la marge inférieure pour plus d'espace
+              }}
+            />
+            <br></br>
+            <div style={{ display: "flex", justifyContent: "center" }}>
               <button
                 onClick={() => {
                   next();
                   console.log("hh");
                 }}
+                style={{
+                  width: "150px", 
+                  height: "45px",
+                  background: "#110636",
+                  color: "#fff",
+                  fontSize: "18px", 
+                  fontWeight: "500",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                }}
               >
                 Next
               </button>
             </div>
+          </div>
           )}
 
           {index === 32 && (
@@ -999,7 +1058,7 @@ const Quiz = () => {
             </div>
           )}
 
-          {data[index].ans === -1 ? (
+          {questions[index].ans === -1 ? (
             <div className="quiz-input-container">
               <input
                 type="text"
@@ -1030,38 +1089,38 @@ const Quiz = () => {
                 Next
               </button>
             </div>
-          ) : data[index].id >= 30 ? (<></>) :(
+          ) : questions[index].id >= 30 ? (<></>) :(
             <div>
               <ul className="quiz-options">
                 <li
-                  className={selectedOptionIndex === 0 ? "selected" : ""}
+                  className={selectedOptionIndex === 0 ? "" : ""}
                   onClick={() => checkAns(0)}
                 >
-                  {data[index].option1}
+                  {questions[index].option1}
                 </li>
                 <li
-                  className={selectedOptionIndex === 1 ? "selected" : ""}
+                  className={selectedOptionIndex === 1 ? "" : ""}
                   onClick={() => checkAns(1)}
                 >
-                  {data[index].option2}
+                  {questions[index].option2}
                 </li>
                 <li
-                  className={selectedOptionIndex === 2 ? "selected" : ""}
+                  className={selectedOptionIndex === 2 ? "" : ""}
                   onClick={() => checkAns(2)}
                 >
-                  {data[index].option3}
+                  {questions[index].option3}
                 </li>
                 <li
-                  className={selectedOptionIndex === 3 ? "selected" : ""}
+                  className={selectedOptionIndex === 3 ? "" : ""}
                   onClick={() => checkAns(3)}
                 >
-                  {data[index].option4}
+                  {questions[index].option4}
                 </li>
                 <li
-                  className={selectedOptionIndex === 4 ? "selected" : ""}
+                  className={selectedOptionIndex === 4 ? "" : ""}
                   onClick={() => checkAns(4)}
                 >
-                  {data[index].option5}
+                  {questions[index].option5}
                 </li>
               </ul>
               
@@ -1074,7 +1133,7 @@ const Quiz = () => {
             </div>
           )}
           <div className="index">
-            {index + 1} of {data.length} questions
+            {index + 1} of {questions.length} questions
           </div>
         </>
       )}
