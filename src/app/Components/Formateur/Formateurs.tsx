@@ -10,7 +10,9 @@ import Loader from "@/Components/Loaders/Loader";
 import DataCard from "../3DCard/DataCard";
 import SearchComponent from "../SearchComponent/Search";
 import GlobalButton from "../globalButton/globalButton";
-function Candidats() {
+import { fetchWithAuth } from "@/utils/api";
+import FormateursTable from "../CustomTable/FormateurTable";
+function Formateur() {
   interface PersonnelType {
     candidat: number;
     formation: number;
@@ -26,53 +28,9 @@ function Candidats() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:8000/api/personnel-count-by-month/",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-            },
-          }
-        );
-        if (!response.ok) {
-          if (response.status === 401) {
-            // Token expired, try to refresh token
-            const refreshResponse = await refreshToken(
-              localStorage.getItem("refresh_token")
-            );
-            if (refreshResponse.ok) {
-              // If refresh successful, retry original request
-              localStorage.setItem("access_token", refreshResponse.access);
-              //@ts-ignore
-
-              const retryResponse = await fetch(
-                `http://localhost:8000/api/personnel-count-by-month/`,
-                {
-                  headers: {
-                    Authorization: `Bearer ${localStorage.getItem(
-                      "access_token"
-                    )}`,
-                  },
-                }
-              );
-              if (retryResponse.ok) {
-                const fetchedData = await retryResponse.json();
-                setPersonnelData(fetchedData);
-              } else {
-                throw new Error("Failed to fetch data after token refresh");
-              }
-            } else {
-              throw new Error("Failed to refresh token");
-            }
-          } else {
-            throw new Error("Failed to fetch data");
-          }
-        } else {
-          const fetchedData = await response.json();
-          setPersonnelData(fetchedData);
-        }
+        const response = await fetchWithAuth("/api/formateurs/");
+        const fetchedData = await response.json();
+        setPersonnelData(fetchedData);
       } catch (error) {
         console.error(error);
       }
@@ -111,32 +69,30 @@ function Candidats() {
     setError(error);
   };
 
-
   return (
     <div>
       <div className="w-full  overflow-hidden   rounded-2xl p-10 text-xl md:text-4xl font-bold text-white bg-gradient-to-br from-white to-slate-300">
         <div className="flex flex-row justify-between text-graydark mb-10">
-          <p>Candidats</p>
+          <p>Formateurs</p>
 
           <div className=" rounded-2xl p-1 text-sm flex flex-row bg-transparent items-center">
             <SearchComponent
               onResults={handleSearchResults}
               onLoading={handleLoading}
               onError={handleError}
-              endpoint="/api/personnel-search"
+              endpoint="/api/search-formateurs/"
             />
           </div>
         </div>
 
-        <CustomTable
+        <FormateursTable
           headers={[
             "Nom",
             "Prenom",
             "CIN",
             "numero tel",
-            "Date_Naissance",
-            "Date_Creation",
-            "Status",
+            "Type",
+            "Affecteur",
             "",
           ]}
           searchResults={searchResults}
@@ -144,9 +100,7 @@ function Candidats() {
       </div>
       <div style={{ position: "fixed", bottom: "20px", right: "20px" }}>
         <GlobalButton
-          onClick={() =>
-            window.location.href = "/AddPersonnel"
-          }
+          onClick={() => (window.location.href = "/AddFormateur")}
           className="bg-blue-950 w-14 h-14 rounded-full flex items-center justify-center shadow-xl text-white mr-10"
           aria-label="add"
         >
@@ -157,4 +111,4 @@ function Candidats() {
   );
 }
 
-export default Candidats;
+export default Formateur;
