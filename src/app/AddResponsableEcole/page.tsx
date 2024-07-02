@@ -16,6 +16,7 @@ const AddResponsableEcole = () => {
     numerotel: '',
     schoolName: '',
     date_naissance: '',
+    username: '',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,7 +47,7 @@ const AddResponsableEcole = () => {
       Swal.fire({
         icon: 'error',
         title: 'Erreur',
-        text: 'L\'âge du responsable doit être supérieur ou égal à 20 ans.',
+        text: "L'âge du responsable doit être supérieur ou égal à 20 ans.",
       });
       return;
     }
@@ -72,7 +73,8 @@ const AddResponsableEcole = () => {
           addresse: formValues.addresse,
           numerotel: formValues.numerotel,
           date_naissance: formValues.date_naissance,
-          role: 'ResponsableEcoleFormation' 
+          role: 'ResponsableEcoleFormation',
+          username: formValues.username,
         },
         school_name: formValues.schoolName,
       });
@@ -88,6 +90,7 @@ const AddResponsableEcole = () => {
         numerotel: '',
         schoolName: '',
         date_naissance: '',
+        username: '',
       });
 
       const Toast = Swal.mixin({
@@ -109,30 +112,21 @@ const AddResponsableEcole = () => {
     } catch (error) {
       console.error('Failed to add responsable', error);
 
-      if (error.response && error.response.status === 400 && error.response.data.cin) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Erreur',
-          text: 'Le CIN existe déjà.',
-        });
-      } else {
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'top-end',
-          iconColor: 'red',
-          customClass: {
-            popup: 'colored-toast',
-          },
-          showConfirmButton: false,
-          timer: 2000,
-          timerProgressBar: true,
-        });
+      let errorMessage = "Une erreur est survenue lors de l'ajout du responsable. Veuillez réessayer.";
 
-        Toast.fire({
-          icon: 'error',
-          title: 'Une erreur est survenue lors de l\'ajout du responsable.Veuillez vérifier Cin ou Email.'
-        });
+      if (error.response) {
+        if (error.response.status === 400) {
+          if (error.response.data.username || error.response.data.email || error.response.data.cin) {
+            errorMessage = "Le username, l'email ou le CIN existe déjà.";
+          }
+        }
       }
+
+      Swal.fire({
+        icon: 'error',
+        title: 'Erreur',
+        text: errorMessage,
+      });
     }
   };
 
@@ -143,7 +137,20 @@ const AddResponsableEcole = () => {
           <h1 className="text-2xl font-bold text-center text-blue-800 mb-8">Ajouter Responsable Ecole formation</h1>
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
               <div className="form-group">
+                <label htmlFor="username" className="block text-gray-700">Username</label>
+                <input
+                  type="text"
+                  className="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
+                  id="username"
+                  name="username"
+                  value={formValues.username}
+                  onChange={handleChange}
+                  required
+                />
+              </div> 
+               <div className="form-group">
                 <label htmlFor="nom" className="block text-gray-700">Nom</label>
                 <input
                   type="text"
@@ -163,6 +170,30 @@ const AddResponsableEcole = () => {
                   id="prenom"
                   name="prenom"
                   value={formValues.prenom}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="cin" className="block text-gray-700">CIN</label>
+                <input
+                  type="text"
+                  className="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
+                  id="cin"
+                  name="cin"
+                  value={formValues.cin}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="date_naissance" className="block text-gray-700">Date de naissance</label>
+                <input
+                  type="date"
+                  className="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
+                  id="date_naissance"
+                  name="date_naissance"
+                  value={formValues.date_naissance}
                   onChange={handleChange}
                   required
                 />
@@ -191,30 +222,7 @@ const AddResponsableEcole = () => {
                   required
                 />
               </div>
-              <div className="form-group">
-                <label htmlFor="cin" className="block text-gray-700">CIN</label>
-                <input
-                  type="text"
-                  className="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
-                  id="cin"
-                  name="cin"
-                  value={formValues.cin}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="addresse" className="block text-gray-700">Adresse</label>
-                <input
-                  type="text"
-                  className="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
-                  id="addresse"
-                  name="addresse"
-                  value={formValues.addresse}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
+            
               <div className="form-group">
                 <label htmlFor="numerotel" className="block text-gray-700">Numéro de téléphone</label>
                 <input
@@ -239,18 +247,20 @@ const AddResponsableEcole = () => {
                   required
                 />
               </div>
-              <div className="form-group">
-                <label htmlFor="date_naissance" className="block text-gray-700">Date de naissance</label>
+           
+              <div  className="form-group  col-span-3" >
+                <label htmlFor="addresse" className="block text-gray-700">Adresse</label>
                 <input
-                  type="date"
-                  className="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
-                  id="date_naissance"
-                  name="date_naissance"
-                  value={formValues.date_naissance}
+                  type="text"
+                  className="mt-1 p-4 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  id="addresse"
+                  name="addresse"
+                  value={formValues.addresse}
                   onChange={handleChange}
                   required
                 />
               </div>
+
             </div>
             <button type="submit" className="bg-graydark mt-6 w-full py-3 dark:bg-gray-100 shadow-md flex items-center justify-center px-6 rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:bg-gray-700">  <PlusIcon />  Ajouter Responsable Ecole formation</button>
 
