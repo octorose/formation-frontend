@@ -26,8 +26,41 @@ const AddResponsableEcole = () => {
     }));
   };
 
+  const calculateAge = (dateNaissance) => {
+    const birthDate = new Date(dateNaissance);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    // Age validation
+    const age = calculateAge(formValues.date_naissance);
+    if (age < 20) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Erreur',
+        text: 'L\'âge du responsable doit être supérieur ou égal à 20 ans.',
+      });
+      return;
+    }
+
+    // CIN length validation
+    if (formValues.cin.length > 8) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Erreur',
+        text: 'Le CIN doit comporter au maximum 8 caractères.',
+      });
+      return;
+    }
+
     try {
       await axios.post('http://localhost:8000/api/create-responsable_formation_ecole/', {
         agent: {
@@ -43,6 +76,7 @@ const AddResponsableEcole = () => {
         },
         school_name: formValues.schoolName,
       });
+
       // Clear form after successful submission
       setFormValues({
         nom: '',
@@ -75,22 +109,30 @@ const AddResponsableEcole = () => {
     } catch (error) {
       console.error('Failed to add responsable', error);
 
-      const Toast = Swal.mixin({
-        toast: true,
-        position: 'top-end',
-        iconColor: 'red',
-        customClass: {
-          popup: 'colored-toast',
-        },
-        showConfirmButton: false,
-        timer: 2000,
-        timerProgressBar: true,
-      });
+      if (error.response && error.response.status === 400 && error.response.data.cin) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erreur',
+          text: 'Le CIN existe déjà.',
+        });
+      } else {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'top-end',
+          iconColor: 'red',
+          customClass: {
+            popup: 'colored-toast',
+          },
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+        });
 
-      Toast.fire({
-        icon: 'error',
-        title: 'Une erreur est survenue lors de l\'ajout du responsable.'
-      });
+        Toast.fire({
+          icon: 'error',
+          title: 'Une erreur est survenue lors de l\'ajout du responsable.Veuillez vérifier Cin ou Email.'
+        });
+      }
     }
   };
 
