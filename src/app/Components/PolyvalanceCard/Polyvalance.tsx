@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useState, useEffect } from "react";
 import { Button, Input, Label } from "@headlessui/react";
 import {
@@ -9,12 +9,16 @@ import {
   SelectValue,
 } from "../ui/select";
 import Loader from "../common/Loader";
+import { fetchWithAuth } from "@/utils/api";
 
 interface Employee {
   id: string;
   name: string;
 }
-
+interface ProductionLine {
+  id: string;
+  name: string;
+}
 interface RatedEmployee extends Employee {
   rating: number;
 }
@@ -22,16 +26,23 @@ interface RatedEmployee extends Employee {
 export default function Polyvalance() {
   const [ratedOperateurs, setRatedOperateurs] = useState<RatedEmployee[]>([]);
   const [unratedOperateurs, setUnratedOperateurs] = useState<Employee[]>([]);
-  const [productionLine, setProductionLine] = useState("line-a");
+  const [productionLines, setProductionLines] = useState<ProductionLine[]>([]);
+  const [productionLine, setProductionLine] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [ratedLoading, setRatedLoading] = useState(true);
   const [unratedLoading, setUnratedLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetchRatedOperateurs();
-    fetchUnratedOperateurs();
+    if (productionLine) {
+      fetchRatedOperateurs();
+      fetchUnratedOperateurs();
+    }
   }, [productionLine]);
+
+  useEffect(() => {
+    fetchLignes();
+  }, []);
 
   const fetchRatedOperateurs = async () => {
     setRatedLoading(true);
@@ -43,7 +54,25 @@ export default function Polyvalance() {
       if (!response.ok) throw new Error("Failed to fetch rated operateurs");
       const data = await response.json();
       setRatedOperateurs(data);
-    } catch (error:any) {
+    } catch (error: any) {
+      setError(error.message);
+      setRatedOperateurs([]);
+    } finally {
+      setRatedLoading(false);
+    }
+  };
+
+  const fetchLignes = async () => {
+    setRatedLoading(true);
+    setError("");
+    try {
+      const response = await fetchWithAuth(`/api/lignes`);
+      console.log(response);
+      setProductionLines(response.results);
+      if (response.results.length > 0) {
+        setProductionLine(response.results[0].id);
+      }
+    } catch (error: any) {
       setError(error.message);
       setRatedOperateurs([]);
     } finally {
@@ -61,7 +90,7 @@ export default function Polyvalance() {
       if (!response.ok) throw new Error("Failed to fetch unrated operateurs");
       const data = await response.json();
       setUnratedOperateurs(data);
-    } catch (error:any) {
+    } catch (error: any) {
       setError(error.message);
       setUnratedOperateurs([]);
     } finally {
@@ -76,57 +105,62 @@ export default function Polyvalance() {
           <div>
             <h2 className="text-xl font-bold">Rated Operateurs</h2>
             <p className="text-muted-foreground">
-              Review and rate the performance of operateurs on your production
-              line.
+              Review & rate the performance of operateurs  on your production line.
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <label htmlFor="production-line">Production Line</label>
+            <label htmlFor="production-line">Line</label>
             <Select
-              defaultValue="line-a"
+              defaultValue=""
               onValueChange={(value) => setProductionLine(value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select production line" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="line-a">Line A</SelectItem>
-                <SelectItem value="line-b">Line B</SelectItem>
-                <SelectItem value="line-c">Line C</SelectItem>
+                {productionLines.map((line: any) => (
+                  <SelectItem key={line.id} value={line.id}>
+                    {line.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
         </div>
-        <div className="grid gap-4">
-          {ratedLoading ? (
-            <Loader />
-          ) : error ? (
-            <p>{error}</p>
-          ) : ratedOperateurs.length === 0 ? (
-            <p>No rated operateurs found. Rate operateurs to see them here</p>
-          ) : (
-            ratedOperateurs.map((employee) => (
-              <div
-                key={employee.id}
-                className="flex items-center gap-2 p-4 bg-muted rounded-md"
-              >
-                <div className="flex-1">
-                  <div className="font-medium">{employee.name}</div>
-                  <div className="flex items-center gap-1 text-muted-foreground">
-                    {Array.from({ length: 5 }).map((_, index) => (
-                      <StarIcon
-                        key={index}
-                        className={`w-5 h-5 ${
-                          index < employee.rating
-                            ? "fill-primary"
-                            : "fill-muted stroke-muted-foreground"
-                        }`}
-                      />
-                    ))}
+        <div className="grid gap-4 max-h-[300px] overflow-auto">
+          {productionLine ? (
+            ratedLoading ? (
+              <Loader />
+            ) : error ? (
+              <p>{error}</p>
+            ) : ratedOperateurs.length === 0 ? (
+              <p>No rated operateurs found. Rate operateurs to see them here</p>
+            ) : (
+              ratedOperateurs.map((employee) => (
+                <div
+                  key={employee.id}
+                  className="flex items-center gap-2 p-4 bg-muted rounded-md"
+                >
+                  <div className="flex-1">
+                    <div className="font-medium">{employee.name}</div>
+                    <div className="flex items-center gap-1 text-muted-foreground">
+                      {Array.from({ length: 5 }).map((_, index) => (
+                        <StarIcon
+                          key={index}
+                          className={`w-5 h-5 ${
+                            index < employee.rating
+                              ? "fill-primary"
+                              : "fill-muted stroke-muted-foreground"
+                          }`}
+                        />
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))
+              ))
+            )
+          ) : (
+            <p>Please choose a Production Line</p>
           )}
         </div>
       </div>
@@ -152,27 +186,33 @@ export default function Polyvalance() {
           </div>
         </div>
         <div className="grid gap-4 max-h-[300px] overflow-auto">
-          {unratedLoading ? (
-            <Loader />
-          ) : error ? (
-            <p>{error}</p>
-          ) : unratedOperateurs.length === 0 ? (
-            <p>No unrated operateurs found. everything is updated</p>
-          ) : (
-            unratedOperateurs
-              .filter((employee) =>
-                employee.name.toLowerCase().includes(searchQuery.toLowerCase())
-              )
-              .map((employee) => (
-                <div
-                  key={employee.id}
-                  className="flex items-center gap-2 p-4 bg-muted rounded-md"
-                >
-                  <div className="flex-1">
-                    <div className="font-medium">{employee.name}</div>
+          {productionLine ? (
+            unratedLoading ? (
+              <Loader />
+            ) : error ? (
+              <p>{error}</p>
+            ) : unratedOperateurs.length === 0 ? (
+              <p>No unrated operateurs found. everything is updated</p>
+            ) : (
+              unratedOperateurs
+                .filter((employee) =>
+                  employee.name
+                    .toLowerCase()
+                    .includes(searchQuery.toLowerCase())
+                )
+                .map((employee) => (
+                  <div
+                    key={employee.id}
+                    className="flex items-center gap-2 p-4 bg-muted rounded-md"
+                  >
+                    <div className="flex-1">
+                      <div className="font-medium">{employee.name}</div>
+                    </div>
                   </div>
-                </div>
-              ))
+                ))
+            )
+          ) : (
+            <p>Please choose a Production Line</p>
           )}
         </div>
       </div>
