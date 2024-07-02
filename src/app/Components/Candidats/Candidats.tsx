@@ -4,10 +4,6 @@ import CardBarChart from "../ui/charts/CardBarChart";
 import { Plus, Search, SearchIcon } from "lucide-react";
 import { refreshToken } from "@/utils/RefreshToken";
 import Loader from "@/Components/Loaders/Loader";
-// import DataCard from "../3DCard/DataCard";
-// import SearchComponent from "../SearchComponent/Search";
-// import Loader from "@/Components/Loaders/Loader";
-import DataCard from "../3DCard/DataCard";
 import SearchComponent from "../SearchComponent/Search";
 import GlobalButton from "../globalButton/globalButton";
 function Candidats() {

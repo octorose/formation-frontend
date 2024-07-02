@@ -197,6 +197,8 @@ const handleChange = (
                   name="cin"
                   value={formValues.cin}
                   onChange={handleChange}
+                  min={5}
+                  max={6}
                   required
                 />
               </div>
