@@ -14,6 +14,7 @@ import { Module } from "module";
 import { title } from "process";
 import Dash from "@/Components/Dash/Dash";
 import { PlusIcon } from "lucide-react";
+import Formateur from "@/Components/Formateur/Formateurs";
 interface Module {
   id: number;
   name: string;
@@ -27,7 +28,7 @@ const Home = () => {
   const [modules, setModules] = useState<Module[]>([]);
   const [totalModules, setTotalModules] = useState(0);
 
-  const tabs = [
+  const tabsRH = [
   
     {
       title: "Dashboard",
@@ -61,23 +62,43 @@ const Home = () => {
       content: <Supervisors />,
     },
   ];
+  const tabsSupervisor = [ 
+    {
+      title: "Dashboard",
+      value: "Dashboard",
+      content: <Dash />,
+    },
+    {
+      title: "Formateurs",
+      value: "Formateurs",
+      content: <Formateur />,
+    },
+    {
+      title: "Candidats",
+      value: "Candidats",
+      content: <Candidats />,
+    },
+  ];
+
   const role = getRoleFromToken();
   return (
     <DefaultLayout importexport={true}>
       <div className="h-full">
         {role == "RH" ? (
           <Tabs
-            tabs={tabs}
+            tabs={tabsRH}
             activeTabClassName="bg-blue-200 dark:bg-blue-800 border-5 text-black dark:text-white"
           />
         ) : role == "Superviseur" ? (
-          <>fiw</>
+          <Tabs
+            tabs={tabsSupervisor}
+            activeTabClassName="bg-blue-200 dark:bg-blue-800 border-5 text-black dark:text-white"
+          />
         ) : role == "ResponsableFormation" ? (
-          <>fiw</>
+          <>Responsable view</>
         ) : (
           <></>
         )}
-      
       </div>
     </DefaultLayout>
   );

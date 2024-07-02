@@ -34,10 +34,11 @@ interface Agent {
   username: string | null;
 }
 
-interface CandidateData {
+interface FormateurData {
   agent: Agent;
-  etat: string;
+  isAffecteur: boolean;
   id: number;
+  Type : string;
 }
 
 interface TableHeaderProps {
@@ -61,22 +62,20 @@ const TableHeader: React.FC<TableHeaderProps> = ({
   return <th className={classNames}>{header}</th>;
 };
 
-
-function CustomTable({
+function FormateursTable({
   headers,
   searchResults,
 }: {
   headers: string[];
   searchResults: any;
 }) {
-  
   const perpage = 5;
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [editMode, setEditMode] = useState(Array(15).fill(false));
-  const [data2, setData] = useState<CandidateData[]>();
-  const [CandidateNameToDelete, setCandidateNameToDelete] = useState();
-  const [CandidatetoEdit, setCandidatetoEdit] = useState({} as any);
+  const [data2, setData] = useState<FormateurData[]>();
+  const [FormateurNameToDelete, setFormateurNameToDelete] = useState();
+  const [FormateurtoEdit, setFormateurtoEdit] = useState({} as any);
   let fetched: any;
   const totalPages = Math.ceil((data2 as any)?.count / perpage);
   const { alert, setAlert } = useAlert();
@@ -102,16 +101,13 @@ function CustomTable({
     timerProgressBar: true,
   });
 
-  const DeleteCandidate = async (Candidate: any) => {
-
+  const DeleteFormateur = async (Formateur: any) => {
     //@ts-ignore
-    if (CandidateNameToDelete?.Nom === Candidate.agent.nom) {
-
+    if (FormateurNameToDelete?.Nom === Formateur.agent.nom) {
       try {
-        const response = await deleteWithAuth(`/api/delete_personnel/${Candidate.id}/`);
-        if (!response.ok) {
-          throw new Error("Failed to delete candidate");
-        }
+        const response = await deleteWithAuth(
+          `/api/delete-formateurs/${Formateur.id}/`
+        );
         // const data = await response.json();
         fetchData();
         setAlert2((prev) => ({ ...prev, isOpen: false }));
@@ -121,7 +117,7 @@ function CustomTable({
     } else {
       Toast.fire({
         icon: "error",
-        title: "Invalid Candidate name",
+        title: "Invalid Formateur name",
       });
     }
   };
@@ -130,8 +126,8 @@ function CustomTable({
     event: React.ChangeEvent<HTMLInputElement>,
     key: string
   ) => {
-    setCandidateNameToDelete((prevCandidateNameToDelete: any) => ({
-      ...prevCandidateNameToDelete,
+    setFormateurNameToDelete((prevFormateurNameToDelete: any) => ({
+      ...prevFormateurNameToDelete,
       [key]: event.target.value,
     }));
   };
@@ -139,12 +135,13 @@ function CustomTable({
   const fetchData = async () => {
     try {
       setIsLoading(true);
-        const fetchedData = await fetchWithAuth(
-          `/api/personnel/?page=${currentPage}`
-        );
-        setData(fetchedData);
-        setIsLoading(false);
-
+      const fetchedData = await fetchWithAuth(
+        `/api/formateurs/?page=${currentPage}`
+      );
+      setData(fetchedData);
+      console.log(fetchedData);
+      
+      setIsLoading(false);
     } catch (error) {
       console.error(error);
     }
@@ -156,10 +153,13 @@ function CustomTable({
     const year = date.getFullYear().toString().slice(-2);
     return `${day}/${month}/${year}`;
   }
-  const updateCandidate = async (Candidate: any) => {
-    console.log(Candidate);
+  const updateFormateur = async (Formateur: any) => {
+    console.log(Formateur);
     try {
-      const response = await putWithAuth(`/api/update_personnel/${Candidate.id}/`, Candidate);
+      const response = await putWithAuth(
+        `/api/update-formateurs/${Formateur.id}/`,
+        Formateur
+      );
       fetchData();
 
       // const data = await response.json();
@@ -173,12 +173,12 @@ function CustomTable({
     fetched = fetchData();
   }, [currentPage]);
   const PersonalInfo = {
-    nom: CandidatetoEdit?.agent?.nom,
-    prenom: CandidatetoEdit?.agent?.prenom,
-    cin: CandidatetoEdit?.agent?.cin,
-    date_naissance: CandidatetoEdit?.agent?.date_naissance,
-    // date_joined: CandidatetoEdit?.agent?.date_joined,
-    etat: CandidatetoEdit?.etat,
+    nom: FormateurtoEdit?.agent?.nom,
+    prenom: FormateurtoEdit?.agent?.prenom,
+    cin: FormateurtoEdit?.agent?.cin,
+    Type: FormateurtoEdit?.Type,
+    // date_joined: FormateurtoEdit?.agent?.date_joined,
+    isAffecteur: FormateurtoEdit?.isAffecteur,
   };
 
   return (
@@ -217,7 +217,7 @@ function CustomTable({
                         onClick={() => {
                           // console.log(item);
                           setAlert((prev) => ({ ...prev, isOpen: true }));
-                          setCandidatetoEdit(item);
+                          setFormateurtoEdit(item);
                         }}
                       >
                         {item.agent["nom"]}
@@ -227,7 +227,7 @@ function CustomTable({
                         onClick={() => {
                           // console.log(item);
                           setAlert((prev) => ({ ...prev, isOpen: true }));
-                          setCandidatetoEdit(item);
+                          setFormateurtoEdit(item);
                         }}
                       >
                         {item.agent["prenom"]}
@@ -237,7 +237,7 @@ function CustomTable({
                         onClick={() => {
                           // console.log(item);
                           setAlert((prev) => ({ ...prev, isOpen: true }));
-                          setCandidatetoEdit(item);
+                          setFormateurtoEdit(item);
                         }}
                       >
                         {item.agent["cin"]}
@@ -247,7 +247,7 @@ function CustomTable({
                         onClick={() => {
                           // console.log(item);
                           setAlert((prev) => ({ ...prev, isOpen: true }));
-                          setCandidatetoEdit(item);
+                          setFormateurtoEdit(item);
                         }}
                       >
                         {item.agent["numerotel"]}
@@ -257,17 +257,17 @@ function CustomTable({
                         onClick={() => {
                           // console.log(item);
                           setAlert((prev) => ({ ...prev, isOpen: true }));
-                          setCandidatetoEdit(item);
+                          setFormateurtoEdit(item);
                         }}
                       >
-                        {formatDate(item.agent["date_naissance"])}
+                        {formatDate(item["Type"])}
                       </td>
                       <td
                         className=""
                         onClick={() => {
                           // console.log(item);
                           setAlert((prev) => ({ ...prev, isOpen: true }));
-                          setCandidatetoEdit(item);
+                          setFormateurtoEdit(item);
                         }}
                       >
                         {formatDate(item.agent["date_joined"])}
@@ -277,7 +277,7 @@ function CustomTable({
                         onClick={() => {
                           // console.log(item);
                           setAlert((prev) => ({ ...prev, isOpen: true }));
-                          setCandidatetoEdit(item);
+                          setFormateurtoEdit(item);
                         }}
                       >
                         {item.etat}
@@ -285,7 +285,7 @@ function CustomTable({
 
                       <button
                         onClick={() => {
-                          setCandidatetoEdit(item);
+                          setFormateurtoEdit(item);
                           setAlert2((prev) => ({ ...prev, isOpen: true }));
                         }}
                       >
@@ -310,7 +310,10 @@ function CustomTable({
                             onClick={() => {
                               // console.log(item);
                               setAlert((prev) => ({ ...prev, isOpen: true }));
-                              setCandidatetoEdit(item);
+
+                              setFormateurtoEdit(item);
+                              console.log(FormateurtoEdit);
+                              
                             }}
                           >
                             {item.agent["nom"]}
@@ -320,7 +323,7 @@ function CustomTable({
                             onClick={() => {
                               // console.log(item);
                               setAlert((prev) => ({ ...prev, isOpen: true }));
-                              setCandidatetoEdit(item);
+                              setFormateurtoEdit(item);
                             }}
                           >
                             {item.agent["prenom"]}
@@ -330,7 +333,7 @@ function CustomTable({
                             onClick={() => {
                               // console.log(item);
                               setAlert((prev) => ({ ...prev, isOpen: true }));
-                              setCandidatetoEdit(item);
+                              setFormateurtoEdit(item);
                             }}
                           >
                             {item.agent["cin"]}
@@ -338,9 +341,8 @@ function CustomTable({
                           <td
                             className=""
                             onClick={() => {
-                              
                               setAlert((prev) => ({ ...prev, isOpen: true }));
-                              setCandidatetoEdit(item);
+                              setFormateurtoEdit(item);
                             }}
                           >
                             {item.agent["numerotel"]}
@@ -350,35 +352,29 @@ function CustomTable({
                             onClick={() => {
                               // console.log(item);
                               setAlert((prev) => ({ ...prev, isOpen: true }));
-                              setCandidatetoEdit(item);
+                              setFormateurtoEdit(item);
                             }}
                           >
-                            {formatDate(item.agent["date_naissance"])}
+                            {item.Type}
                           </td>
                           <td
                             className=""
                             onClick={() => {
                               // console.log(item);
                               setAlert((prev) => ({ ...prev, isOpen: true }));
-                              setCandidatetoEdit(item);
+                              setFormateurtoEdit(item);
                             }}
                           >
-                            {formatDate(item.agent["date_joined"])}
-                          </td>
-                          <td
-                            className=""
-                            onClick={() => {
-                              // console.log(item);
-                              setAlert((prev) => ({ ...prev, isOpen: true }));
-                              setCandidatetoEdit(item);
-                            }}
-                          >
-                            {item.etat}
+                            {item.isAffecteur ? (
+                              <p className="text-green-600">Oui</p>
+                            ) : (
+                              <p className="text-red-600">Non</p>
+                            )}
                           </td>
 
                           <button
                             onClick={() => {
-                              setCandidatetoEdit(item);
+                              setFormateurtoEdit(item);
                               setAlert2((prev) => ({ ...prev, isOpen: true }));
                             }}
                           >
@@ -406,16 +402,16 @@ function CustomTable({
       <Modal
         isOpen={alert.isOpen}
         onSubmit={() => {
-          // console.log(CandidatetoEdit);
-          
-          updateCandidate(CandidatetoEdit);
+          // console.log(FormateurtoEdit);
+
+          updateFormateur(FormateurtoEdit);
         }}
         onCancel={() => {
           setAlert((prev) => ({ ...prev, isOpen: false }));
         }}
         alertTitle={
-          "Edit " + CandidatetoEdit?.agent?.nom + " Details" ||
-          "Candidate" + "Details"
+          "Edit " + FormateurtoEdit?.agent?.nom + " Details" ||
+          "Formateur" + "Details"
         }
         alertDescription={"Edit "}
         submitBtnName={"Submit"}
@@ -429,20 +425,20 @@ function CustomTable({
           fields={PersonalInfo}
           editMode={editMode}
           handleEdit={handleEdit}
-          CandidatetoEdit={CandidatetoEdit}
-          setCandidatetoEdit={setCandidatetoEdit}
+          CandidatetoEdit={FormateurtoEdit}
+          setCandidatetoEdit={setFormateurtoEdit}
         />
       </Modal>
       <Modal
         isOpen={alert2.isOpen}
-        onSubmit={() => DeleteCandidate(CandidatetoEdit)}
+        onSubmit={() => DeleteFormateur(FormateurtoEdit)}
         onCancel={() => {
           setAlert2((prev) => ({ ...prev, isOpen: false }));
         }}
-        alertTitle={"Delete Candidate"}
+        alertTitle={"Delete Formateur"}
         alertDescription={
-          `If You are sure type the Candidates Name "` +
-          CandidatetoEdit?.agent?.nom +
+          `If You are sure type the Formateurs Name "` +
+          FormateurtoEdit?.agent?.nom +
           `" to confirm your request`
         }
         submitBtnName={"Delete"}
@@ -469,4 +465,4 @@ function CustomTable({
   );
 }
 
-export default CustomTable;
+export default FormateursTable;

@@ -11,7 +11,7 @@ function BreadcrumbsV2(
 ) {
   return (
     <div className="flex flex-row justify-between p-5 pb-0 mx-20">
-      <Breadcrumb pageName="yes" />
+      <Breadcrumb />
       {importexport && (
         <div className="flex gap-1 justify-center h-4/5">
           <button
