@@ -125,6 +125,7 @@ function ResponsableFormationEcole({
 
         fetchData();
         setAlert2((prev) => ({ ...prev, isOpen: false }));
+        setDeleteNameInput(''); 
       } else {
         Toast.fire({
           icon: 'error',
@@ -141,7 +142,10 @@ function ResponsableFormationEcole({
       });
     }
   };
-
+  const handleClose = () => {
+    setAlert2((prev) => ({ ...prev, isOpen: false }));
+    setDeleteNameInput('');
+  };
   return (
     <div className="rounded-sm bg-transparent px-5 pb-2.5 pt-6 dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
       <div className="flex flex-col">
@@ -296,10 +300,10 @@ function ResponsableFormationEcole({
         total={Math.ceil(totalResponsables / 10)}
         onPageChange={handlePageChange}
       />
-      <Modal
+    <Modal
         isOpen={alert2.isOpen}
         onSubmit={handleDelete}
-        onCancel={() => setAlert2((prev) => ({ ...prev, isOpen: false }))}
+        onCancel={handleClose}
         alertTitle="Supprimer le responsable"
         alertDescription={`Veuillez confirmer la suppression en saisissant le nom du responsable : "${responsableToDelete?.agent?.nom}"`}
         submitBtnName="Supprimer"
