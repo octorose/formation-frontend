@@ -56,7 +56,7 @@ const PersonalInfo = {
 }
   const fetchData = async () => {
     const response: ApiResponse<Superviseur> = await fetchWithAuth(
-      `${process.env.NEXT_PUBLIC_API_URL}${endpoint}?page=${currentPage}`
+      `${endpoint}?page=${currentPage}`
     ); 
     setSupervisors(response.results);
     setTotalSupervisors(response.count);

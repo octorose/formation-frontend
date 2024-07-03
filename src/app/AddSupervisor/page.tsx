@@ -1,13 +1,13 @@
-import DefaultLayout from '@/Components/Layout/DefaultLayout'
+import SupervisorForm from '@/Components/Forms/SupervisorForm'
 import React from 'react'
 
-function page() {
+function AddSupervisor() {
   return (
-    <DefaultLayout importexport={false}>
-
-        <div>Adding Sups page</div>
-    </DefaultLayout>
+    <>  
+  
+        <SupervisorForm />
+    </>
   )
 }
 
-export default page
+export default AddSupervisor
