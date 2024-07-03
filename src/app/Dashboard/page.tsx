@@ -5,6 +5,7 @@ import DefaultLayout from "@/Components/Layout/DefaultLayout";
 import { Tabs } from "../Components/Tabs/tab";
 import Candidats from "@/Components/Candidats/Candidats";
 import Supervisors from "@/Components/SupervisorsCard/Supervisors";
+import ResponsableEcole from "@/components/ResponsableEcoleCard/ResponsableEcole";
 import Cards from "../Components/3DCard/3d-cards";
 import withAuth from "@/utils/HOC/withAuth";
 import { getRoleFromToken } from "@/utils/getRoleFromToken";
@@ -60,6 +61,11 @@ const Home = () => {
       title: "Supervisors",
       value: "Supervisors",
       content: <Supervisors />,
+    },
+    {
+      title: "Responsable ecole formation",
+      value: "ResponsableEcoleFormation",
+      content: <ResponsableEcole />,
     },
   ];
   const tabsSupervisor = [ 
