@@ -4,6 +4,8 @@ import DefaultLayout from '@/Components/Layout/DefaultLayout';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { PlusIcon } from 'lucide-react';
+import { calculateAge } from '@/utils/calculateAge';
+import { validateCINLength } from '@/utils/cinValidation';
 
 const AddResponsableEcole = () => {
   const [formValues, setFormValues] = React.useState({
@@ -14,7 +16,6 @@ const AddResponsableEcole = () => {
     cin: '',
     addresse: '',
     numerotel: '',
-    schoolName: '',
     date_naissance: '',
     username: '',
   });
@@ -27,17 +28,7 @@ const AddResponsableEcole = () => {
     }));
   };
 
-  const calculateAge = (dateNaissance) => {
-    const birthDate = new Date(dateNaissance);
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    return age;
-  };
-
+ 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -53,14 +44,7 @@ const AddResponsableEcole = () => {
     }
 
     // CIN length validation
-    if (formValues.cin.length > 8) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Erreur',
-        text: 'Le CIN doit comporter au maximum 8 caractères.',
-      });
-      return;
-    }
+    validateCINLength(formValues.cin)
 
     try {
       await axios.post('http://localhost:8000/api/create-responsable_formation_ecole/', {
@@ -76,7 +60,7 @@ const AddResponsableEcole = () => {
           role: 'ResponsableEcoleFormation',
           username: formValues.username,
         },
-        school_name: formValues.schoolName,
+    
       });
 
       // Clear form after successful submission
@@ -88,7 +72,7 @@ const AddResponsableEcole = () => {
         cin: '',
         addresse: '',
         numerotel: '',
-        schoolName: '',
+      
         date_naissance: '',
         username: '',
       });
@@ -109,7 +93,7 @@ const AddResponsableEcole = () => {
         icon: 'success',
         title: 'Responsable ajouté avec succès !'
       });
-    } catch (error) {
+    } catch (error:any) {
       console.error('Failed to add responsable', error);
 
       let errorMessage = "Une erreur est survenue lors de l'ajout du responsable. Veuillez réessayer.";
@@ -235,20 +219,9 @@ const AddResponsableEcole = () => {
                   required
                 />
               </div>
-              <div className="form-group">
-                <label htmlFor="schoolName" className="block text-gray-700">Nom de l'école</label>
-                <input
-                  type="text"
-                  className="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
-                  id="schoolName"
-                  name="schoolName"
-                  value={formValues.schoolName}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
+             
            
-              <div  className="form-group  col-span-3" >
+              <div  className="form-group " >
                 <label htmlFor="addresse" className="block text-gray-700">Adresse</label>
                 <input
                   type="text"

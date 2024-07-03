@@ -11,7 +11,7 @@ import axios from "axios";
 interface ResponsableFormationEcole {
   id: number;
   agent: Agent;
-  school_name: string;
+  
 }
 
 interface ApiResponse<T> {
@@ -39,7 +39,7 @@ function ResponsableFormationEcole({
     nom: '',
     prenom: '',
     email: '',
-    school_name: '',
+  
   });
 
   const handleEditInputChange = (event: React.ChangeEvent<HTMLInputElement>, fieldName: string) => {
@@ -60,7 +60,7 @@ function ResponsableFormationEcole({
           prenom: editFormData.prenom,
           email: editFormData.email,
         },
-        school_name: editFormData.school_name,
+     
       });
 
       Toast.fire({
@@ -159,11 +159,7 @@ function ResponsableFormationEcole({
           <div className="p-2.5 text-center xl:p-5">
             <h5 className="text-sm font-medium uppercase xsm:text-base">Email</h5>
           </div>
-          <div className="p-2.5 text-center xl:p-5">
-            <h5 className="text-sm font-medium uppercase xsm:text-base">
-            Nom de l'ecole
-            </h5>
-          </div>
+        
        
           <div className="hidden p-2.5 text-center sm:block xl:p-5">
             <h5 className="text-sm font-medium uppercase xsm:text-base">Actions</h5>
@@ -196,11 +192,7 @@ function ResponsableFormationEcole({
                 {responsable.agent.email}
               </p>
             </div>
-                <div className="flex items-center justify-center p-2.5 xl:p-5">
-                  <p className="text-black dark:text-white">
-                    {responsable.school_name}
-                  </p>
-                </div>
+             
               
                 <div className="hidden items-center justify-center gap-4 p-2.5 sm:flex xl:p-5">
                 <button
@@ -211,7 +203,7 @@ function ResponsableFormationEcole({
                     nom: responsable.agent.nom,
                     prenom: responsable.agent.prenom,
                     email: responsable.agent.email,
-                    school_name: responsable.school_name,
+                  
                   });
                   setAlert((prev) => ({ ...prev, isOpen: true }));
                 }}
@@ -258,11 +250,7 @@ function ResponsableFormationEcole({
                 {responsable.agent.email}
               </p>
             </div>
-                <div className="flex items-center justify-center p-2.5 xl:p-5">
-                  <p className="text-black dark:text-white">
-                    {responsable.school_name}
-                  </p>
-                </div>
+              
                 <div className="hidden items-center justify-center gap-4 p-2.5 sm:flex xl:p-5">
                 <button
                 className="text-black dark:text-white"
@@ -272,7 +260,7 @@ function ResponsableFormationEcole({
                     nom: responsable.agent.nom,
                     prenom: responsable.agent.prenom,
                     email: responsable.agent.email,
-                    school_name: responsable.school_name,
+                
                   });
                   setAlert((prev) => ({ ...prev, isOpen: true }));
                 }}
@@ -381,19 +369,7 @@ function ResponsableFormationEcole({
               placeholder="Email"
             />
           </div>
-          <div className="flex flex-col mt-4">
-            <label htmlFor="editSchoolName" className="text-sm font-medium">
-            Nom de l'école
-            </label>
-            <input
-              id="editSchoolName"
-              type="text"
-              value={editFormData.school_name}
-              onChange={(event) => handleEditInputChange(event, 'school_name')}
-              className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              placeholder="School Name"
-            />
-          </div>
+        
         </div>
       </Modal>
     </div>
