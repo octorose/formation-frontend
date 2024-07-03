@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ResponsivePagination from "react-responsive-pagination";
-import { fetchWithAuth } from "@/utils/api";
+import { deleteWithAuth, fetchWithAuth, putWithAuth } from "@/utils/api";
 import { Agent } from "@/interfaces/Agent";
 import { Edit2Icon, Trash2Icon } from "lucide-react";
 import useAlert from "@/Hooks/useAlert";
@@ -54,7 +54,7 @@ function ResponsableFormationEcole({
 
   const updateResponsable = async (responsable: any) => {
     try {
-      await axios.put(`http://localhost:8000/api/update-responsable_formation_ecole/${responsable.id}/`, {
+      await putWithAuth(`api/update-responsable_formation_ecole/${responsable.id}/`, {
         agent: {
           nom: editFormData.nom,
           prenom: editFormData.prenom,
@@ -115,17 +115,21 @@ function ResponsableFormationEcole({
   const handleDelete = async () => {
     try {
       if (deleteNameInput === responsableToDelete?.agent?.nom) {
-        await axios.delete(`http://localhost:8000/api/delete-responsable_formation_ecole/${responsableToDelete.id}/`);
-
-        Toast.fire({
-          icon: 'success',
-          title: 'Responsable supprimé avec succès !',
-          iconColor: 'green',
-        });
-
-        fetchData();
-        setAlert2((prev) => ({ ...prev, isOpen: false }));
-        setDeleteNameInput(''); 
+        const response = await deleteWithAuth(`api/delete-responsable_formation_ecole/${responsableToDelete.id}/`);
+  
+        if (!response || response.status === 204) {
+          Toast.fire({
+            icon: 'success',
+            title: 'Responsable supprimé avec succès !',
+            iconColor: 'green',
+          });
+  
+          fetchData();
+          setAlert2((prev) => ({ ...prev, isOpen: false }));
+          setDeleteNameInput('');
+        } else {
+          throw new Error('Failed to delete responsable');
+        }
       } else {
         Toast.fire({
           icon: 'error',

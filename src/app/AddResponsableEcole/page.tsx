@@ -7,6 +7,7 @@ import { PlusIcon } from 'lucide-react';
 import { calculateAge } from '@/utils/calculateAge';
 import { validateCINLength } from '@/utils/cinValidation';
 
+import { postWithAuth } from '@/utils/api';
 const AddResponsableEcole = () => {
   const [formValues, setFormValues] = React.useState({
     nom: '',
@@ -44,10 +45,12 @@ const AddResponsableEcole = () => {
     }
 
     // CIN length validation
-    validateCINLength(formValues.cin)
+    if (!validateCINLength(formValues.cin)) {
+      return;
+    }
 
     try {
-      await axios.post('http://localhost:8000/api/create-responsable_formation_ecole/', {
+      await postWithAuth('api/create-responsable_formation_ecole/', {
         agent: {
           nom: formValues.nom,
           prenom: formValues.prenom,
@@ -94,21 +97,23 @@ const AddResponsableEcole = () => {
         title: 'Responsable ajouté avec succès !'
       });
     } catch (error:any) {
-      console.error('Failed to add responsable', error);
+      console.error("Failed to add Responsable", error);
+      let errorMessage = "Une erreur est survenue lors de l'ajout du responsable. Le username, l'email ou le CIN existe déjà.";
+      
+      const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        iconColor: "red",
+        customClass: {
+          popup: "colored-toast",
+        },
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+      });
 
-      let errorMessage = "Une erreur est survenue lors de l'ajout du responsable. Veuillez réessayer.";
-
-      if (error.response) {
-        if (error.response.status === 400) {
-          if (error.response.data.username || error.response.data.email || error.response.data.cin) {
-            errorMessage = "Le username, l'email ou le CIN existe déjà.";
-          }
-        }
-      }
-
-      Swal.fire({
-        icon: 'error',
-        title: 'Erreur',
+      Toast.fire({
+        icon: "error",
         text: errorMessage,
       });
     }
@@ -225,7 +230,7 @@ const AddResponsableEcole = () => {
                 <label htmlFor="addresse" className="block text-gray-700">Adresse</label>
                 <input
                   type="text"
-                  className="mt-1 p-4 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="mt-1 p-4 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
                   id="addresse"
                   name="addresse"
                   value={formValues.addresse}
