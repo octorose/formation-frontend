@@ -119,7 +119,7 @@ function Candidats() {
               onResults={handleSearchResults}
               onLoading={handleLoading}
               onError={handleError}
-              endpoint="/api/personnel-search"
+              endpoint="api/personnel-search"
             />
           </div>
         </div>

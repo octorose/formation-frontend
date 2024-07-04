@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ResponsivePagination from "react-responsive-pagination";
-import { fetchWithAuth } from "@/utils/api";
+import { deleteWithAuth, fetchWithAuth } from "@/utils/api";
 import { Agent } from "@/interfaces/Agent";
 import { Edit2Icon, Trash2Icon } from "lucide-react";
 import useAlert from "@/Hooks/useAlert";
@@ -8,10 +8,15 @@ import Modal from "../GlobalModal/Modal";
 import Swal from "sweetalert2";
 import PhaseRenderer from "../phaserenderer/PhaseRenderer";
 
+interface Lignes {
+  id: number;
+  name: string;
+}
+
 interface Superviseur {
   id: number;
   agent: Agent;
-  ligne_name: string;
+  lignes: Lignes;
 }
 
 interface ApiResponse<T> {
@@ -59,7 +64,7 @@ const PersonalInfo = {
       `${endpoint}?page=${currentPage}`
     ); 
     setSupervisors(response.results);
-    setTotalSupervisors(response.count);
+    setTotalSupervisors(response.count);  
   };
   useEffect(() => {
     fetchData();
@@ -91,31 +96,23 @@ const PersonalInfo = {
 
   const handleDelete = async (supervisor: any) => {
     // `${process.env.NEXT_PUBLIC_API_URL}${endpoint}/${id}`,
-    console.log(supervisor);
-
+    
     //@ts-ignore
     if (SupervisortoDelete?.Nom === supervisor.agent.nom) {
       // console.log("aywa");
-
+      
       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}${endpoint}/${SupervisortoDelete.id}`,
-          {
-            method: "DELETE",
-          }
-        );
-        if (!response.ok) {
-          throw new Error("Failed to delete candidate");
-        }
+        deleteWithAuth(`${endpoint}/${supervisor.id}`);
         fetchData();
         setAlert2((prev) => ({ ...prev, isOpen: false }));
+        console.log("deleted");
       } catch (error) {
         console.error(error);
       }
     } else {
       Toast.fire({
         icon: "error",
-        title: "Invalid Candidate name",
+        title: "Invalid Supervisor name",
       });
     }
   };
@@ -177,7 +174,7 @@ const PersonalInfo = {
 
                 <div className="flex items-center justify-center p-2.5 xl:p-5">
                   <p className="text-black dark:text-white">
-                    {supervisor.ligne_name}
+                    {supervisor.lignes.name[0]}
                   </p>
                 </div>
                 <div className="flex items-center justify-center p-2.5 xl:p-5">
@@ -233,7 +230,7 @@ const PersonalInfo = {
 
                 <div className="flex items-center justify-center p-2.5 xl:p-5">
                   <p className="text-black dark:text-white">
-                    {supervisor.ligne_name}
+                    {supervisor.lignes.name}
                   </p>
                 </div>
                 <div className="flex items-center justify-center p-2.5 xl:p-5">
