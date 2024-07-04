@@ -109,8 +109,12 @@ function CustomTable({
 
       try {
         const response = await deleteWithAuth(`/api/delete_personnel/${Candidate.id}/`);
-        if (!response.ok) {
-          throw new Error("Failed to delete candidate");
+        if (!response) {
+          Toast.fire({
+            icon: 'success',
+            title: 'Candidat supprimé avec succès !',
+            iconColor: 'green',
+          });
         }
         // const data = await response.json();
         fetchData();
@@ -125,7 +129,7 @@ function CustomTable({
       });
     }
   };
-
+ 
   const handleDeleteInputChange = (
     event: React.ChangeEvent<HTMLInputElement>,
     key: string
