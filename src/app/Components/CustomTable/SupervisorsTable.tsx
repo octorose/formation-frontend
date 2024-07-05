@@ -62,7 +62,7 @@ const PersonalInfo = {
     setTotalSupervisors(response.count);
   };
   useEffect(() => {
-    fetchData();
+    // fetchData();
   }, [currentPage, endpoint]);
 
   const handlePageChange = (newPage: number) => {
@@ -90,13 +90,10 @@ const PersonalInfo = {
   };
 
   const handleDelete = async (supervisor: any) => {
-    // `${process.env.NEXT_PUBLIC_API_URL}${endpoint}/${id}`,
     console.log(supervisor);
 
     //@ts-ignore
     if (SupervisortoDelete?.Nom === supervisor.agent.nom) {
-      // console.log("aywa");
-
       try {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}${endpoint}/${SupervisortoDelete.id}`,
@@ -178,7 +175,7 @@ const PersonalInfo = {
                 </div>
                 <div className="flex items-center justify-center p-2.5 xl:p-5">
                   <p className="text-black dark:text-white">
-                    we need it from ichraq's code
+                    we need it from ichraq&apos;s code
                   </p>
                 </div>
                 <div className="hidden items-center justify-center gap-4 p-2.5 sm:flex xl:p-5">
@@ -234,7 +231,7 @@ const PersonalInfo = {
                 </div>
                 <div className="flex items-center justify-center p-2.5 xl:p-5">
                   <p className="text-black dark:text-white">
-                    we need it from ichraq's code
+                    we need it from ichraq&apos;s code
                   </p>
                 </div>
                 <div className="hidden items-center justify-center gap-4 p-2.5 sm:flex xl:p-5">
