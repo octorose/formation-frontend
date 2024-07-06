@@ -51,7 +51,8 @@ function SupervisorsTable({
   };
 
   const updateCandidate = async (Candidate: any) => {
-    //
+    console.log(Candidate);
+    
     try{
     putWithAuth(`${endpoint}/update/${Candidate.id}/`, {
       agent: {
@@ -59,14 +60,12 @@ function SupervisorsTable({
         prenom: Candidate.agent.prenom,
         email: Candidate.agent.email,
         password: Candidate.agent.password,
-        cin: Candidate.agent.cin,
         addresse: Candidate.agent.addresse,
         numerotel: Candidate.agent.numerotel,
         date_naissance: Candidate.agent.date_naissance,
-        role: "Supervisor",
-        username: Candidate.agent.username,
+        role: "Superviseur",
       },
-      lignes_id: Candidate.lignes,
+      lignes_ids: Candidate.lignes,
     });
     fetchData();
     setAlert((prev) => ({ ...prev, isOpen: false }));
