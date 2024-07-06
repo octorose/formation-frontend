@@ -45,7 +45,7 @@ function ResponsableFormationEcole() {
         </div>
 
         <ResponsableFormationEcoleTable 
-          endpoint="/api/responsable_formation_ecole/"
+          endpoint="api/responsable_formation_ecole/"
           searchResults={searchResults}
         />
       </div>

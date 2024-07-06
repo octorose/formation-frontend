@@ -49,8 +49,6 @@ const AddResponsableEcole = () => {
     }
 
     try {
-      console.log('formValues', formValues);
-      
       await postWithAuth('api/create-responsable_formation_ecole/', {
         agent: {
           nom: formValues.nom,

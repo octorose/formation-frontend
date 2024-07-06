@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ResponsivePagination from "react-responsive-pagination";
-import { deleteWithAuth, fetchWithAuth } from "@/utils/api";
+import { deleteWithAuth, fetchWithAuth, putWithAuth } from "@/utils/api";
 import { Agent } from "@/interfaces/Agent";
 import { Edit2Icon, Trash2Icon } from "lucide-react";
 import useAlert from "@/Hooks/useAlert";
@@ -16,7 +16,7 @@ interface Lignes {
 interface Superviseur {
   id: number;
   agent: Agent;
-  lignes: Lignes;
+  lignes: Lignes[];
 }
 
 interface ApiResponse<T> {
@@ -33,9 +33,9 @@ function SupervisorsTable({
 }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [supervisors, setSupervisors] = useState<Superviseur[]>([]);
-    const [editMode, setEditMode] = useState(Array(15).fill(false));
-      const { alert, setAlert } = useAlert();
-
+  const [editMode, setEditMode] = useState(Array(15).fill(false));
+  const { alert, setAlert } = useAlert();
+  const [ligneOptions, setLigneOptions] = useState<Lignes[]>([]);
   const [totalSupervisors, setTotalSupervisors] = useState(0);
   const [SupervisortoDelete, setSupervisortoDelete] = useState({} as any);
   const [SupervisortoEdit, setSupervisortoEdit] = useState({} as any);
@@ -49,30 +49,57 @@ function SupervisorsTable({
     }
     setEditMode(updatedEditMode);
   };
-const updateCandidate = async (Candidate: any) => {
-  // 
-  console.log(Candidate);
-};
-const PersonalInfo = {
-  nom : SupervisortoEdit?.agent?.nom,
-  prenom : SupervisortoEdit?.agent?.prenom,
-  ligne_name: SupervisortoEdit?.ligne_name,
-  contract : "we need it from ichraq's code",
-}
+
+  const updateCandidate = async (Candidate: any) => {
+    //
+    try{
+    putWithAuth(`${endpoint}/update/${Candidate.id}/`, {
+      agent: {
+        nom: Candidate.agent.nom,
+        prenom: Candidate.agent.prenom,
+        email: Candidate.agent.email,
+        password: Candidate.agent.password,
+        cin: Candidate.agent.cin,
+        addresse: Candidate.agent.addresse,
+        numerotel: Candidate.agent.numerotel,
+        date_naissance: Candidate.agent.date_naissance,
+        role: "Supervisor",
+        username: Candidate.agent.username,
+      },
+      lignes_id: Candidate.lignes,
+    });
+    fetchData();
+    setAlert((prev) => ({ ...prev, isOpen: false }));
+  } catch (error) {
+    console.error(error);
+  }
+    
+  };
+
+  const PersonalInfo = {
+    nom: SupervisortoEdit?.agent?.nom,
+    prenom: SupervisortoEdit?.agent?.prenom,
+    lignes: SupervisortoEdit?.ligne_name,
+    contract: "we need it from ichraq's code",
+  };
+
   const fetchData = async () => {
     const response: ApiResponse<Superviseur> = await fetchWithAuth(
       `${endpoint}?page=${currentPage}`
-    ); 
+    );
     setSupervisors(response.results);
-    setTotalSupervisors(response.count);  
+    setTotalSupervisors(response.count);
   };
+
   useEffect(() => {
     fetchData();
+    fetchLignes();
   }, [currentPage, endpoint]);
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
   };
+
   const Toast = Swal.mixin({
     toast: true,
     position: "top-end",
@@ -84,6 +111,7 @@ const PersonalInfo = {
     timer: 2000,
     timerProgressBar: true,
   });
+
   const handleDeleteInputChange = (
     event: React.ChangeEvent<HTMLInputElement>,
     key: string
@@ -95,12 +123,10 @@ const PersonalInfo = {
   };
 
   const handleDelete = async (supervisor: any) => {
-    // `${process.env.NEXT_PUBLIC_API_URL}${endpoint}/${id}`,
-    
+    console.log(supervisor);
+
     //@ts-ignore
     if (SupervisortoDelete?.Nom === supervisor.agent.nom) {
-      // console.log("aywa");
-      
       try {
         deleteWithAuth(`${endpoint}/${supervisor.id}`);
         fetchData();
@@ -116,13 +142,24 @@ const PersonalInfo = {
       });
     }
   };
+   const fetchLignes = async () => {
+     try {
+       const response = await fetchWithAuth("/api/lignes/");
+       const lignesData = response.results.map((ligne: any) => ({
+         id: ligne.id,
+         name: ligne.name,
+       }));
+       console.log(response);
+
+       setLigneOptions(lignesData);
+     } catch (error) {
+       console.error("Failed to fetch lignes", error);
+       // Handle error if needed
+     }
+   };
 
   return (
-    <div className="rounded-sm border border-stroke bg-transparent px-5 pb-2.5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
-      <h4 className="mb-6 text-xl font-semibold text-black dark:text-white">
-        Superviseurs
-      </h4>
-
+    <div className="rounded-sm bg-transparent px-5 pb-2.5 pt-6 dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
       <div className="flex flex-col">
         <div className="grid grid-cols-3 rounded-sm text-black dark:text-white bg-gray-2 dark:bg-meta-4 sm:grid-cols-5">
           <div className="p-2.5 xl:p-5">
@@ -135,7 +172,7 @@ const PersonalInfo = {
           </div>
           <div className="p-2.5 text-center xl:p-5">
             <h5 className="text-sm font-medium uppercase xsm:text-base">
-              Ligne_name
+              Ligne Names
             </h5>
           </div>
           <div className="p-2.5 text-center xl:p-5">
@@ -174,12 +211,12 @@ const PersonalInfo = {
 
                 <div className="flex items-center justify-center p-2.5 xl:p-5">
                   <p className="text-black dark:text-white">
-                    {supervisor.lignes.name[0]}
+                    {supervisor.lignes.map((ligne) => ligne.name).join(", ")}
                   </p>
                 </div>
                 <div className="flex items-center justify-center p-2.5 xl:p-5">
                   <p className="text-black dark:text-white">
-                    we need it from ichraq's code
+                    we need it from ichraq&apos;s code
                   </p>
                 </div>
                 <div className="hidden items-center justify-center gap-4 p-2.5 sm:flex xl:p-5">
@@ -230,12 +267,12 @@ const PersonalInfo = {
 
                 <div className="flex items-center justify-center p-2.5 xl:p-5">
                   <p className="text-black dark:text-white">
-                    {supervisor.lignes.name}
+                    {supervisor.lignes.map((ligne) => ligne.name).join(", ")}
                   </p>
                 </div>
                 <div className="flex items-center justify-center p-2.5 xl:p-5">
                   <p className="text-black dark:text-white">
-                    we need it from ichraq's code
+                    we need it from ichraq&apos;s code
                   </p>
                 </div>
                 <div className="hidden items-center justify-center gap-4 p-2.5 sm:flex xl:p-5">
@@ -329,6 +366,7 @@ const PersonalInfo = {
           handleEdit={handleEdit}
           CandidatetoEdit={SupervisortoEdit}
           setCandidatetoEdit={setSupervisortoEdit}
+          lignes={ligneOptions}
         />
       </Modal>
     </div>

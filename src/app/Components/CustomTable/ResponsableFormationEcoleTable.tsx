@@ -4,7 +4,7 @@ import { deleteWithAuth, fetchWithAuth, putWithAuth } from "@/utils/api";
 import { Agent } from "@/interfaces/Agent";
 import { Edit2Icon, Trash2Icon } from "lucide-react";
 import useAlert from "@/Hooks/useAlert";
-import Modal from "@/Components/GlobalModal/Modal";
+import Modal from "../GlobalModal/Modal";
 import Swal from "sweetalert2";
 
 

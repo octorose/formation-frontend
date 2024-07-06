@@ -108,7 +108,7 @@ const [selectedLignes, setSelectedLignes] = useState<number[]>([]);
           numerotel: formValues.numerotel,
           role: "Superviseur",
         },
-        lignes: formValues.lignes,
+        lignes_ids: formValues.lignes,
       });
       console.log(formValues);
       

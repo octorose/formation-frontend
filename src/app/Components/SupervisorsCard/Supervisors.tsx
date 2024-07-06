@@ -36,7 +36,7 @@ function Supervisors() {
         </div>
 
         <SupervisorsTable
-          endpoint="/api/supervisors"
+          endpoint="api/supervisors"
           searchResults={searchResults}
         />
       </div>
