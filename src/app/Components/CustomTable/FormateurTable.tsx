@@ -106,7 +106,7 @@ function FormateursTable({
     if (FormateurNameToDelete?.Nom === Formateur.agent.nom) {
       try {
         const response = await deleteWithAuth(
-          `/api/delete-formateurs/${Formateur.id}/`
+          `api/delete-formateurs/${Formateur.id}/`
         );
         // const data = await response.json();
         fetchData();
@@ -136,7 +136,7 @@ function FormateursTable({
     try {
       setIsLoading(true);
       const fetchedData = await fetchWithAuth(
-        `/api/formateurs/?page=${currentPage}`
+        `api/formateurs/?page=${currentPage}`
       );
       setData(fetchedData);
       console.log(fetchedData);
@@ -157,7 +157,7 @@ function FormateursTable({
     console.log(Formateur);
     try {
       const response = await putWithAuth(
-        `/api/update-formateurs/${Formateur.id}/`,
+        `api/update-formateurs/${Formateur.id}/`,
         Formateur
       );
       fetchData();

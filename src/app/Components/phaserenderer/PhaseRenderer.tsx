@@ -1,5 +1,20 @@
 import { EditIcon } from "lucide-react";
 import React from "react";
+import MultiSelectDropDown from "../MultiSelectDropDown/MultiSelectDropDown";
+
+interface Lignes {
+  id: number;
+  name: string;
+}
+
+interface PhaseRendererProps {
+  fields: any;
+  editMode: boolean[];
+  CandidatetoEdit: any;
+  setCandidatetoEdit: (value: any) => void;
+  handleEdit: (index: number, key: string) => void;
+  lignes?: Lignes[] | null; // Make lignes optional and allow null
+}
 
 function PhaseRenderer({
   fields,
@@ -7,13 +22,15 @@ function PhaseRenderer({
   CandidatetoEdit,
   setCandidatetoEdit,
   handleEdit,
-}: any) {
+  lignes,
+}: PhaseRendererProps) {
   const handleInputChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
     key: string
   ) => {
     const { value } = event.target;
-
+    console.log(CandidatetoEdit.id);
+    
     setCandidatetoEdit((prevCandidatetoEdit: any) => {
       if (
         key === "ligne" ||
@@ -29,13 +46,11 @@ function PhaseRenderer({
           [key]: updatedValue,
         };
       } else {
-        // Construct the new agent object without modifying the key directly
         const updatedAgent = {
           ...prevCandidatetoEdit.agent,
           [key]: value,
         };
 
-        // Return the updated candidate object with the updated agent
         return {
           ...prevCandidatetoEdit,
           agent: updatedAgent,
@@ -50,7 +65,7 @@ function PhaseRenderer({
   }
 
   return (
-    <div className="grid grid-cols-2 gap-5 p-4">
+    <div className="grid grid-cols-2 gap-5 p-4 overflow-hidden">
       {Object.keys(fields).map((key, index) => (
         <div key={index} className="text-slate-900">
           <div>
@@ -73,6 +88,18 @@ function PhaseRenderer({
                 <option value="Oui">Oui</option>
                 <option value="Non">Non</option>
               </select>
+            ) : editMode[index] && key === "lignes" && lignes ? (
+              <MultiSelectDropDown
+                options={lignes || []} // Ensure options are defined
+                formFieldName="ligne"
+                selected={CandidatetoEdit.lignes.map((item: any) => item.id)}
+                onChange={(selectedIds: number[]) =>
+                  setCandidatetoEdit((prevCandidatetoEdit: any) => ({
+                    ...prevCandidatetoEdit,
+                    lignes: selectedIds
+                  }))
+                }
+              />
             ) : editMode[index] ? (
               <input
                 type="text"
@@ -82,17 +109,27 @@ function PhaseRenderer({
               />
             ) : (
               <div className="flex flex-row items-center text-black justify-between">
-                <h2>
-                  {flattenData(CandidatetoEdit)[key]?.toString().length > 10
-                    ? flattenData(CandidatetoEdit)[key].toString().slice(0, 6) +
-                      "..."
-                    : flattenData(CandidatetoEdit)[key]}
-                  {CandidatetoEdit[key] === true
-                    ? "Oui"
-                    : CandidatetoEdit[key] === false
-                    ? "Non"
-                    : CandidatetoEdit[key]}
-                </h2>
+                {key === "lignes" ? (
+                  <div>clic pour modifier</div>
+                ) : (
+                  <h2>
+                    {Array.isArray(flattenData(CandidatetoEdit)[key])
+                      ? flattenData(CandidatetoEdit)
+                          [key].map((item: any) => item.name)
+                          .join(", ")
+                      : flattenData(CandidatetoEdit)[key]?.toString().length >
+                        10
+                      ? flattenData(CandidatetoEdit)
+                          [key].toString()
+                          .slice(0, 6) + "..."
+                      : flattenData(CandidatetoEdit)[key]}
+                    {CandidatetoEdit[key] === true
+                      ? "Oui"
+                      : CandidatetoEdit[key] === false
+                      ? "Non"
+                      : CandidatetoEdit[key]}
+                  </h2>
+                )}
                 <EditIcon
                   className="w-6 h-6"
                   onClick={() => handleEdit(index, key)}
