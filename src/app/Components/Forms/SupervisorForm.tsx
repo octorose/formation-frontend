@@ -4,6 +4,8 @@ import DefaultLayout from "../Layout/DefaultLayout";
 import { PlusIcon } from "lucide-react";
 import Swal from "sweetalert2";
 import { postWithAuth, fetchWithAuth } from "@/utils/api"; // Assuming you have API utility functions
+import { calculateAge } from "@/utils/calculateAge";
+import { validateCINLength } from "@/utils/cinValidation";
 
 interface FormValues {
   nom: string;
@@ -94,6 +96,23 @@ const [selectedLignes, setSelectedLignes] = useState<number[]>([]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    e.preventDefault();
+
+    // Age validation
+    const age = calculateAge(formValues.date_naissance);
+    if (age < 20) {
+      Swal.fire({
+        icon: "error",
+        title: "Erreur",
+        text: "L'âge du responsable doit être supérieur ou égal à 20 ans.",
+      });
+      return;
+    }
+
+    // CIN length validation
+    if (!validateCINLength(formValues.cin)) {
+      return;
+    }
     try {
       const response = await postWithAuth("/api/create_supervisor/", {
         agent: {

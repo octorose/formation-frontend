@@ -122,8 +122,6 @@ function SupervisorsTable({
   };
 
   const handleDelete = async (supervisor: any) => {
-    console.log(supervisor);
-
     //@ts-ignore
     if (SupervisortoDelete?.Nom === supervisor.agent.nom) {
       try {

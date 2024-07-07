@@ -5,6 +5,8 @@ import DefaultLayout from "../Layout/DefaultLayout";
 import { PlusIcon, Type } from "lucide-react";
 import Swal from "sweetalert2";
 import { postWithAuth } from "@/utils/api";
+import { calculateAge } from "@/utils/calculateAge";
+import { validateCINLength } from "@/utils/cinValidation";
 
 function FormateurForm() {
   const [formValues, setFormValues] = React.useState({
@@ -37,6 +39,22 @@ const handleChange = (
 };
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    // Age validation
+    const age = calculateAge(formValues.date_naissance);
+    if (age < 20) {
+      Swal.fire({
+        icon: "error",
+        title: "Erreur",
+        text: "L'âge du responsable doit être supérieur ou égal à 20 ans.",
+      });
+      return;
+    }
+
+    // CIN length validation
+    if (!validateCINLength(formValues.cin)) {
+      return;
+    }
     // console.log(formValues);
     try {
       await postWithAuth("/api/create-formateurs/", {
