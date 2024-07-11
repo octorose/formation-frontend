@@ -1,7 +1,6 @@
 "use client";
 import React from 'react';
 import DefaultLayout from '@/Components/Layout/DefaultLayout';
-import axios from 'axios';
 import Swal from 'sweetalert2';
 import { PlusIcon } from 'lucide-react';
 import { calculateAge } from '@/utils/calculateAge';

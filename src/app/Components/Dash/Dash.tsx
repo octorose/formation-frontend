@@ -98,7 +98,7 @@ function Dash() {
         const found = data.find((item: any) => item.etat === etat);
         return found ? found.sum_personnel : 0;
       };
-      const totalCandidates = getPersonnelSum(personnelSumByEtat, "Candidate");
+      const totalCandidates = getPersonnelSum(personnelSumByEtat, "Candidate") + getPersonnelSum(personnelSumByEtat, "Candidat");
       const totalInFormation = getPersonnelSum(
         personnelSumByEtat,
         "En Formation"

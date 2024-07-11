@@ -116,7 +116,6 @@ const postWithAuth = async (
 
     return response.json();
   } catch (error: any) {
-    // Specify 'any' for the error type
     throw new Error(`POST request failed: ${(error as Error).message}`);
   }
 };

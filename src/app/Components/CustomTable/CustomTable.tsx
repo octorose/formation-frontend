@@ -144,7 +144,7 @@ function CustomTable({
     try {
       setIsLoading(true);
         const fetchedData = await fetchWithAuth(
-          `/api/personnel/?page=${currentPage}`
+          `api/personnel/?page=${currentPage}`
         );
         setData(fetchedData);
         setIsLoading(false);

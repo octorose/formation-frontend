@@ -6,7 +6,7 @@ import { Edit2Icon, Trash2Icon } from "lucide-react";
 import useAlert from "@/Hooks/useAlert";
 import Modal from "../GlobalModal/Modal";
 import Swal from "sweetalert2";
-import axios from "axios";
+
 
 interface ResponsableFormationEcole {
   id: number;
