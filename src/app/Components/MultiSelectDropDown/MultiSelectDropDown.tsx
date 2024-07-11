@@ -6,7 +6,7 @@ interface Lignes {
 }
 
 interface MultiSelectDropDownProps {
-  options: Lignes[];
+  options: any[];
   formFieldName: string;
   selected: number[];
   onChange: (selectedIds: number[]) => void;
@@ -25,6 +25,8 @@ const MultiSelectDropDown: React.FC<MultiSelectDropDownProps> = ({
     const selectedNames = options
       .filter((option) => selectedOptions.includes(option.id))
       .map((option) => option.name);
+      console.log(selectedNames);
+      
     const namesText = selectedNames.join(", ");
     setDisplayText(
       namesText.length > 10 ? `${namesText.slice(0, 10)}...` : namesText
@@ -32,6 +34,8 @@ const MultiSelectDropDown: React.FC<MultiSelectDropDownProps> = ({
   }, [selectedOptions, options]); // Only update effect when selectedOptions or options change
 
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+
+    
     const { value, checked } = event.target;
     const numericValue = Number(value);
     setSelectedOptions((prevSelected) =>
@@ -63,7 +67,14 @@ const MultiSelectDropDown: React.FC<MultiSelectDropDownProps> = ({
                   onChange={handleCheckboxChange}
                   className="cursor-pointer"
                 />
-                <span className="ml-1">{option.name}</span>
+                {option.name ? (
+                  <span className="ml-1">{option.name}</span>
+                ) : (
+                  <span className="ml-1">
+                    {option.agent.nom} {option.agent.prenom}
+                  </span>
+                  
+                )}
               </label>
             </li>
           ))}

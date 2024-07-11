@@ -1,10 +1,17 @@
 import { EditIcon } from "lucide-react";
 import React from "react";
 import MultiSelectDropDown from "../MultiSelectDropDown/MultiSelectDropDown";
+import Supervisors from '../SupervisorsCard/Supervisors';
+import { Agent } from '../../interfaces/Agent';
 
 interface Lignes {
   id: number;
   name: string;
+}
+interface Supervisors {
+  id: number;
+  agent: Agent;
+  
 }
 
 interface PhaseRendererProps {
@@ -13,7 +20,8 @@ interface PhaseRendererProps {
   CandidatetoEdit: any;
   setCandidatetoEdit: (value: any) => void;
   handleEdit: (index: number, key: string) => void;
-  lignes?: Lignes[] | null; // Make lignes optional and allow null
+  lignes?: Lignes[] | null;
+  Supervisors?: Supervisors[] | null;
 }
 
 function PhaseRenderer({
@@ -23,24 +31,28 @@ function PhaseRenderer({
   setCandidatetoEdit,
   handleEdit,
   lignes,
+  Supervisors,
 }: PhaseRendererProps) {
   const handleInputChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
     key: string
   ) => {
     const { value } = event.target;
-    console.log(CandidatetoEdit.id);
+    
     
     setCandidatetoEdit((prevCandidatetoEdit: any) => {
       if (
         key === "ligne" ||
         key === "etat" ||
         key === "contract" ||
-        key === "isAffecteur"
+        key === "isAffecteur"||
+        key === "superviseur_nom" ||
+        key === "name"
       ) {
+        console.log(CandidatetoEdit);
         const updatedValue =
           key === "isAffecteur" ? (value === "Oui" ? true : false) : value;
-
+        
         return {
           ...prevCandidatetoEdit,
           [key]: updatedValue,
@@ -96,10 +108,22 @@ function PhaseRenderer({
                 onChange={(selectedIds: number[]) =>
                   setCandidatetoEdit((prevCandidatetoEdit: any) => ({
                     ...prevCandidatetoEdit,
-                    lignes: selectedIds
+                    lignes: selectedIds,
                   }))
                 }
               />
+            ) : editMode[index] && key === "superviseur_nom" && Supervisors ? (
+              <select
+                value={flattenData(CandidatetoEdit)["id"]}
+                onChange={(e: any) => handleInputChange(e, key)}
+                className="w-full"
+              >
+                {Supervisors.map((supervisor) => (
+                  <option key={supervisor.id} value={supervisor.id}>
+                    {supervisor.agent.nom}
+                  </option>
+                ))}
+              </select>
             ) : editMode[index] ? (
               <input
                 type="text"
@@ -113,12 +137,7 @@ function PhaseRenderer({
                   <div>clic pour modifier</div>
                 ) : (
                   <h2>
-                    {Array.isArray(flattenData(CandidatetoEdit)[key])
-                      ? flattenData(CandidatetoEdit)
-                          [key].map((item: any) => item.name)
-                          .join(", ")
-                      : flattenData(CandidatetoEdit)[key]?.toString().length >
-                        10
+                    {flattenData(CandidatetoEdit)[key]?.toString().length > 10
                       ? flattenData(CandidatetoEdit)
                           [key].toString()
                           .slice(0, 6) + "..."
@@ -127,7 +146,7 @@ function PhaseRenderer({
                       ? "Oui"
                       : CandidatetoEdit[key] === false
                       ? "Non"
-                      : CandidatetoEdit[key]}
+                      : ""}
                   </h2>
                 )}
                 <EditIcon
