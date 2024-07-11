@@ -275,7 +275,7 @@ function FormateurForm() {
               type="submit"
               className="bg-graydark mt-6 w-full py-3 dark:bg-gray-100 shadow-md flex items-center justify-center px-6 rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:bg-gray-700"
             >
-              <PlusIcon /> Ajouter Personnel
+              <PlusIcon /> Ajouter Formateur
             </button>
           </form>
         </div>
