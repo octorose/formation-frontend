@@ -54,7 +54,7 @@ function SupervisorsTable({
     console.log(Candidate);
     
     try{
-    putWithAuth(`${endpoint}/update/${Candidate.id}/`, {
+      await putWithAuth(`${endpoint}/update/${Candidate.id}/`, {
       agent: {
         nom: Candidate.agent.nom,
         prenom: Candidate.agent.prenom,
@@ -67,10 +67,21 @@ function SupervisorsTable({
       },
       lignes_ids: Candidate.lignes,
     });
+    Toast.fire({
+      icon: 'success',
+      title: 'superviseur mis à jour avec succès !',
+      iconColor: 'green',
+    });
+
     fetchData();
     setAlert((prev) => ({ ...prev, isOpen: false }));
   } catch (error) {
-    console.error(error);
+    console.error('Échec de la mise à jour du superviseur',error);
+    Toast.fire({
+      icon: 'error',
+      title: 'Une erreur est survenue lors de la mise à jour du responsable.',
+      iconColor: 'red',
+    });
   }
     
   };
@@ -125,10 +136,20 @@ function SupervisorsTable({
     //@ts-ignore
     if (SupervisortoDelete?.Nom === supervisor.agent.nom) {
       try {
-        deleteWithAuth(`${endpoint}/${supervisor.id}`);
+        const response = await deleteWithAuth(
+          `${endpoint}/${supervisor.id}/`
+        );
+        if (!response || response.status === 204) {
+          Toast.fire({
+            icon: 'success',
+            title: 'Superviseur supprimé avec succès !',
+            iconColor: 'green',
+          });
+        }
+        // const data = await response.json();
         fetchData();
         setAlert2((prev) => ({ ...prev, isOpen: false }));
-        console.log("deleted");
+     
       } catch (error) {
         console.error(error);
       }
@@ -322,18 +343,22 @@ function SupervisorsTable({
           setAlert2((prev) => ({ ...prev, isOpen: false }));
         }}
       >
-        <div className="grid grid-cols-2 gap-5 p-4">
-          <div className="text-slate-900">
-            <div>
-              <h2 className="font-semibold">Name</h2>
+         <div className="p-4">
+          <div className="flex flex-col">
+            <label htmlFor="deleteName" className="text-sm font-medium">
+              Nom :
+            </label>
               <input
-                type="text"
-                onChange={(event) => handleDeleteInputChange(event, "Nom")}
-                className="w-full p-2 border border-neutral-200 rounded-lg"
-              />
+              id="deleteName"
+              type="text"
+             
+              onChange={(event) => handleDeleteInputChange(event, 'Nom')}
+              className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              placeholder={`Tapez "${ SupervisortoDelete?.agent?.nom}"`}
+            />
             </div>
           </div>
-        </div>
+      
       </Modal>
       <Modal
         isOpen={alert.isOpen}
