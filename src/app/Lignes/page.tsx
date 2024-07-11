@@ -7,7 +7,6 @@ import { Plus, PlusIcon } from 'lucide-react';
 import SearchComponent from '@/Components/SearchComponent/Search';
 
 function page() {
-      const [searchResults, setSearchResults] = useState<any[]>([]);
 
   return (
     <DefaultLayout>
