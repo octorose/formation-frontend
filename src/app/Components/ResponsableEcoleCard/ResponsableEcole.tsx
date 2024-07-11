@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { PlusIcon } from 'lucide-react'; 
+import { Plus, PlusIcon } from 'lucide-react'; 
 import SearchComponent from '../SearchComponent/Search';
 import ResponsableFormationEcoleTable from '../CustomTable/ResponsableFormationEcoleTable';
+import GlobalButton from '../globalButton/globalButton';
 
 function ResponsableFormationEcole() {
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -35,12 +36,7 @@ function ResponsableFormationEcole() {
               />
             </div>
           
-            <a
-              href="/AddResponsableEcole"
-              className="bg-graydark px-5 py-3 dark:bg-gray-100 text-white text-base rounded-md gap-2 shadow-md flex items-center justify-center hover:bg-gray-700 transition duration-300"
-            >
-              <PlusIcon /> Add Responsable Ecole
-            </a>
+          
           </div>
         </div>
 
@@ -48,6 +44,18 @@ function ResponsableFormationEcole() {
           endpoint="api/responsable_formation_ecole/"
           searchResults={searchResults}
         />
+      </div>
+      <div style={{ position: "fixed", bottom: "20px", right: "20px" }}>
+        <GlobalButton
+          onClick={() =>
+
+            (window.location.href = "/AddResponsableEcole")
+          }
+          className="bg-blue-950 w-14 h-14 rounded-full flex items-center justify-center shadow-xl text-white mr-10"
+          aria-label="add"
+        >
+          <Plus />
+        </GlobalButton>
       </div>
     </div>
   );
