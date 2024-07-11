@@ -85,7 +85,19 @@ const Home = () => {
       content: <Candidats />,
     },
   ];
-
+  const tabsResponsableEcole = [ 
+    {
+      title: "Dashboard",
+      value: "Dashboard",
+      content: <Dash />,
+    },
+    {
+      title: "Formateurs",
+      value: "Formateurs",
+      content: <Formateur />,
+    },
+  
+  ];
   const role = getRoleFromToken();
   return (
     <DefaultLayout importexport={true}>
@@ -100,8 +112,12 @@ const Home = () => {
             tabs={tabsSupervisor}
             activeTabClassName="bg-blue-200 dark:bg-blue-800 border-5 text-black dark:text-white"
           />
-        ) : role == "ResponsableFormation" ? (
-          <>Responsable view</>
+        ) : role == "ResponsableEcoleFormation" ? (
+          <Tabs
+          tabs={tabsResponsableEcole}
+          activeTabClassName="bg-blue-200 dark:bg-blue-800 border-5 text-black dark:text-white"
+        />
+        
         ) : (
           <></>
         )}

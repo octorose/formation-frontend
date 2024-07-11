@@ -152,17 +152,22 @@ const deleteWithAuth = async (
       if (!newResponse.ok) {
         throw new Error("Failed to fetch data");
       }
-      return newResponse.json();
+      return newResponse;
+    }
+
+    if (response.status === 204) {
+      // Suppression réussie, pas de contenu à retourner
+      return null;
     }
 
     if (!response.ok) {
       throw new Error("Failed to fetch data");
     }
 
-    return response.json();
+    return response;
   } catch (error: any) {
-    // Specify 'any' for the error type
-    throw new Error(`DELETE request failed: ${(error as Error).message}`);
+    console.error(`DELETE request failed: ${error.message}`);
+    throw new Error(`DELETE request failed: ${error.message}`);
   }
 };
 
