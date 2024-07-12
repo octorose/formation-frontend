@@ -10,6 +10,7 @@ import {
 } from "../ui/select";
 import Loader from "../common/Loader";
 import { fetchWithAuth } from "@/utils/api";
+import { getRoleIdFromToken } from "@/utils/getRoleIdFromToken";
 
 interface Employee {
   id: string;
@@ -66,7 +67,7 @@ export default function Polyvalance() {
     setRatedLoading(true);
     setError("");
     try {
-      const response = await fetchWithAuth(`/api/lignes`);
+      const response = await fetchWithAuth(`api/supervisor-lignes/${getRoleIdFromToken()}/`);
       console.log(response);
       setProductionLines(response.results);
       if (response.results.length > 0) {
