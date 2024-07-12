@@ -98,6 +98,22 @@ export default function Polyvalance() {
       setUnratedLoading(false);
     }
   };
+  const fetchThisLineOperateurs = async (lineId: string) => {
+    setRatedLoading(true);
+    setUnratedLoading(true);
+    setError("");
+    try {
+      const response = await fetchWithAuth(`api/line-operateurs/${lineId}`)
+      console.log(response);
+      setUnratedOperateurs(response);
+    }
+    catch (error: any) {
+      setError(error.message);
+      setUnratedOperateurs([]);
+    } finally {
+      setUnratedLoading(false);
+    }
+  }
 
   return (
     <div className="grid md:grid-cols-2 gap-6 w-full">
@@ -113,7 +129,11 @@ export default function Polyvalance() {
             <label htmlFor="production-line">Line</label>
             <Select
               defaultValue=""
-              onValueChange={(value) => setProductionLine(value)}
+              onValueChange={(value) => {
+                setProductionLine(value);
+                fetchThisLineOperateurs(value);
+                
+              }}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select production line" />
