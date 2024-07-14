@@ -7,6 +7,7 @@ import { calculateAge } from '@/utils/calculateAge';
 import { validateCINLength } from '@/utils/cinValidation';
 
 import { postWithAuth } from '@/utils/api';
+import withAuth from '@/utils/HOC/withAuth';
 const AddResponsableEcole = () => {
   const [formValues, setFormValues] = React.useState({
     nom: '',
@@ -248,4 +249,4 @@ const AddResponsableEcole = () => {
   );
 };
 
-export default AddResponsableEcole;
+export default withAuth(AddResponsableEcole);

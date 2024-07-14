@@ -1,5 +1,6 @@
 import DefaultLayout from '@/Components/Layout/DefaultLayout';
 import React from 'react'
+import withAuth from '@/utils/HOC/withAuth';
 
 function page() {
   return (
@@ -14,4 +15,4 @@ function page() {
   );
 }
 
-export default page
+export default withAuth(page)
