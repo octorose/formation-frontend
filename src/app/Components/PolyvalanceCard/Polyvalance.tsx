@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Button, Input, Label } from "@headlessui/react";
+import { Button, Input } from "@headlessui/react";
 import {
   Select,
   SelectContent,
@@ -11,17 +11,23 @@ import {
 import Loader from "../common/Loader";
 import { fetchWithAuth } from "@/utils/api";
 import { getRoleIdFromToken } from "@/utils/getRoleIdFromToken";
+import { Agent } from "@/interfaces/Agent";
+import Image from "next/image";
+import { Poste } from "@/interfaces/Poste";
 
 interface Employee {
   id: string;
-  name: string;
+  agent: Agent;
+  etat: string;
+  ligne: number;
+  poste: Poste;
 }
 interface ProductionLine {
   id: string;
   name: string;
 }
 interface RatedEmployee extends Employee {
-  rating: number;
+  score: number;
 }
 
 export default function Polyvalance() {
@@ -49,12 +55,10 @@ export default function Polyvalance() {
     setRatedLoading(true);
     setError("");
     try {
-      const response = await fetch(
-        `/api/rated-operateurs?line=${productionLine}`
+      const response = await fetchWithAuth(
+        `/api/rated-operators/${productionLine}/`
       );
-      if (!response.ok) throw new Error("Failed to fetch rated operateurs");
-      const data = await response.json();
-      setRatedOperateurs(data);
+      setRatedOperateurs(response);
     } catch (error: any) {
       setError(error.message);
       setRatedOperateurs([]);
@@ -67,8 +71,9 @@ export default function Polyvalance() {
     setRatedLoading(true);
     setError("");
     try {
-      const response = await fetchWithAuth(`api/supervisor-lignes/${getRoleIdFromToken()}/`);
-      console.log(response);
+      const response = await fetchWithAuth(
+        `api/supervisor-lignes/${getRoleIdFromToken()}/`
+      );
       setProductionLines(response.results);
       if (response.results.length > 0) {
         setProductionLine(response.results[0].id);
@@ -85,12 +90,10 @@ export default function Polyvalance() {
     setUnratedLoading(true);
     setError("");
     try {
-      const response = await fetch(
-        `/api/unrated-operateurs?line=${productionLine}`
+      const response = await fetchWithAuth(
+        `api/unrated-operators/${productionLine}/`
       );
-      if (!response.ok) throw new Error("Failed to fetch unrated operateurs");
-      const data = await response.json();
-      setUnratedOperateurs(data);
+      setUnratedOperateurs(response);
     } catch (error: any) {
       setError(error.message);
       setUnratedOperateurs([]);
@@ -98,22 +101,14 @@ export default function Polyvalance() {
       setUnratedLoading(false);
     }
   };
-  const fetchThisLineOperateurs = async (lineId: string) => {
-    setRatedLoading(true);
-    setUnratedLoading(true);
-    setError("");
-    try {
-      const response = await fetchWithAuth(`api/line-operateurs/${lineId}`)
-      console.log(response);
-      setUnratedOperateurs(response);
-    }
-    catch (error: any) {
-      setError(error.message);
-      setUnratedOperateurs([]);
-    } finally {
-      setUnratedLoading(false);
-    }
-  }
+
+  const handleLineChange = async (value: string) => {
+    setProductionLine(value);
+    setRatedOperateurs([]); // Clear the rated operators
+    setUnratedOperateurs([]); // Clear the unrated operators
+    fetchRatedOperateurs();
+    fetchUnratedOperateurs();
+  };
 
   return (
     <div className="grid md:grid-cols-2 gap-6 w-full">
@@ -122,18 +117,15 @@ export default function Polyvalance() {
           <div>
             <h2 className="text-xl font-bold">Rated Operateurs</h2>
             <p className="text-muted-foreground">
-              Review & rate the performance of operateurs  on your production line.
+              Review & rate the performance of operateurs on your production
+              line.
             </p>
           </div>
           <div className="flex items-center gap-2">
             <label htmlFor="production-line">Line</label>
             <Select
               defaultValue=""
-              onValueChange={(value) => {
-                setProductionLine(value);
-                fetchThisLineOperateurs(value);
-                
-              }}
+              onValueChange={(value) => handleLineChange(value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select production line" />
@@ -160,22 +152,29 @@ export default function Polyvalance() {
               ratedOperateurs.map((employee) => (
                 <div
                   key={employee.id}
-                  className="flex items-center gap-2 p-4 bg-muted rounded-md"
+                  className="flex items-center  rounded-md text-black"
                 >
-                  <div className="flex-1">
-                    <div className="font-medium">{employee.name}</div>
-                    <div className="flex items-center gap-1 text-muted-foreground">
-                      {Array.from({ length: 5 }).map((_, index) => (
-                        <StarIcon
-                          key={index}
-                          className={`w-5 h-5 ${
-                            index < employee.rating
-                              ? "fill-primary"
-                              : "fill-muted stroke-muted-foreground"
-                          }`}
-                        />
-                      ))}
-                    </div>
+                  <div className="flex  w-full items-center gap-3 ">
+                    <span className=" rounded-full">
+                      <Image
+                        width={20}
+                        height={20}
+                        src={
+                          "https://ui-avatars.com/api/?name=" +
+                          employee.agent.nom +
+                          "i&size=160&background=random"
+                        }
+                        style={{
+                          width: "auto",
+                          height: "auto",
+                          borderRadius: "50%",
+                        }}
+                        alt="User"
+                      />
+                    </span>
+                    <div className="font-medium">{employee.agent.nom}</div>
+                    <div>{employee.poste.name}</div>
+                    <div>Score: {employee.score}</div>
                   </div>
                 </div>
               ))
@@ -213,21 +212,40 @@ export default function Polyvalance() {
             ) : error ? (
               <p>{error}</p>
             ) : unratedOperateurs.length === 0 ? (
-              <p>No unrated operateurs found. everything is updated</p>
+              <p>No unrated operateurs found. Everything is updated</p>
             ) : (
               unratedOperateurs
                 .filter((employee) =>
-                  employee.name
-                    .toLowerCase()
-                    .includes(searchQuery.toLowerCase())
+                  employee.agent.nom.toLowerCase().includes(searchQuery)
                 )
                 .map((employee) => (
                   <div
                     key={employee.id}
-                    className="flex items-center gap-2 p-4 bg-muted rounded-md"
+                    className="flex items-center rounded-md text-black"
                   >
-                    <div className="flex-1">
-                      <div className="font-medium">{employee.name}</div>
+                    <div
+                      className="flex w-full items-center gap-3"
+                      onClick={() => console.log(unratedOperateurs)}
+                    >
+                      <span className="rounded-full">
+                        <Image
+                          width={20}
+                          height={20}
+                          src={
+                            "https://ui-avatars.com/api/?name=" +
+                            employee.agent.nom +
+                            "i&size=160&background=random"
+                          }
+                          style={{
+                            width: "auto",
+                            height: "auto",
+                            borderRadius: "50%",
+                          }}
+                          alt="User"
+                        />
+                      </span>
+                      <div className="font-medium">{employee.agent.nom}</div>
+                      <div>{employee.poste.name}</div>
                     </div>
                   </div>
                 ))
