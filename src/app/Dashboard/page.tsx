@@ -80,6 +80,24 @@ const Home = () => {
     },
   ];
 
+  const tabsCandidats = [ 
+    {
+      title: "Dashboard",
+      value: "Dashboard",
+      content: <Dash />,
+    },
+    {
+      title: "Formateurs",
+      value: "Formateurs",
+      content: <Formateur />,
+    },
+    {
+      title: "Candidats",
+      value: "Candidats",
+      content: <Candidats />,
+    },
+  ];
+
   const role = getRoleFromToken();
   return (
     <DefaultLayout importexport={true}>

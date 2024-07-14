@@ -24,7 +24,7 @@ interface SidebarProps {
 const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const [role, setRole] = useState<string | null>(null);
 
-  const pathname = usePathname();
+  const pathname = usePathname(); 
   const trigger = useRef<any>(null);
   const sidebar = useRef<any>(null);
 
@@ -182,6 +182,14 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                   }`}
                                 >
                                   Add Manually
+                                </Link>
+                                <Link
+                                  href="/AddFormateur"
+                                  className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
+                                    pathname === "/#" && "text-white"
+                                  }`}
+                                >
+                                  Add With IA
                                 </Link>
                               </li>
                             </ul>
@@ -493,6 +501,17 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 >
                                   Add Manually
                                 </Link>
+
+                                <li>
+                                <Link
+                                  href="/AddPersonnelIA"
+                                  className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
+                                    pathname === "/#" && "text-white"
+                                  }`}
+                                >
+                                  Add Candidats With IA
+                                </Link>
+                                </li>
                               </li>
                             </ul>
                           </div>
@@ -670,7 +689,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                             : setSidebarExpanded(true);
                         }}
                       >
-                        Maybe We Will need Something here
+                        Test Logique 
                         <DynamicArrow open={open} />
                       </Link>
 
