@@ -6,7 +6,6 @@ import { PlusIcon } from "lucide-react";
 import Swal from "sweetalert2";
 import { postWithAuth, fetchWithAuth } from "@/utils/api";
 import { Agent } from "@/interfaces/Agent";
-import { AnimatedTooltip } from "../Tooltip/Tooltip";
 
 interface Ligne {
   id: number;
