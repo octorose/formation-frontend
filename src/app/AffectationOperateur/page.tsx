@@ -1,3 +1,4 @@
+"use client"
 import DefaultLayout from '@/Components/Layout/DefaultLayout';
 import React from 'react'
 import withAuth from '@/utils/HOC/withAuth';
