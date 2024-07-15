@@ -15,6 +15,9 @@ import { Agent } from "@/interfaces/Agent";
 import Image from "next/image";
 import { Poste } from "@/interfaces/Poste";
 
+interface ScoreGridProps {
+  score: number;
+}
 interface Employee {
   id: string;
   agent: Agent;
@@ -54,7 +57,7 @@ export default function Polyvalance() {
   const fetchRatedOperateurs = async () => {
     setRatedLoading(true);
     setError("");
-    try {
+    try { 
       const response = await fetchWithAuth(
         `/api/rated-operators/${productionLine}/`
       );
@@ -174,7 +177,12 @@ export default function Polyvalance() {
                     </span>
                     <div className="font-medium">{employee.agent.nom}</div>
                     <div>{employee.poste.name}</div>
-                    <div>Score: {employee.score}</div>
+                    <div>
+                     
+                      <ScoreGrid
+                        score={employee.score > 4 ? 4 : employee.score}
+                      />
+                    </div>
                   </div>
                 </div>
               ))
@@ -258,6 +266,64 @@ export default function Polyvalance() {
     </div>
   );
 }
+const ScoreGrid: React.FC<ScoreGridProps> = ({ score }) => {
+  const grids: { [key: number]: string[] } = {
+    1: [
+      "bg-blue-500",
+      "bg-white",
+      "bg-white",
+      "bg-blue-500",
+      "bg-white",
+      "bg-white",
+      "bg-blue-500",
+      "bg-white",
+      "bg-white",
+    ],
+    2: [
+      "bg-blue-500",
+      "bg-white",
+      "bg-white",
+      "bg-blue-500",
+      "bg-white",
+      "bg-white",
+      "bg-blue-500",
+      "bg-blue-500",
+      "bg-blue-500",
+    ],
+    3: [
+      "bg-blue-500",
+      "bg-white",
+      "bg-blue-500",
+      "bg-blue-500",
+      "bg-white",
+      "bg-blue-500",
+      "bg-blue-500",
+      "bg-blue-500",
+      "bg-blue-500",
+    ],
+    4: [
+      "bg-blue-500",
+      "bg-blue-500",
+      "bg-blue-500",
+      "bg-blue-500",
+      "bg-white",
+      "bg-blue-500",
+      "bg-blue-500",
+      "bg-blue-500",
+      "bg-blue-500",
+    ],
+  };
+
+  const scoreGrid = grids[score];
+
+  return (
+    <div className="grid grid-cols-3 gap-1">
+      {scoreGrid.map((className:string, index:number) => (
+        <div key={index} className={`w-2 h-2 ${className}`}></div>
+      ))}
+    </div>
+  );
+};
 
 function SearchIcon(props: any) {
   return (

@@ -9,7 +9,7 @@ function page() {
   return (
     <DefaultLayout importexport={false}>
       <div className="flex flex-col items-center justify-center">
-        <h1 className="text-4xl font-bold text-gray-800">
+        <h1 className="text-4xl font-bold text-gray-800 mb-5">
           Ajouter une polyvalence
         </h1>
       </div>
