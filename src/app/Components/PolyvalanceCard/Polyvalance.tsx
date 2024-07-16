@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Button, Input, Label } from "@headlessui/react";
+import { Button, Input } from "@headlessui/react";
 import {
   Select,
   SelectContent,
@@ -9,25 +9,99 @@ import {
   SelectValue,
 } from "../ui/select";
 import Loader from "../common/Loader";
-import { fetchWithAuth } from "@/utils/api";
+import { fetchWithAuth, postWithAuth, putWithAuth } from "@/utils/api";
+import { getRoleIdFromToken } from "@/utils/getRoleIdFromToken";
+import { Agent } from "@/interfaces/Agent";
+import Image from "next/image";
+import { Poste } from "@/interfaces/Poste";
+import useAlert from "@/Hooks/useAlert";
+import Modal from "../GlobalModal/Modal";
+import Swal from "sweetalert2";
+
+interface ScoreGridProps {
+  score: number | undefined;
+}
 
 interface Employee {
   id: string;
-  name: string;
+  agent: Agent;
+  etat: string;
+  ligne: number;
+  poste: Poste;
 }
+
 interface ProductionLine {
   id: string;
   name: string;
 }
+
 interface RatedEmployee extends Employee {
-  rating: number;
+  score: number;
+  comments: string;
+}
+interface UnRatedEmployee extends Employee {
+  score: number;
+  comments: string;
 }
 
-export default function Polyvalance() {
+const grids: { [key: number]: string[] } = {
+  1: [
+    "bg-blue-500",
+    "bg-white",
+    "bg-white",
+    "bg-blue-500",
+    "bg-white",
+    "bg-white",
+    "bg-blue-500",
+    "bg-white",
+    "bg-white",
+  ],
+  2: [
+    "bg-blue-500",
+    "bg-white",
+    "bg-white",
+    "bg-blue-500",
+    "bg-white",
+    "bg-white",
+    "bg-blue-500",
+    "bg-blue-500",
+    "bg-blue-500",
+  ],
+  3: [
+    "bg-blue-500",
+    "bg-white",
+    "bg-blue-500",
+    "bg-blue-500",
+    "bg-white",
+    "bg-blue-500",
+    "bg-blue-500",
+    "bg-blue-500",
+    "bg-blue-500",
+  ],
+  4: [
+    "bg-blue-500",
+    "bg-blue-500",
+    "bg-blue-500",
+    "bg-blue-500",
+    "bg-white",
+    "bg-blue-500",
+    "bg-blue-500",
+    "bg-blue-500",
+    "bg-blue-500",
+  ],
+};
+
+export default function Polyvalence() {
   const [ratedOperateurs, setRatedOperateurs] = useState<RatedEmployee[]>([]);
-  const [unratedOperateurs, setUnratedOperateurs] = useState<Employee[]>([]);
+  const [unratedOperateurs, setUnratedOperateurs] = useState<RatedEmployee[]>(
+    []
+  );
   const [productionLines, setProductionLines] = useState<ProductionLine[]>([]);
   const [productionLine, setProductionLine] = useState("");
+  const { alert, setAlert } = useAlert();
+  const { alert: alert2, setAlert: setAlert2 } = useAlert();
+  const [operatortoedit, setOperatorToEdit] = useState<RatedEmployee>();
+  const [operatorToAdd, setOperatorToAdd] = useState<RatedEmployee>();
   const [searchQuery, setSearchQuery] = useState("");
   const [ratedLoading, setRatedLoading] = useState(true);
   const [unratedLoading, setUnratedLoading] = useState(true);
@@ -48,12 +122,10 @@ export default function Polyvalance() {
     setRatedLoading(true);
     setError("");
     try {
-      const response = await fetch(
-        `/api/rated-operateurs?line=${productionLine}`
+      const response = await fetchWithAuth(
+        `/api/rated-operators/${productionLine}/`
       );
-      if (!response.ok) throw new Error("Failed to fetch rated operateurs");
-      const data = await response.json();
-      setRatedOperateurs(data);
+      setRatedOperateurs(response);
     } catch (error: any) {
       setError(error.message);
       setRatedOperateurs([]);
@@ -66,8 +138,9 @@ export default function Polyvalance() {
     setRatedLoading(true);
     setError("");
     try {
-      const response = await fetchWithAuth(`/api/lignes`);
-      console.log(response);
+      const response = await fetchWithAuth(
+        `api/supervisor-lignes/${getRoleIdFromToken()}/`
+      );
       setProductionLines(response.results);
       if (response.results.length > 0) {
         setProductionLine(response.results[0].id);
@@ -84,12 +157,10 @@ export default function Polyvalance() {
     setUnratedLoading(true);
     setError("");
     try {
-      const response = await fetch(
-        `/api/unrated-operateurs?line=${productionLine}`
+      const response = await fetchWithAuth(
+        `api/unrated-operators/${productionLine}/`
       );
-      if (!response.ok) throw new Error("Failed to fetch unrated operateurs");
-      const data = await response.json();
-      setUnratedOperateurs(data);
+      setUnratedOperateurs(response);
     } catch (error: any) {
       setError(error.message);
       setUnratedOperateurs([]);
@@ -97,25 +168,93 @@ export default function Polyvalance() {
       setUnratedLoading(false);
     }
   };
+  const AddPolyvalance = async (payload: any) => {
+    try {
+      const res = await postWithAuth(`api/polyvalences/`, payload);
+      console.log(res);
+      setAlert2((prev) => ({ ...prev, isOpen: false }));
+      const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        iconColor: "green",
+        customClass: {
+          popup: "colored-toast",
+        },
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+      });
+      Toast.fire({
+        icon: "success",
+        title: "Polyvalance ajouté avec succès !",
+      });
+      fetchRatedOperateurs();
+      fetchUnratedOperateurs();
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  const updateCandidate = async (payload: any) => {
+    try {
+      const res = await putWithAuth(
+        `api/polyvalences/${operatortoedit?.id}/`,
+        payload
+      );
+      console.log(res);
+      setAlert((prev) => ({ ...prev, isOpen: false }));
+      const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        iconColor: "green",
+        customClass: {
+          popup: "colored-toast",
+        },
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+      });
+
+      Toast.fire({
+        icon: "success",
+        title: "Polyvalance ajouté avec succès !",
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  const handleLineChange = async (value: string) => {
+    setProductionLine(value);
+    setRatedOperateurs([]); // Clear the rated operators
+    setUnratedOperateurs([]); // Clear the unrated operators
+    fetchRatedOperateurs();
+    fetchUnratedOperateurs();
+  };
+
+  const handleScoreChange = (id: string, score: number) => {
+    console.log(`Employee ${id} score changed to: ${score}`);
+    // Here, you would update the employee's score in your state or send the update to your backend.
+  };
 
   return (
     <div className="grid md:grid-cols-2 gap-6 w-full">
       <div className="bg-background rounded-lg shadow-md bg-white p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-xl font-bold">Rated Operateurs</h2>
+            <h2 className="text-xl font-bold">Opérateurs Évalués</h2>
             <p className="text-muted-foreground">
-              Review & rate the performance of operateurs  on your production line.
+              Examinez et évaluez la performance des opérateurs sur votre ligne
+              de production.
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <label htmlFor="production-line">Line</label>
+            <label htmlFor="production-line">Ligne</label>
             <Select
               defaultValue=""
-              onValueChange={(value) => setProductionLine(value)}
+              onValueChange={(value) => handleLineChange(value)}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select production line" />
+                <SelectValue placeholder="Sélectionnez une ligne de production" />
               </SelectTrigger>
               <SelectContent>
                 {productionLines.map((line: any) => (
@@ -134,49 +273,67 @@ export default function Polyvalance() {
             ) : error ? (
               <p>{error}</p>
             ) : ratedOperateurs.length === 0 ? (
-              <p>No rated operateurs found. Rate operateurs to see them here</p>
+              <p>
+                Aucun opérateur évalué trouvé. Évaluez les opérateurs pour les
+                voir ici.
+              </p>
             ) : (
               ratedOperateurs.map((employee) => (
                 <div
                   key={employee.id}
-                  className="flex items-center gap-2 p-4 bg-muted rounded-md"
+                  className="flex items-center rounded-md text-black cursor-pointer"
+                  onClick={() => {
+                    setOperatorToEdit(employee);
+                    setAlert((prev) => ({ ...prev, isOpen: true }));
+                  }}
                 >
-                  <div className="flex-1">
-                    <div className="font-medium">{employee.name}</div>
-                    <div className="flex items-center gap-1 text-muted-foreground">
-                      {Array.from({ length: 5 }).map((_, index) => (
-                        <StarIcon
-                          key={index}
-                          className={`w-5 h-5 ${
-                            index < employee.rating
-                              ? "fill-primary"
-                              : "fill-muted stroke-muted-foreground"
-                          }`}
-                        />
-                      ))}
+                  <div className="flex justify-between items-center w-full gap-3">
+                    <span className="rounded-full">
+                      <Image
+                        width={20}
+                        height={20}
+                        src={
+                          "https://ui-avatars.com/api/?name=" +
+                          employee.agent.nom +
+                          "i&size=160&background=random"
+                        }
+                        style={{
+                          width: "auto",
+                          height: "auto",
+                          borderRadius: "50%",
+                        }}
+                        alt="Utilisateur"
+                      />
+                    </span>
+                    <div className="font-medium">{employee.agent.nom}</div>
+                    <div className="text-center">{employee.poste.name}</div>
+                    <div>
+                      <ScoreGrid
+                        score={employee.score > 4 ? 4 : employee.score}
+                      />
                     </div>
                   </div>
                 </div>
               ))
             )
           ) : (
-            <p>Please choose a Production Line</p>
+            <p>Veuillez choisir une ligne de production</p>
           )}
         </div>
       </div>
       <div className="bg-background rounded-lg bg-white shadow-md p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-xl font-bold">Unrated Operateurs</h2>
+            <h2 className="text-xl font-bold">Opérateurs Non Évalués</h2>
             <p className="text-muted-foreground">
-              Review and rate the performance of operateurs on your production
-              line.
+              Examinez et évaluez la performance des opérateurs sur votre ligne
+              de production.
             </p>
           </div>
           <div className="flex items-center gap-2">
             <Input
               type="text"
-              placeholder="Search operateurs..."
+              placeholder="Rechercher des opérateurs..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -192,33 +349,225 @@ export default function Polyvalance() {
             ) : error ? (
               <p>{error}</p>
             ) : unratedOperateurs.length === 0 ? (
-              <p>No unrated operateurs found. everything is updated</p>
+              <p>Aucun opérateur non évalué trouvé. Tout est à jour.</p>
             ) : (
               unratedOperateurs
                 .filter((employee) =>
-                  employee.name
-                    .toLowerCase()
-                    .includes(searchQuery.toLowerCase())
+                  employee.agent.nom.toLowerCase().includes(searchQuery)
                 )
                 .map((employee) => (
                   <div
                     key={employee.id}
-                    className="flex items-center gap-2 p-4 bg-muted rounded-md"
+                    className="flex items-center rounded-md text-black"
+                    onClick={() => {
+                      setAlert2((prev) => ({ ...prev, isOpen: true }));                      
+                      setOperatorToAdd(employee);
+                    }}
                   >
-                    <div className="flex-1">
-                      <div className="font-medium">{employee.name}</div>
+                    <div
+                      className="flex items-center w-full gap-3 cursor-pointer"
+                      onClick={() => console.log(unratedOperateurs)}
+                    >
+                      <span className="rounded-full">
+                        <Image
+                          width={20}
+                          height={20}
+                          src={
+                            "https://ui-avatars.com/api/?name=" +
+                            employee.agent.nom +
+                            "i&size=160&background=random"
+                          }
+                          style={{
+                            width: "auto",
+                            height: "auto",
+                            borderRadius: "50%",
+                          }}
+                          alt="Utilisateur"
+                        />
+                      </span>
+                      <div className="font-medium">{employee.agent.nom}</div>
+                      <div>{employee.poste.name}</div>
                     </div>
                   </div>
                 ))
             )
           ) : (
-            <p>Please choose a Production Line</p>
+            <p>Veuillez choisir une ligne de production</p>
           )}
         </div>
       </div>
+      <Modal
+        isOpen={alert.isOpen}
+        onSubmit={() => {
+          const payload = {
+            score: operatortoedit?.score,
+            comments: operatortoedit?.comments,
+          };
+          updateCandidate(payload);
+        }}
+        onCancel={() => {
+          setAlert((prev) => ({ ...prev, isOpen: false }));
+        }}
+        alertTitle={
+          "Modifier les détails de " + operatortoedit?.agent?.nom ||
+          "Détails du operateur"
+        }
+        alertDescription={"Modifier "}
+        submitBtnName={"Modifier"}
+        cancelBtnName="Annuler"
+        type="success"
+        onClose={() => {
+          setAlert((prev) => ({ ...prev, isOpen: false }));
+        }}
+      >
+        <div className="grid grid-cols-2 gap-5">
+          <div>
+            <label htmlFor="score">Score</label>
+            <input
+              type="number"
+              id="score"
+              name="score"
+              value={operatortoedit?.score}
+              min="1"
+              max="4"
+              className="w-full p-2 border border-gray-300 rounded-md"
+              onChange={(e) => {
+                const value = parseInt(e.target.value);
+
+                if (isNaN(value)) {
+                  e.target.value = "";
+                } else if (value < 1) {
+                  e.target.value = "1";
+                } else if (value > 4) {
+                  e.target.value = "4";
+                }
+
+                setOperatorToEdit((prev: RatedEmployee | undefined) => ({
+                  ...prev!,
+                  score: parseInt(e.target.value),
+                }));
+              }}
+            />
+          </div>
+          <div>
+            <label htmlFor="score">careau magique </label>
+            <div className="flex items-center justify-between">
+              <ScoreGrid score={operatortoedit?.score} />
+            </div>
+          </div>
+        </div>
+        <div>
+          <label htmlFor="score">commentaire</label>
+          <textarea
+            id="commentaire"
+            name="commentaire"
+            value={operatortoedit?.comments}
+            className="w-full p-2 border border-gray-300 rounded-md"
+            onChange={(e) => {
+              setOperatorToEdit((prev: RatedEmployee | undefined) => ({
+                ...prev!,
+                comments: e.target.value,
+              }));
+            }}
+          />
+        </div>
+      </Modal>
+      <Modal
+        isOpen={alert2.isOpen}
+        onSubmit={() => {
+          const payload = {
+            score: operatorToAdd?.score,
+            comments: operatorToAdd?.comments,
+            supervisor: getRoleIdFromToken(),
+            personnel: operatorToAdd?.id,
+            ligne: productionLine,
+            poste: operatorToAdd?.poste.id,
+          };
+          AddPolyvalance(payload);
+        }}
+        onCancel={() => {
+          setAlert2((prev) => ({ ...prev, isOpen: false }));
+        }}
+        alertTitle={
+          "Ajouter les détails de " + operatortoedit?.agent?.nom ||
+          "Détails du Operateur"
+        }
+        alertDescription={"Ajouter "}
+        submitBtnName={"Ajouter"}
+        cancelBtnName="Annuler"
+        type="success"
+        onClose={() => {
+          setAlert((prev) => ({ ...prev, isOpen: false }));
+        }}
+      >
+        <div className="grid grid-cols-2 gap-5">
+          <div>
+            <label htmlFor="score">Score</label>
+            <input
+              type="number"
+              id="score"
+              name="score"
+              value={operatortoedit?.score}
+              min="1"
+              max="4"
+              className="w-full p-2 border border-gray-300 rounded-md"
+              onChange={(e) => {
+                const value = parseInt(e.target.value);
+
+                if (isNaN(value)) {
+                  e.target.value = "";
+                } else if (value < 1) {
+                  e.target.value = "1";
+                } else if (value > 4) {
+                  e.target.value = "4";
+                }
+
+                setOperatorToAdd((prev: UnRatedEmployee | undefined) => ({
+                  ...prev!,
+                  score: parseInt(e.target.value),
+                }));
+              }}
+            />
+          </div>
+          <div>
+            <label htmlFor="score">careau magique </label>
+            <div className="flex items-center justify-between">
+              <ScoreGrid score={operatorToAdd?.score} />
+            </div>
+          </div>
+        </div>
+        <div>
+          <label htmlFor="score">commentaire</label>
+          <textarea
+            id="commentaire"
+            name="commentaire"
+            value={operatortoedit?.comments}
+            className="w-full p-2 border border-gray-300 rounded-md"
+            onChange={(e) => {
+              setOperatorToAdd((prev: UnRatedEmployee | undefined) => ({
+                ...prev!,
+                comments: e.target.value,
+              }));
+            }}
+          />
+        </div>
+      </Modal>
     </div>
   );
 }
+
+const ScoreGrid: React.FC<ScoreGridProps> = ({ score }) => {
+  const scoreGrid = grids[Number(score?.toString()) || 1];
+
+  return (
+    <div className="grid grid-cols-3 gap-1">
+      {scoreGrid &&
+        scoreGrid.map((className: string, index: number) => (
+          <div key={index} className={`w-2 h-2 ${className}`}></div>
+        ))}
+    </div>
+  );
+};
 
 function SearchIcon(props: any) {
   return (
@@ -236,25 +585,6 @@ function SearchIcon(props: any) {
     >
       <circle cx="11" cy="11" r="8" />
       <path d="m21 21-4.3-4.3" />
-    </svg>
-  );
-}
-
-function StarIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
     </svg>
   );
 }

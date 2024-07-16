@@ -6,7 +6,7 @@ interface TokenResponse {
   refresh: string;
 }
 
-const refreshToken = async (refreshToken: string): Promise<string> => {
+const refreshToken = async (refreshToken: string) => {
   const response = await fetch(`${API_URL}/api/token/refresh/`, {
     method: "POST",
     headers: {
@@ -20,7 +20,7 @@ const refreshToken = async (refreshToken: string): Promise<string> => {
     localStorage.setItem("access_token", data.access);
     return data.access;
   } else {
-    throw new Error("Failed to refresh token");
+    return { error: "Failed to refresh token" };
   }
 };
 
@@ -56,7 +56,7 @@ const fetchWithAuth = async (
         },
       });
       if (!newResponse.ok) {
-        throw new Error("Failed to fetch data");
+        throw new Error("Failed to refresh token");
       }
       return newResponse.json();
     }
