@@ -44,7 +44,6 @@ const AddResponsableEcole = () => {
       return;
     }
 
-    // CIN length validation
     if (!validateCINLength(formValues.cin)) {
       return;
     }
@@ -66,7 +65,6 @@ const AddResponsableEcole = () => {
     
       });
 
-      // Clear form after successful submission
       setFormValues({
         nom: '',
         prenom: '',
