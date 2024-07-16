@@ -11,7 +11,6 @@ function page() {
           Affectation des Operateur
         </h1>
       </div>
-      {/* <Polyvalance /> */}
     </DefaultLayout>
   );
 }
