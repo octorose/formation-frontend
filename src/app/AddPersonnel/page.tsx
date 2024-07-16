@@ -1,13 +1,16 @@
-import PersonnelForm from '@/Components/Forms/PersonnelForm'
-import DefaultLayout from '@/Components/Layout/DefaultLayout'
-import React from 'react'
+"use client";
+
+import PersonnelForm from "@/Components/Forms/PersonnelForm";
+import DefaultLayout from "@/Components/Layout/DefaultLayout";
+import withAuth from "@/utils/HOC/withAuth";
+import React from "react";
 
 function page() {
   return (
-<>
-    <PersonnelForm />
-</>
-  )
+    <>
+      <PersonnelForm />
+    </>
+  );
 }
 
-export default page
+export default withAuth(page);

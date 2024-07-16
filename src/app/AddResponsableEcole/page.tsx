@@ -7,6 +7,7 @@ import { calculateAge } from '@/utils/calculateAge';
 import { validateCINLength } from '@/utils/cinValidation';
 
 import { postWithAuth } from '@/utils/api';
+import withAuth from '@/utils/HOC/withAuth';
 const AddResponsableEcole = () => {
   const [formValues, setFormValues] = React.useState({
     nom: '',
@@ -43,7 +44,6 @@ const AddResponsableEcole = () => {
       return;
     }
 
-    // CIN length validation
     if (!validateCINLength(formValues.cin)) {
       return;
     }
@@ -65,7 +65,6 @@ const AddResponsableEcole = () => {
     
       });
 
-      // Clear form after successful submission
       setFormValues({
         nom: '',
         prenom: '',
@@ -248,4 +247,4 @@ const AddResponsableEcole = () => {
   );
 };
 
-export default AddResponsableEcole;
+export default withAuth(AddResponsableEcole);
