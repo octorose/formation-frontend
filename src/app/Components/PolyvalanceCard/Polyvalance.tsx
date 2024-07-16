@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Button, Input, Label } from "@headlessui/react";
+import { Button, Input } from "@headlessui/react";
 import {
   Select,
   SelectContent,
@@ -10,17 +10,27 @@ import {
 } from "../ui/select";
 import Loader from "../common/Loader";
 import { fetchWithAuth } from "@/utils/api";
+import { getRoleIdFromToken } from "@/utils/getRoleIdFromToken";
+import { Agent } from "@/interfaces/Agent";
+import Image from "next/image";
+import { Poste } from "@/interfaces/Poste";
 
+interface ScoreGridProps {
+  score: number;
+}
 interface Employee {
   id: string;
-  name: string;
+  agent: Agent;
+  etat: string;
+  ligne: number;
+  poste: Poste;
 }
 interface ProductionLine {
   id: string;
   name: string;
 }
 interface RatedEmployee extends Employee {
-  rating: number;
+  score: number;
 }
 
 export default function Polyvalance() {
@@ -47,13 +57,11 @@ export default function Polyvalance() {
   const fetchRatedOperateurs = async () => {
     setRatedLoading(true);
     setError("");
-    try {
-      const response = await fetch(
-        `/api/rated-operateurs?line=${productionLine}`
+    try { 
+      const response = await fetchWithAuth(
+        `/api/rated-operators/${productionLine}/`
       );
-      if (!response.ok) throw new Error("Failed to fetch rated operateurs");
-      const data = await response.json();
-      setRatedOperateurs(data);
+      setRatedOperateurs(response);
     } catch (error: any) {
       setError(error.message);
       setRatedOperateurs([]);
@@ -66,8 +74,9 @@ export default function Polyvalance() {
     setRatedLoading(true);
     setError("");
     try {
-      const response = await fetchWithAuth(`/api/lignes`);
-      console.log(response);
+      const response = await fetchWithAuth(
+        `api/supervisor-lignes/${getRoleIdFromToken()}/`
+      );
       setProductionLines(response.results);
       if (response.results.length > 0) {
         setProductionLine(response.results[0].id);
@@ -84,18 +93,24 @@ export default function Polyvalance() {
     setUnratedLoading(true);
     setError("");
     try {
-      const response = await fetch(
-        `/api/unrated-operateurs?line=${productionLine}`
+      const response = await fetchWithAuth(
+        `api/unrated-operators/${productionLine}/`
       );
-      if (!response.ok) throw new Error("Failed to fetch unrated operateurs");
-      const data = await response.json();
-      setUnratedOperateurs(data);
+      setUnratedOperateurs(response);
     } catch (error: any) {
       setError(error.message);
       setUnratedOperateurs([]);
     } finally {
       setUnratedLoading(false);
     }
+  };
+
+  const handleLineChange = async (value: string) => {
+    setProductionLine(value);
+    setRatedOperateurs([]); // Clear the rated operators
+    setUnratedOperateurs([]); // Clear the unrated operators
+    fetchRatedOperateurs();
+    fetchUnratedOperateurs();
   };
 
   return (
@@ -105,14 +120,15 @@ export default function Polyvalance() {
           <div>
             <h2 className="text-xl font-bold">Rated Operateurs</h2>
             <p className="text-muted-foreground">
-              Review & rate the performance of operateurs  on your production line.
+              Review & rate the performance of operateurs on your production
+              line.
             </p>
           </div>
           <div className="flex items-center gap-2">
             <label htmlFor="production-line">Line</label>
             <Select
               defaultValue=""
-              onValueChange={(value) => setProductionLine(value)}
+              onValueChange={(value) => handleLineChange(value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select production line" />
@@ -139,21 +155,33 @@ export default function Polyvalance() {
               ratedOperateurs.map((employee) => (
                 <div
                   key={employee.id}
-                  className="flex items-center gap-2 p-4 bg-muted rounded-md"
+                  className="flex items-center  rounded-md text-black"
                 >
-                  <div className="flex-1">
-                    <div className="font-medium">{employee.name}</div>
-                    <div className="flex items-center gap-1 text-muted-foreground">
-                      {Array.from({ length: 5 }).map((_, index) => (
-                        <StarIcon
-                          key={index}
-                          className={`w-5 h-5 ${
-                            index < employee.rating
-                              ? "fill-primary"
-                              : "fill-muted stroke-muted-foreground"
-                          }`}
-                        />
-                      ))}
+                  <div className="flex  w-full items-center gap-3 ">
+                    <span className=" rounded-full">
+                      <Image
+                        width={20}
+                        height={20}
+                        src={
+                          "https://ui-avatars.com/api/?name=" +
+                          employee.agent.nom +
+                          "i&size=160&background=random"
+                        }
+                        style={{
+                          width: "auto",
+                          height: "auto",
+                          borderRadius: "50%",
+                        }}
+                        alt="User"
+                      />
+                    </span>
+                    <div className="font-medium">{employee.agent.nom}</div>
+                    <div>{employee.poste.name}</div>
+                    <div>
+                     
+                      <ScoreGrid
+                        score={employee.score > 4 ? 4 : employee.score}
+                      />
                     </div>
                   </div>
                 </div>
@@ -192,21 +220,40 @@ export default function Polyvalance() {
             ) : error ? (
               <p>{error}</p>
             ) : unratedOperateurs.length === 0 ? (
-              <p>No unrated operateurs found. everything is updated</p>
+              <p>No unrated operateurs found. Everything is updated</p>
             ) : (
               unratedOperateurs
                 .filter((employee) =>
-                  employee.name
-                    .toLowerCase()
-                    .includes(searchQuery.toLowerCase())
+                  employee.agent.nom.toLowerCase().includes(searchQuery)
                 )
                 .map((employee) => (
                   <div
                     key={employee.id}
-                    className="flex items-center gap-2 p-4 bg-muted rounded-md"
+                    className="flex items-center rounded-md text-black"
                   >
-                    <div className="flex-1">
-                      <div className="font-medium">{employee.name}</div>
+                    <div
+                      className="flex w-full items-center gap-3"
+                      onClick={() => console.log(unratedOperateurs)}
+                    >
+                      <span className="rounded-full">
+                        <Image
+                          width={20}
+                          height={20}
+                          src={
+                            "https://ui-avatars.com/api/?name=" +
+                            employee.agent.nom +
+                            "i&size=160&background=random"
+                          }
+                          style={{
+                            width: "auto",
+                            height: "auto",
+                            borderRadius: "50%",
+                          }}
+                          alt="User"
+                        />
+                      </span>
+                      <div className="font-medium">{employee.agent.nom}</div>
+                      <div>{employee.poste.name}</div>
                     </div>
                   </div>
                 ))
@@ -219,6 +266,64 @@ export default function Polyvalance() {
     </div>
   );
 }
+const ScoreGrid: React.FC<ScoreGridProps> = ({ score }) => {
+  const grids: { [key: number]: string[] } = {
+    1: [
+      "bg-blue-500",
+      "bg-white",
+      "bg-white",
+      "bg-blue-500",
+      "bg-white",
+      "bg-white",
+      "bg-blue-500",
+      "bg-white",
+      "bg-white",
+    ],
+    2: [
+      "bg-blue-500",
+      "bg-white",
+      "bg-white",
+      "bg-blue-500",
+      "bg-white",
+      "bg-white",
+      "bg-blue-500",
+      "bg-blue-500",
+      "bg-blue-500",
+    ],
+    3: [
+      "bg-blue-500",
+      "bg-white",
+      "bg-blue-500",
+      "bg-blue-500",
+      "bg-white",
+      "bg-blue-500",
+      "bg-blue-500",
+      "bg-blue-500",
+      "bg-blue-500",
+    ],
+    4: [
+      "bg-blue-500",
+      "bg-blue-500",
+      "bg-blue-500",
+      "bg-blue-500",
+      "bg-white",
+      "bg-blue-500",
+      "bg-blue-500",
+      "bg-blue-500",
+      "bg-blue-500",
+    ],
+  };
+
+  const scoreGrid = grids[score];
+
+  return (
+    <div className="grid grid-cols-3 gap-1">
+      {scoreGrid.map((className:string, index:number) => (
+        <div key={index} className={`w-2 h-2 ${className}`}></div>
+      ))}
+    </div>
+  );
+};
 
 function SearchIcon(props: any) {
   return (
