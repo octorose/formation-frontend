@@ -16,6 +16,7 @@ import { title } from "process";
 import Dash from "@/Components/Dash/Dash";
 import { PlusIcon } from "lucide-react";
 import Formateur from "@/Components/Formateur/Formateurs";
+import Postes from "@/Components/Postes/Postes";
 interface Module {
   id: number;
   name: string;
@@ -84,6 +85,11 @@ const Home = () => {
       title: "Candidats",
       value: "Candidats",
       content: <Candidats />,
+    },
+    {
+      title: "Postes",
+      value: "Postes",
+      content: <Postes />,
     },
   ];
   const tabsResponsableEcole = [ 
