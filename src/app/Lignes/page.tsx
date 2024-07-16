@@ -24,7 +24,9 @@ function page() {
           href="/AddLigne"
           className="bg-graydark px-5 py-3 dark:bg-gray-100 text-white text-base rounded-md gap-2 shadow-md flex items-center justify-center hover:bg-gray-700 transition duration-300"
         >
+
           <PlusIcon /> Ajouter ligne
+
         </a>
       </div>
       <div>
