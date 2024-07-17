@@ -49,8 +49,11 @@ function PostesTable({
 
 const handleEditInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, field: string, id?: number) => {
   if (field === 'lignes') {
+    const target = event.target as HTMLInputElement; // Définir le type de target comme HTMLInputElement
     const newLignes = editFormData.lignes ? [...editFormData.lignes] : [];
-    if (event.target.checked) {
+    
+    // Vérifier la propriété checked après avoir assuré le type
+    if (target.checked) {
       if (id) newLignes.push(id);
     } else {
       if (id) {
@@ -65,13 +68,14 @@ const handleEditInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLS
       lignes: newLignes,
     }));
   } else {
-    const { value } = event.target;
+    const { value } = event.target as HTMLInputElement | HTMLSelectElement; // Définir le type de value comme string
     setEditFormData((prevData) => ({
       ...prevData,
       [field]: value,
     }));
   }
 };
+
 
   
   const handleDeleteInputChange = (event: React.ChangeEvent<HTMLInputElement>, fieldName: string) => {
