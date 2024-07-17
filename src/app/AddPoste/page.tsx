@@ -1,8 +1,10 @@
+
+"use client";
 import PosteForm from '@/Components/Forms/PosteForm'
 import React from 'react'
 import withAuth from '@/utils/HOC/withAuth';
 
-function AddPoste() {
+function page() {
     return (
       <>  
     
@@ -11,4 +13,4 @@ function AddPoste() {
     )
   }
   
-  export default withAuth(AddPoste);
+  export default withAuth(page);

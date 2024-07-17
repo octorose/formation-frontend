@@ -44,32 +44,35 @@ function PostesTable({
   const [editFormData, setEditFormData] = useState({
     name: '',
     type: '',
-    lignes: [],
-  });
+    lignes: [] as number[],
+});
 
-  const handleEditInputChange = (event, field, id) => {
-    if (field === 'lignes') {
-      const newLignes = editFormData.lignes ? [...editFormData.lignes] : [];
-      if (event.target.checked) {
-        newLignes.push(id);
-      } else {
+const handleEditInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, field: string, id?: number) => {
+  if (field === 'lignes') {
+    const newLignes = editFormData.lignes ? [...editFormData.lignes] : [];
+    if (event.target.checked) {
+      if (id) newLignes.push(id);
+    } else {
+      if (id) {
         const index = newLignes.indexOf(id);
         if (index > -1) {
           newLignes.splice(index, 1);
         }
       }
-      setEditFormData((prevData) => ({
-        ...prevData,
-        lignes: newLignes,
-      }));
-    } else {
-      const { value } = event.target;
-      setEditFormData((prevData) => ({
-        ...prevData,
-        [field]: value,
-      }));
     }
-  };
+    setEditFormData((prevData) => ({
+      ...prevData,
+      lignes: newLignes,
+    }));
+  } else {
+    const { value } = event.target;
+    setEditFormData((prevData) => ({
+      ...prevData,
+      [field]: value,
+    }));
+  }
+};
+
   
   const handleDeleteInputChange = (event: React.ChangeEvent<HTMLInputElement>, fieldName: string) => {
     if (fieldName === 'name') {
