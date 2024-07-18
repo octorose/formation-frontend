@@ -17,6 +17,7 @@ import { Poste } from "@/interfaces/Poste";
 import useAlert from "@/Hooks/useAlert";
 import Modal from "../GlobalModal/Modal";
 import Swal from "sweetalert2";
+import Polyvalance from '@/Components/PolyvalanceCard/Polyvalance';
 
 interface ScoreGridProps {
   score: number | undefined;
@@ -29,6 +30,15 @@ interface Employee {
   ligne: number;
   poste: Poste;
 }
+interface Polyvalence {
+  id: number;
+  score: number;
+  comments: string;
+  personnel: number;
+  supervisor: number;
+  poste: number;
+  ligne: number;
+}
 
 interface ProductionLine {
   id: string;
@@ -36,10 +46,11 @@ interface ProductionLine {
 }
 
 interface RatedEmployee extends Employee {
-  score: number;
-  comments: string;
+ polyvalence: Polyvalence;
 }
+
 interface UnRatedEmployee extends Employee {
+  polyvalenceId: string; // Add this field to store the Polyvalence ID
   score: number;
   comments: string;
 }
@@ -100,8 +111,9 @@ export default function Polyvalence() {
   const [productionLine, setProductionLine] = useState("");
   const { alert, setAlert } = useAlert();
   const { alert: alert2, setAlert: setAlert2 } = useAlert();
-  const [operatortoedit, setOperatorToEdit] = useState<RatedEmployee>();
-  const [operatorToAdd, setOperatorToAdd] = useState<RatedEmployee>();
+  const [operatortoedit, setOperatorToEdit] = useState<Polyvalence>();
+  const [operatorToAdd, setOperatorToAdd] = useState<Polyvalence>();
+  const [postToAdd, setpostToAdd] = useState<RatedEmployee>();
   const [searchQuery, setSearchQuery] = useState("");
   const [ratedLoading, setRatedLoading] = useState(true);
   const [unratedLoading, setUnratedLoading] = useState(true);
@@ -118,21 +130,26 @@ export default function Polyvalence() {
     fetchLignes();
   }, []);
 
-  const fetchRatedOperateurs = async () => {
-    setRatedLoading(true);
-    setError("");
-    try {
-      const response = await fetchWithAuth(
-        `/api/rated-operators/${productionLine}/`
-      );
-      setRatedOperateurs(response);
-    } catch (error: any) {
-      setError(error.message);
-      setRatedOperateurs([]);
-    } finally {
-      setRatedLoading(false);
-    }
-  };
+const fetchRatedOperateurs = async () => {
+  setRatedLoading(true);
+  setError("");
+  try {
+    const response = await fetchWithAuth(
+      `/api/rated-operators/${productionLine}/`
+    );
+    setRatedOperateurs(
+      response.map((operator: any) => ({
+        ...operator,
+        polyvalenceId: operator.polyvalence.id, // Ensure you have the Polyvalence ID
+      }))
+    );
+  } catch (error: any) {
+    setError(error.message);
+    setRatedOperateurs([]);
+  } finally {
+    setRatedLoading(false);
+  }
+};
 
   const fetchLignes = async () => {
     setRatedLoading(true);
@@ -168,61 +185,63 @@ export default function Polyvalence() {
       setUnratedLoading(false);
     }
   };
-  const AddPolyvalance = async (payload: any) => {
-    try {
-      const res = await postWithAuth(`api/polyvalences/`, payload);
-      console.log(res);
-      setAlert2((prev) => ({ ...prev, isOpen: false }));
-      const Toast = Swal.mixin({
-        toast: true,
-        position: "top-end",
-        iconColor: "green",
-        customClass: {
-          popup: "colored-toast",
-        },
-        showConfirmButton: false,
-        timer: 2000,
-        timerProgressBar: true,
-      });
-      Toast.fire({
-        icon: "success",
-        title: "Polyvalance ajouté avec succès !",
-      });
-      fetchRatedOperateurs();
-      fetchUnratedOperateurs();
-    } catch (err) {
-      console.log(err);
-    }
+const AddPolyvalence = async (payload: any) => {
+  try {
+    const res = await postWithAuth(`api/polyvalences/`, payload);
+    console.log(res);
+    setAlert2((prev) => ({ ...prev, isOpen: false }));
+    const Toast = Swal.mixin({
+      toast: true,
+      position: "top-end",
+      iconColor: "green",
+      customClass: {
+        popup: "colored-toast",
+      },
+      showConfirmButton: false,
+      timer: 2000,
+      timerProgressBar: true,
+    });
+    Toast.fire({
+      icon: "success",
+      title: "Polyvalence ajouté avec succès !",
+    });
+    fetchRatedOperateurs();
+    fetchUnratedOperateurs();
+  } catch (err) {
+    console.log(err);
   }
+};
 
-  const updateCandidate = async (payload: any) => {
-    try {
-      const res = await putWithAuth(
-        `api/polyvalences/${operatortoedit?.id}/`,
-        payload
-      );
-      console.log(res);
-      setAlert((prev) => ({ ...prev, isOpen: false }));
-      const Toast = Swal.mixin({
-        toast: true,
-        position: "top-end",
-        iconColor: "green",
-        customClass: {
-          popup: "colored-toast",
-        },
-        showConfirmButton: false,
-        timer: 2000,
-        timerProgressBar: true,
-      });
+const updateCandidate = async (payload: any) => {
+  try {
+    const res = await putWithAuth(
+      `api/polyvalences/${operatortoedit?.id}/`,
+      payload
+    );
+    console.log(res);
+    setAlert((prev) => ({ ...prev, isOpen: false }));
+    const Toast = Swal.mixin({
+      toast: true,
+      position: "top-end",
+      iconColor: "green",
+      customClass: {
+        popup: "colored-toast",
+      },
+      showConfirmButton: false,
+      timer: 2000,
+      timerProgressBar: true,
+    });
 
-      Toast.fire({
-        icon: "success",
-        title: "Polyvalance ajouté avec succès !",
-      });
-    } catch (err) {
-      console.log(err);
-    }
-  };
+    Toast.fire({
+      icon: "success",
+      title: "Polyvalence ajouté avec succès !",
+    });
+    fetchRatedOperateurs();
+  } catch (err) {
+    console.log(err);
+  }
+};
+
   const handleLineChange = async (value: string) => {
     setProductionLine(value);
     setRatedOperateurs([]); // Clear the rated operators
@@ -280,10 +299,11 @@ export default function Polyvalence() {
             ) : (
               ratedOperateurs.map((employee) => (
                 <div
-                  key={employee.id}
+                  key={employee.polyvalence.id}
                   className="flex items-center rounded-md text-black cursor-pointer"
                   onClick={() => {
-                    setOperatorToEdit(employee);
+                    setOperatorToEdit(employee.polyvalence);
+                    setpostToAdd(employee);
                     setAlert((prev) => ({ ...prev, isOpen: true }));
                   }}
                 >
@@ -309,7 +329,11 @@ export default function Polyvalence() {
                     <div className="text-center">{employee.poste.name}</div>
                     <div>
                       <ScoreGrid
-                        score={employee.score > 4 ? 4 : employee.score}
+                        score={
+                          employee.polyvalence.score > 4
+                            ? 4
+                            : employee.polyvalence.score
+                        }
                       />
                     </div>
                   </div>
@@ -360,8 +384,9 @@ export default function Polyvalence() {
                     key={employee.id}
                     className="flex items-center rounded-md text-black"
                     onClick={() => {
-                      setAlert2((prev) => ({ ...prev, isOpen: true }));                      
-                      setOperatorToAdd(employee);
+                      setAlert2((prev) => ({ ...prev, isOpen: true }));
+                      setpostToAdd(employee);
+                      setOperatorToAdd(employee.polyvalence);
                     }}
                   >
                     <div
@@ -409,8 +434,7 @@ export default function Polyvalence() {
           setAlert((prev) => ({ ...prev, isOpen: false }));
         }}
         alertTitle={
-          "Modifier les détails de " + operatortoedit?.agent?.nom ||
-          "Détails du operateur"
+          "Modifier la polyvalence"
         }
         alertDescription={"Modifier "}
         submitBtnName={"Modifier"}
@@ -442,7 +466,7 @@ export default function Polyvalence() {
                   e.target.value = "4";
                 }
 
-                setOperatorToEdit((prev: RatedEmployee | undefined) => ({
+                setOperatorToEdit((prev) => ({
                   ...prev!,
                   score: parseInt(e.target.value),
                 }));
@@ -464,7 +488,7 @@ export default function Polyvalence() {
             value={operatortoedit?.comments}
             className="w-full p-2 border border-gray-300 rounded-md"
             onChange={(e) => {
-              setOperatorToEdit((prev: RatedEmployee | undefined) => ({
+              setOperatorToEdit((prev) => ({
                 ...prev!,
                 comments: e.target.value,
               }));
@@ -481,16 +505,15 @@ export default function Polyvalence() {
             supervisor: getRoleIdFromToken(),
             personnel: operatorToAdd?.id,
             ligne: productionLine,
-            poste: operatorToAdd?.poste.id,
+            poste: postToAdd?.poste.id,
           };
-          AddPolyvalance(payload);
+          AddPolyvalence(payload);
         }}
         onCancel={() => {
           setAlert2((prev) => ({ ...prev, isOpen: false }));
         }}
         alertTitle={
-          "Ajouter les détails de " + operatortoedit?.agent?.nom ||
-          "Détails du Operateur"
+          "Ajouter Polyvalence"
         }
         alertDescription={"Ajouter "}
         submitBtnName={"Ajouter"}
@@ -522,7 +545,7 @@ export default function Polyvalence() {
                   e.target.value = "4";
                 }
 
-                setOperatorToAdd((prev: UnRatedEmployee | undefined) => ({
+                setOperatorToAdd((prev) => ({
                   ...prev!,
                   score: parseInt(e.target.value),
                 }));
@@ -544,7 +567,7 @@ export default function Polyvalence() {
             value={operatortoedit?.comments}
             className="w-full p-2 border border-gray-300 rounded-md"
             onChange={(e) => {
-              setOperatorToAdd((prev: UnRatedEmployee | undefined) => ({
+              setOperatorToAdd((prev) => ({
                 ...prev!,
                 comments: e.target.value,
               }));
