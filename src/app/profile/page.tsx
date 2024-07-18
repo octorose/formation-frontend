@@ -5,15 +5,16 @@ import { Metadata } from "next";
 import DefaultLayout from "@/Components/Layout/DefaultLayout";
 import { getUserNameFromToken } from "@/utils/getUserNameFromToken";
 import { getRoleFromToken } from "@/utils/getRoleFromToken";
+import { useEffect, useState } from "react";
 
-// export const metadata: Metadata = {
-//   title: "Profile",
-//   description:
-//     "This is the profile page of the application. It shows the user's profile information.",
-// };
-const link = `https://ui-avatars.com/api/?name=${getUserNameFromToken()}&background=random`;
-const link2 = `https://ui-avatars.com/api/?name=${getUserNameFromToken()}&size=160&background=random`;
+
+
 const Profile = () => {
+  const [userName, setUserName] = useState(getUserNameFromToken());
+  const [userRole, setUserRole] = useState(getRoleFromToken());
+
+  const link = `https://ui-avatars.com/api/?name=${userName}&background=random`;
+  const link2 = `https://ui-avatars.com/api/?name=${userName}&size=160&background=random`;
   return (
     <DefaultLayout>
       <div className="mx-auto max-w-242.5">
