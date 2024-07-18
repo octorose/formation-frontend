@@ -2,6 +2,7 @@
 import DefaultLayout from '@/Components/Layout/DefaultLayout';
 import React from 'react'
 import withAuth from '@/utils/HOC/withAuth';
+import Affectation from '@/Components/AffectationCard/Affectation';
 
 function page() {
   return (
@@ -11,6 +12,7 @@ function page() {
           Affectation des Operateur
         </h1>
       </div>
+      <Affectation/>
     </DefaultLayout>
   );
 }

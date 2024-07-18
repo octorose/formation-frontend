@@ -36,7 +36,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     storedSidebarExpanded === null ? false : storedSidebarExpanded === "true"
   );
 
-  // close on click outside
   useEffect(() => {
 
     const clickHandler = ({ target }: MouseEvent) => {
@@ -315,7 +314,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                       return (
                         <React.Fragment>
                           <Link
-                            href="/calendar"
+                            href="#"
                             className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
                               pathname.includes("calendar") &&
                               "bg-graydark dark:bg-meta-4"
@@ -327,7 +326,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 : setSidebarExpanded(true);
                             }}
                           >
-                            <PenSquareIcon width={20}/>
+                            <PenSquareIcon width={20} />
                             Affectation
                             <DynamicArrow open={open} />
                           </Link>
@@ -349,7 +348,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               </li>
                               <li>
                                 <Link
-                                  href=""
+                                  href="/AffectationOperateur"
                                   className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
                                     pathname === "/#" && "text-white"
                                   }`}
