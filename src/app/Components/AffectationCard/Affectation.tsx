@@ -72,11 +72,7 @@ function Affectation() {
     try {
       const response = await fetchWithAuth(`api/En-Formation/`);
       console.log("fetchEnformation response:", response); // Log the full response for debugging
-      if (response && response.results && Array.isArray(response.results)) {
-        setEnformation(response.results);
-      } else {
-        throw new Error("Invalid response format");
-      }
+      setEnformation(response);
     } catch (error: any) {
       console.error("Failed to fetch candidates in formation:", error.message);
       setError("Failed to fetch candidates in formation");
@@ -142,7 +138,7 @@ function Affectation() {
             operators.map((operator: any) => (
               <div
                 key={operator.id}
-                className="flex items-center justify-between p-4 bg-white rounded-lg shadow-md"
+                className="flex items-center justify-between p-4 bg-white rounded-lg "
               >
                 <div className="flex items-center gap-4 w-full">
                   <Image
@@ -165,9 +161,12 @@ function Affectation() {
                       {operator.agent.nom}
                     </h3>
                     <div className="flex flex-row gap-1 justify-between">
-                      <p className="text-muted-foreground">
-                        {operator.agent.role}
-                      </p>
+                      <div className="flex gap-1 justify-center items-center text-center  ">
+                        <p className="text-muted-foreground">
+                          {operator.agent.role}
+                        </p>
+                        <p className="text-sm">{operator.etat}</p>
+                      </div>
                       <p
                         className={
                           operator.poste.type == "simple_sans_risque"
@@ -216,7 +215,57 @@ function Affectation() {
             </Button>
           </div>
         </div>
-        <div className="grid gap-4 max-h-[300px] overflow-auto"></div>
+        <div className="grid gap-4 max-h-[300px] overflow-auto">
+          {EnformationLoading ? (
+            <Loader />
+          ) : error ? (
+            <div className="text-center text-muted-foreground">{error}</div>
+          ) : Enformation.length > 0 ? (
+            Enformation.map((operator: any) => (
+              <div
+                key={operator.id}
+                className="flex items-center justify-between p-4 bg-white rounded-lg shadow-md"
+              >
+                <div className="flex items-center gap-4 w-full">
+                  <Image
+                    width={20}
+                    height={20}
+                    src={
+                      "https://ui-avatars.com/api/?name=" +
+                      operator.nom +
+                      "i&size=160&background=random"
+                    }
+                    style={{
+                      width: "auto",
+                      height: "auto",
+                      borderRadius: "50%",
+                    }}
+                    alt="Utilisateur"
+                  />
+                  <div className="w-full">
+                    <h3 className="text-lg font-semibold">
+                      {operator.agent.nom}
+                    </h3>
+                    <div className="flex flex-row gap-1 items-center ">
+                      <p className="text-muted-foreground">
+                        {operator.agent.role}
+                      </p>
+                      <p className="text-muted-foreground text-sm ">
+                        {operator.etat}
+                      </p>
+                    </div>
+                    {/* <p className="text-muted-foreground">{operator.email}</p> */}
+                  </div>
+                </div>
+                <Button>{/* <span>Affecter</span> */}</Button>
+              </div>
+            ))
+          ) : (
+            <div className="text-center text-muted-foreground">
+              Aucun candidat en formation trouvé
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
