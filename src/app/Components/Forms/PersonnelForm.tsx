@@ -33,7 +33,6 @@ function PersonnelForm() {
       e.preventDefault();
       e.preventDefault();
 
-      // Age validation
       const age = calculateAge(formValues.date_naissance);
       if (age < 20) {
         Swal.fire({
@@ -44,7 +43,6 @@ function PersonnelForm() {
         return;
       }
 
-      // CIN length validation
       if (!validateCINLength(formValues.cin)) {
         return;
       }
@@ -72,6 +70,7 @@ function PersonnelForm() {
             numerotel: formValues.numerotel,
             role: "Personnel",
           },
+          poste:null,
           etat: "Candidat",
         });
         
@@ -85,6 +84,7 @@ function PersonnelForm() {
           addresse: "",
           numerotel: "",
           date_naissance: "",
+          // poste:null,
         });
 
         const Toast = Swal.mixin({
