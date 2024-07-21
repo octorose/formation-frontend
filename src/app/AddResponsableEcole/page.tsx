@@ -8,6 +8,7 @@ import { validateCINLength } from '@/utils/cinValidation';
 
 import { postWithAuth } from '@/utils/api';
 import withAuth from '@/utils/HOC/withAuth';
+import { validatePhoneNumber } from '@/utils/phoneValidation';
 const AddResponsableEcole = () => {
   const [formValues, setFormValues] = React.useState({
     nom: '',
@@ -47,7 +48,14 @@ const AddResponsableEcole = () => {
     if (!validateCINLength(formValues.cin)) {
       return;
     }
-
+    if (!validatePhoneNumber(formValues.numerotel)) {
+      Swal.fire({
+        icon: "error",
+        title: "Erreur",
+        text: "Le numéro de téléphone doit commencer par 0 et contenir 10 chiffres.",
+      });
+      return;
+    }
     try {
       await postWithAuth('api/create-responsable_formation_ecole/', {
         agent: {
