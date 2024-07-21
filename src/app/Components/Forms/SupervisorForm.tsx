@@ -6,6 +6,7 @@ import Swal from "sweetalert2";
 import { postWithAuth, fetchWithAuth } from "@/utils/api"; // Assuming you have API utility functions
 import { calculateAge } from "@/utils/calculateAge";
 import { validateCINLength } from "@/utils/cinValidation";
+import { validatePhoneNumber } from "@/utils/phoneValidation";
 
 interface FormValues {
   nom: string;
@@ -108,7 +109,14 @@ const [selectedLignes, setSelectedLignes] = useState<number[]>([]);
       });
       return;
     }
-
+    if (!validatePhoneNumber(formValues.numerotel)) {
+      Swal.fire({
+        icon: "error",
+        title: "Erreur",
+        text: "Le numéro de téléphone doit commencer par 0 et contenir 10 chiffres.",
+      });
+      return;
+    }
     // CIN length validation
     if (!validateCINLength(formValues.cin)) {
       return;

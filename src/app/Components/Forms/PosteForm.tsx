@@ -3,7 +3,8 @@ import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import DefaultLayout from "../Layout/DefaultLayout";
 import { PlusIcon } from "lucide-react";
 import Swal from "sweetalert2";
-import { postWithAuth, fetchWithAuth } from "@/utils/api"; // Assuming you have API utility functions
+import { postWithAuth, fetchWithAuth } from "@/utils/api";
+import { getRoleIdFromToken } from "@/utils/getRoleIdFromToken";
 
 interface FormValues {
   name: string;
@@ -23,7 +24,10 @@ function PosteForm() {
   >([]);
 
   useEffect(() => {
-    fetchLignes();
+    const supervisorId = getRoleIdFromToken();
+    if (supervisorId) {
+      fetchLignes(supervisorId);
+    }
   }, []);
 
   const handleLigneChange = (ligneId: number) => {
@@ -42,9 +46,9 @@ function PosteForm() {
     }
   };
 
-  const fetchLignes = async () => {
+  const fetchLignes = async (supervisorId: number) => {
     try {
-      const response = await fetchWithAuth("/api/lignes/");
+      const response = await fetchWithAuth(`/api/supervisor-lignes/${supervisorId}/`);
       const lignesData = response.results.map((ligne: any) => ({
         id: ligne.id,
         name: ligne.name,
@@ -82,9 +86,8 @@ function PosteForm() {
         name: formValues.name,
         lignes_ids: formValues.lignes,
         type: formValues.type,
-      }
-    
-    );
+      });
+
       console.log(formValues);
       setFormValues({
         name: "",

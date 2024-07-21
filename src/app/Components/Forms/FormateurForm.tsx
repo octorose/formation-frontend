@@ -8,6 +8,7 @@ import { postWithAuth } from "@/utils/api";
 import { calculateAge } from "@/utils/calculateAge";
 import { validateCINLength } from "@/utils/cinValidation";
 import { getRoleFromToken } from "@/utils/getRoleFromToken";
+import { validatePhoneNumber } from "@/utils/phoneValidation";
 
 function FormateurForm() {
   const [formValues, setFormValues] = React.useState({
@@ -67,7 +68,14 @@ function FormateurForm() {
     if (!validateCINLength(formValues.cin)) {
       return;
     }
-
+    if (!validatePhoneNumber(formValues.numerotel)) {
+      Swal.fire({
+        icon: "error",
+        title: "Erreur",
+        text: "Le numéro de téléphone doit commencer par 0 et contenir 10 chiffres.",
+      });
+      return;
+    }
     try {
       await postWithAuth("api/create-formateurs/", {
         agent: {

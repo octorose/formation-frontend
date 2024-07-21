@@ -5,6 +5,7 @@ import { Edit2Icon, Trash2Icon } from "lucide-react";
 import useAlert from "@/Hooks/useAlert";
 import Modal from "../GlobalModal/Modal";
 import Swal from "sweetalert2";
+import { getRoleIdFromToken } from "@/utils/getRoleIdFromToken";
 
 interface Lignes {
   id: number;
@@ -112,8 +113,9 @@ const handleEditInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLS
 
   const fetchData = async () => {
     try {
+      const supervisorId = getRoleIdFromToken(); // Get the supervisor ID from the token
       const response: ApiResponse<Poste> = await fetchWithAuth(
-        `${endpoint}?page=${currentPage}`
+        `${endpoint}?page=${currentPage}&supervisor_id=${supervisorId}`
       );
       setPostes(response.results);
       setTotalPostes(response.count);
@@ -124,7 +126,10 @@ const handleEditInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLS
 
   useEffect(() => {
     fetchData();
-    fetchLignes();
+    const supervisorId = getRoleIdFromToken();
+    if (supervisorId) {
+      fetchLignes(supervisorId);
+    } 
   }, [currentPage, endpoint]);
 
   const handlePageChange = (newPage: number) => {
@@ -181,9 +186,9 @@ const handleEditInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLS
     setAlert2((prev) => ({ ...prev, isOpen: false }));
     setDeleteNameInput('');
   };
-  const fetchLignes = async () => {
+  const fetchLignes = async (supervisorId: number) => {
     try {
-      const response = await fetchWithAuth("api/lignes/");
+      const response = await fetchWithAuth(`/api/supervisor-lignes/${supervisorId}/`);
       const lignesData = response.results.map((ligne: any) => ({
         id: ligne.id,
         name: ligne.name,
@@ -193,9 +198,9 @@ const handleEditInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLS
       setLigneOptions(lignesData);
     } catch (error) {
       console.error("Failed to fetch lignes", error);
-      // Handle error if needed
     }
   };
+
   return (
     <div className="rounded-sm bg-transparent px-5 pb-2.5 pt-6 dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
       <div className="flex flex-col">

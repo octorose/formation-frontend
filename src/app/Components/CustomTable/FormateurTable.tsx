@@ -11,6 +11,9 @@ import { refreshToken } from "@/utils/RefreshToken";
 import PhaseRenderer from "../phaserenderer/PhaseRenderer";
 import { deleteWithAuth, fetchWithAuth, putWithAuth } from "@/utils/api";
 import { getRoleFromToken } from "@/utils/getRoleFromToken";
+import { validatePhoneNumber } from "@/utils/phoneValidation";
+import { calculateAge } from "@/utils/calculateAge";
+import { validateCINLength } from "@/utils/cinValidation";
 
 interface Agent {
   address: string;
@@ -174,6 +177,31 @@ function FormateursTable({
 
   const updateFormateur = async (Formateur: any) => {
     console.log(Formateur);
+    if (!validateCINLength(Formateur.agent.cin)) {
+      Toast.fire({
+        icon: 'error',
+        title: 'Le CIN doit commencer par une ou deux lettres suivies de 4 à 6 chiffres.',
+        iconColor: 'red',
+      });
+      return;
+    }
+    if (!validatePhoneNumber(Formateur.agent.numerotel)) {
+      Toast.fire({
+        icon: 'error',
+        title: 'Numéro de téléphone invalide !',
+        iconColor: 'red',
+      });
+      return;
+    }
+   
+    if (!calculateAge(Formateur.agent.date_naissance)) {
+      Toast.fire({
+        icon: 'error',
+        title: 'Âge invalide !',
+        iconColor: 'red',
+      });
+      return;
+    }
     try {
       const response = await putWithAuth(
         `api/update-formateurs/${Formateur.id}/`,
