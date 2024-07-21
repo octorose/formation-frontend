@@ -10,6 +10,9 @@ import Swal from "sweetalert2";
 import { refreshToken } from "@/utils/RefreshToken";
 import PhaseRenderer from "../phaserenderer/PhaseRenderer";
 import { deleteWithAuth, fetchWithAuth, putWithAuth } from "@/utils/api";
+import { validateCINLength } from "@/utils/cinValidation";
+import { validatePhoneNumber } from "@/utils/phoneValidation";
+import { calculateAge } from "@/utils/calculateAge";
 
 interface Agent {
   address: string;
@@ -162,6 +165,31 @@ function CustomTable({
   }
   const updateCandidate = async (Candidate: any) => {
     console.log(Candidate);
+    if (!validateCINLength(Candidate.agent.cin)) {
+      Toast.fire({
+        icon: 'error',
+        title: 'Le CIN doit commencer par une ou deux lettres suivies de 4 à 6 chiffres.',
+        iconColor: 'red',
+      });
+      return;
+    }
+    if (!validatePhoneNumber(Candidate.agent.numerotel)) {
+      Toast.fire({
+        icon: 'error',
+        title: 'Numéro de téléphone invalide !',
+        iconColor: 'red',
+      });
+      return;
+    }
+   
+    if (!calculateAge(Candidate.agent.date_naissance)) {
+      Toast.fire({
+        icon: 'error',
+        title: 'Âge invalide !',
+        iconColor: 'red',
+      });
+      return;
+    }
     try {
       const response = await putWithAuth(`/api/update_personnel/${Candidate.id}/`, Candidate);
       Toast.fire({
