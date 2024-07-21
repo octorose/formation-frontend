@@ -113,8 +113,9 @@ const handleEditInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLS
 
   const fetchData = async () => {
     try {
+      const supervisorId = getRoleIdFromToken(); // Get the supervisor ID from the token
       const response: ApiResponse<Poste> = await fetchWithAuth(
-        `${endpoint}?page=${currentPage}`
+        `${endpoint}?page=${currentPage}&supervisor_id=${supervisorId}`
       );
       setPostes(response.results);
       setTotalPostes(response.count);
