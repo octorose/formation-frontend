@@ -46,7 +46,7 @@ function PersonnelForm() {
         return;
       }
       try {
-        await postWithAuth("/api/create_personnel/", {
+        const res = await postWithAuth("/api/create_personnel/", {
           agent: {
             username: formValues.username,
             email: formValues.email,
@@ -62,6 +62,7 @@ function PersonnelForm() {
           poste:null,
           etat: "Candidat",
         });
+        
         
         setFormValues({
           nom: "",

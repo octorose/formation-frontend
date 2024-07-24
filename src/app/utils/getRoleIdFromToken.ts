@@ -1,7 +1,6 @@
 import { jwtDecode } from "jwt-decode";
 interface DecodedToken {
   role_specific_id: number;
-  // Add other properties if needed
 }
 export const getRoleIdFromToken = (): number | null => {
   const token = localStorage.getItem("access_token");
