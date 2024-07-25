@@ -15,6 +15,8 @@ import { get } from "http";
 import { getRoleFromToken } from "@/utils/getRoleFromToken";
 import HistoryIcon from "../../../../public/assets/Icons/HistoryIcon";
 import { GroupIcon } from "lucide-react";
+import { PlusIcon } from "lucide-react";
+
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -613,6 +615,39 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                         </React.Fragment>
                       );
                     }}
+                  </SidebarLinkGroup>
+                  <SidebarLinkGroup activeCondition={pathname === "/contrats" || pathname.includes("contrats")}>
+                    {(handleClick, open) => (
+                      <React.Fragment>
+                        <Link
+                          href="/contrats"
+                          className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                            pathname.includes("contrats") && "bg-graydark dark:bg-meta-4"
+                          }`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            sidebarExpanded ? handleClick() : setSidebarExpanded(true);
+                          }}
+                        >
+                          <PlusIcon />
+                          Contrats
+                        </Link>
+                        <div className={`translate transform overflow-hidden ${!open && "hidden"}`}>
+                          <ul className="mb-5.5 mt-4 flex flex-col gap-2.5 pl-6">
+                            <li>
+                              <Link
+                                href="/AddContrat"
+                                className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
+                                  pathname === "/AddContrat" && "text-white"
+                                }`}
+                              >
+                                Add Manualy
+                              </Link>
+                            </li>
+                          </ul>
+                        </div>
+                      </React.Fragment>
+                    )}
                   </SidebarLinkGroup>
                   <SidebarLinkGroup
                     activeCondition={

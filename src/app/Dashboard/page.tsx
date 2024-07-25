@@ -16,6 +16,9 @@ import { title } from "process";
 import Dash from "@/Components/Dash/Dash";
 import { PlusIcon } from "lucide-react";
 import Formateur from "@/Components/Formateur/Formateurs";
+import Contrats from "@/Components/Contrats/Contrats";
+import TestTable from "@/Components/CustomTable/TestTable";
+
 interface Module {
   id: number;
   name: string;
@@ -67,6 +70,16 @@ const Home = () => {
       value: "ResponsableEcoleFormation",
       content: <ResponsableEcole />,
     },
+    {
+      title: "Contrats", 
+      value: "Contrats",
+      content: <Contrats />, 
+    },
+    {
+      title: "Tests",
+      value: "Tests",
+      content: <TestTable endpoint="/api/tests" />,  
+    },
   ];
   const tabsSupervisor = [ 
     {
@@ -83,6 +96,11 @@ const Home = () => {
       title: "Candidats",
       value: "Candidats",
       content: <Candidats />,
+    },
+    {
+      title: "Contrats", 
+      value: "Contrats",
+      content: <Contrats />, 
     },
   ];
 
