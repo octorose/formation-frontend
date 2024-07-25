@@ -1,13 +1,14 @@
 "use client";
 import React from 'react';
 import DefaultLayout from '@/Components/Layout/DefaultLayout';
-import axios from 'axios';
 import Swal from 'sweetalert2';
 import { PlusIcon } from 'lucide-react';
 import { calculateAge } from '@/utils/calculateAge';
 import { validateCINLength } from '@/utils/cinValidation';
 
 import { postWithAuth } from '@/utils/api';
+import withAuth from '@/utils/HOC/withAuth';
+import { validatePhoneNumber } from '@/utils/phoneValidation';
 const AddResponsableEcole = () => {
   const [formValues, setFormValues] = React.useState({
     nom: '',
@@ -44,11 +45,17 @@ const AddResponsableEcole = () => {
       return;
     }
 
-    // CIN length validation
     if (!validateCINLength(formValues.cin)) {
       return;
     }
-
+    if (!validatePhoneNumber(formValues.numerotel)) {
+      Swal.fire({
+        icon: "error",
+        title: "Erreur",
+        text: "Le numéro de téléphone doit commencer par 0 et contenir 10 chiffres.",
+      });
+      return;
+    }
     try {
       await postWithAuth('api/create-responsable_formation_ecole/', {
         agent: {
@@ -66,7 +73,6 @@ const AddResponsableEcole = () => {
     
       });
 
-      // Clear form after successful submission
       setFormValues({
         nom: '',
         prenom: '',
@@ -249,4 +255,4 @@ const AddResponsableEcole = () => {
   );
 };
 
-export default AddResponsableEcole;
+export default withAuth(AddResponsableEcole);

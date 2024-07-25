@@ -1,15 +1,15 @@
 "use client";
 
-import PersonnelForm from "@/Components/Forms/PersonnelForm";
 import DefaultLayout from "@/Components/Layout/DefaultLayout";
-import withAuth from "@/utils/HOC/withAuth";
 import React from "react";
+import withAuth from "@/utils/HOC/withAuth";
+import LigneForm from "@/Components/Forms/LigneForm";
 
 function page() {
   return (
-    <>
-      <PersonnelForm />
-    </>
+    <DefaultLayout>
+      <LigneForm/>
+    </DefaultLayout>
   );
 }
 

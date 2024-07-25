@@ -2,7 +2,6 @@
 import Image from "next/image";
 import React, { Component } from "react";
 import Slider from "react-slick";
-import google from "../../../../"
 
 // IMAGES DATA FOR CAROUSEL
 interface Data {

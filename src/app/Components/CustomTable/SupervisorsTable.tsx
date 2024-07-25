@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ResponsivePagination from "react-responsive-pagination";
-import { fetchWithAuth } from "@/utils/api";
+import { deleteWithAuth, fetchWithAuth, putWithAuth } from "@/utils/api";
 import { Agent } from "@/interfaces/Agent";
 import { Edit2Icon, Trash2Icon } from "lucide-react";
 import useAlert from "@/Hooks/useAlert";
@@ -8,10 +8,15 @@ import Modal from "../GlobalModal/Modal";
 import Swal from "sweetalert2";
 import PhaseRenderer from "../phaserenderer/PhaseRenderer";
 
+interface Lignes {
+  id: number;
+  name: string;
+}
+
 interface Superviseur {
   id: number;
   agent: Agent;
-  ligne_name: string;
+  lignes: Lignes[];
 }
 
 interface ApiResponse<T> {
@@ -28,9 +33,9 @@ function SupervisorsTable({
 }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [supervisors, setSupervisors] = useState<Superviseur[]>([]);
-    const [editMode, setEditMode] = useState(Array(15).fill(false));
-      const { alert, setAlert } = useAlert();
-
+  const [editMode, setEditMode] = useState(Array(15).fill(false));
+  const { alert, setAlert } = useAlert();
+  const [ligneOptions, setLigneOptions] = useState<Lignes[]>([]);
   const [totalSupervisors, setTotalSupervisors] = useState(0);
   const [SupervisortoDelete, setSupervisortoDelete] = useState({} as any);
   const [SupervisortoEdit, setSupervisortoEdit] = useState({} as any);
@@ -44,30 +49,67 @@ function SupervisorsTable({
     }
     setEditMode(updatedEditMode);
   };
-const updateCandidate = async (Candidate: any) => {
-  // 
-  console.log(Candidate);
-};
-const PersonalInfo = {
-  nom : SupervisortoEdit?.agent?.nom,
-  prenom : SupervisortoEdit?.agent?.prenom,
-  ligne_name: SupervisortoEdit?.ligne_name,
-  contract : "we need it from ichraq's code",
-}
+
+  const updateCandidate = async (Candidate: any) => {
+    console.log(Candidate);
+    
+    try{
+      await putWithAuth(`${endpoint}/update/${Candidate.id}/`, {
+      agent: {
+        nom: Candidate.agent.nom,
+        prenom: Candidate.agent.prenom,
+        email: Candidate.agent.email,
+        password: Candidate.agent.password,
+        addresse: Candidate.agent.addresse,
+        numerotel: Candidate.agent.numerotel,
+        date_naissance: Candidate.agent.date_naissance,
+        role: "Superviseur",
+      },
+      lignes_ids: Candidate.lignes,
+    });
+    Toast.fire({
+      icon: 'success',
+      title: 'superviseur mis à jour avec succès !',
+      iconColor: 'green',
+    });
+
+    fetchData();
+    setAlert((prev) => ({ ...prev, isOpen: false }));
+  } catch (error) {
+    console.error('Échec de la mise à jour du superviseur',error);
+    Toast.fire({
+      icon: 'error',
+      title: 'Une erreur est survenue lors de la mise à jour du responsable.',
+      iconColor: 'red',
+    });
+  }
+    
+  };
+
+  const PersonalInfo = {
+    nom: SupervisortoEdit?.agent?.nom,
+    prenom: SupervisortoEdit?.agent?.prenom,
+    lignes: SupervisortoEdit?.ligne_name,
+    contract: "we need it from ichraq's code",
+  };
+
   const fetchData = async () => {
     const response: ApiResponse<Superviseur> = await fetchWithAuth(
       `${endpoint}?page=${currentPage}`
-    ); 
+    );
     setSupervisors(response.results);
     setTotalSupervisors(response.count);
   };
+
   useEffect(() => {
     fetchData();
+    fetchLignes();
   }, [currentPage, endpoint]);
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
   };
+
   const Toast = Swal.mixin({
     toast: true,
     position: "top-end",
@@ -79,6 +121,7 @@ const PersonalInfo = {
     timer: 2000,
     timerProgressBar: true,
   });
+
   const handleDeleteInputChange = (
     event: React.ChangeEvent<HTMLInputElement>,
     key: string
@@ -90,35 +133,48 @@ const PersonalInfo = {
   };
 
   const handleDelete = async (supervisor: any) => {
-    // `${process.env.NEXT_PUBLIC_API_URL}${endpoint}/${id}`,
-    console.log(supervisor);
-
     //@ts-ignore
     if (SupervisortoDelete?.Nom === supervisor.agent.nom) {
-      // console.log("aywa");
-
       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}${endpoint}/${SupervisortoDelete.id}`,
-          {
-            method: "DELETE",
-          }
+        const response = await deleteWithAuth(
+          `${endpoint}/${supervisor.id}/`
         );
-        if (!response.ok) {
-          throw new Error("Failed to delete candidate");
+        if (!response || response.status === 204) {
+          Toast.fire({
+            icon: 'success',
+            title: 'Superviseur supprimé avec succès !',
+            iconColor: 'green',
+          });
         }
+        // const data = await response.json();
         fetchData();
         setAlert2((prev) => ({ ...prev, isOpen: false }));
+     
       } catch (error) {
         console.error(error);
       }
     } else {
       Toast.fire({
         icon: "error",
-        title: "Invalid Candidate name",
+        title: "Invalid Supervisor name",
       });
     }
   };
+   const fetchLignes = async () => {
+     try {
+       const response = await fetchWithAuth("/api/lignes/");
+       const lignesData = response.results.map((ligne: any) => ({
+         id: ligne.id,
+         name: ligne.name,
+       }));
+       console.log(response);
+
+       setLigneOptions(lignesData);
+     } catch (error) {
+       console.error("Failed to fetch lignes", error);
+       // Handle error if needed
+     }
+   };
 
   return (
     <div className="rounded-sm bg-transparent px-5 pb-2.5 pt-6 dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
@@ -134,7 +190,7 @@ const PersonalInfo = {
           </div>
           <div className="p-2.5 text-center xl:p-5">
             <h5 className="text-sm font-medium uppercase xsm:text-base">
-              Ligne_name
+              Ligne Names
             </h5>
           </div>
           <div className="p-2.5 text-center xl:p-5">
@@ -173,12 +229,12 @@ const PersonalInfo = {
 
                 <div className="flex items-center justify-center p-2.5 xl:p-5">
                   <p className="text-black dark:text-white">
-                    {supervisor.ligne_name}
+                    {supervisor.lignes.map((ligne) => ligne.name).join(", ")}
                   </p>
                 </div>
                 <div className="flex items-center justify-center p-2.5 xl:p-5">
                   <p className="text-black dark:text-white">
-                    we need it from ichraq's code
+                    we need it from ichraq&apos;s code
                   </p>
                 </div>
                 <div className="hidden items-center justify-center gap-4 p-2.5 sm:flex xl:p-5">
@@ -229,12 +285,12 @@ const PersonalInfo = {
 
                 <div className="flex items-center justify-center p-2.5 xl:p-5">
                   <p className="text-black dark:text-white">
-                    {supervisor.ligne_name}
+                    {supervisor.lignes.map((ligne) => ligne.name).join(", ")}
                   </p>
                 </div>
                 <div className="flex items-center justify-center p-2.5 xl:p-5">
                   <p className="text-black dark:text-white">
-                    we need it from ichraq's code
+                    we need it from ichraq&apos;s code
                   </p>
                 </div>
                 <div className="hidden items-center justify-center gap-4 p-2.5 sm:flex xl:p-5">
@@ -287,18 +343,22 @@ const PersonalInfo = {
           setAlert2((prev) => ({ ...prev, isOpen: false }));
         }}
       >
-        <div className="grid grid-cols-2 gap-5 p-4">
-          <div className="text-slate-900">
-            <div>
-              <h2 className="font-semibold">Name</h2>
+         <div className="p-4">
+          <div className="flex flex-col">
+            <label htmlFor="deleteName" className="text-sm font-medium">
+              Nom :
+            </label>
               <input
-                type="text"
-                onChange={(event) => handleDeleteInputChange(event, "Nom")}
-                className="w-full p-2 border border-neutral-200 rounded-lg"
-              />
+              id="deleteName"
+              type="text"
+             
+              onChange={(event) => handleDeleteInputChange(event, 'Nom')}
+              className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              placeholder={`Tapez "${ SupervisortoDelete?.agent?.nom}"`}
+            />
             </div>
           </div>
-        </div>
+      
       </Modal>
       <Modal
         isOpen={alert.isOpen}
@@ -328,6 +388,7 @@ const PersonalInfo = {
           handleEdit={handleEdit}
           CandidatetoEdit={SupervisortoEdit}
           setCandidatetoEdit={setSupervisortoEdit}
+          lignes={ligneOptions}
         />
       </Modal>
     </div>
