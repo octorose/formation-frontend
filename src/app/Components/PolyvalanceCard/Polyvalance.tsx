@@ -503,7 +503,7 @@ const updateCandidate = async (payload: any) => {
             score: operatorToAdd?.score,
             comments: operatorToAdd?.comments,
             supervisor: getRoleIdFromToken(),
-            personnel: operatorToAdd?.id,
+            personnel: postToAdd?.id,
             ligne: productionLine,
             poste: postToAdd?.poste.id,
           };
