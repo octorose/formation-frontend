@@ -3,6 +3,7 @@ import ContratTable from "../CustomTable/ContratTable";
 import { Plus } from "lucide-react";
 import SearchComponent from "../SearchComponent/Search";
 import GlobalButton from "../globalButton/globalButton";
+import { fetchWithAuth } from "@/utils/api";
 
 interface Contrat {
   id: number;
@@ -13,31 +14,25 @@ interface Contrat {
 }
 
 const Contrats = () => {
-  const [contrats, setContrats] = useState<Contrat[]>([]);
+  const [contrats, setContrats] = useState([]);
   const [searchResults, setSearchResults] = useState<Contrat[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    
+
     const fetchData = async () => {
       try {
-        setLoading(true);
-        const response = await fetch("http://127.0.0.1:8000/api/api/contrats/", {
-          method: "GET",
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const fetchedData = await response.json();
-        setContrats(fetchedData.results); // Assurez-vous que votre API renvoie un objet contenant les résultats
+        const response = await fetchWithAuth("/api/contrats/");
+        // If response is already a JavaScript object, set it directly
+        setContrats(response.results);
       } catch (error) {
         console.error(error);
-        setError("Une erreur s'est produite lors du chargement des données.");
-      } finally {
-        setLoading(false);
       }
     };
-
+    
+    
     fetchData();
   }, []);
 
@@ -70,15 +65,10 @@ const Contrats = () => {
         </div>
 
         <ContratTable
-          headers={[
-            "Agent ID",
-            "Type de Contrat",
-            "Date de Création",
-            "Durée (mois)",
-            "",
-          ]}
-          searchResults={searchResults.length > 0 ? searchResults : contrats}
-        />
+           endpoint="/api/contrats/"
+           searchResults={searchResults}
+         />
+
       </div>
       <div style={{ position: "fixed", bottom: "20px", right: "20px" }}>
         <GlobalButton

@@ -1,68 +1,82 @@
 "use client";
 
-import React, { Key, useEffect, useState } from 'react';
-import DefaultLayout from '@/Components/Layout/DefaultLayout';
-import Swal from 'sweetalert2';
-import { PlusIcon } from 'lucide-react';
+import React, { useEffect, useState } from "react";
+import DefaultLayout from "@/Components/Layout/DefaultLayout";
+import Swal from "sweetalert2";
+import { PlusIcon } from "lucide-react";
+import { fetchWithAuth, postWithAuth } from "@/utils/api";
+import withAuth from "@/utils/HOC/withAuth";
+
+// Define interfaces
+interface Agent {
+  id: number;
+  cin: string;
+  prenom: string;
+  nom: string;
+  role: string;
+}
+
+interface FormValues {
+  cin: string;
+  agent: number;
+  type_contrat: string;
+  date_creation_contrat: string;
+  duree_contrat: string;
+}
 
 const AddContrat = () => {
-  const [formValues, setFormValues] = useState({
+  const [formValues, setFormValues] = useState<FormValues>({
     cin: '',
-    agent_id : 0,
+    agent: 0,
     type_contrat: '',
     date_creation_contrat: '',
     duree_contrat: '',
   });
 
-  const [agents, setAgents] = useState<Array<{
-    id: number;
-    cin: string;
-    prenom: string;
-    nom: string;
-    role: string;
-  }>>([]);
-  const [selectedRole, setSelectedRole] = useState('');
-  const [selectedAgent, setSelectedAgent] = useState<{id : number, prenom: string; nom: string } | null>(null);
-  const [agentId, setAgentId] = useState(0)
-
+  const [agents, setAgents] = useState<Agent[]>([]);
+  const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
+  const [selectedRole, setSelectedRole] = useState<string>('');
   useEffect(() => {
     const fetchAgents = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/api/agents/');
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
+        const response = await fetchWithAuth('/api/agents/');
+        // Check if the response is an object and has the 'results' property
+        if (response && response.results) {
+          const agentsData = response.results.map((agent: any) => ({
+            id: agent.id,
+            cin: agent.cin,
+            prenom: agent.prenom,
+            nom: agent.nom,
+            role: agent.role,
+          }));
+          setAgents(agentsData);
+        } else {
+          console.error("Invalid response format:", response);
         }
-        const data = await response.json();
-        setAgents(data.results);
       } catch (error) {
         console.error("Failed to fetch agents", error);
       }
     };
-
+  
     fetchAgents();
   }, []);
+  
 
-  useEffect(() => {
-    
-  }, [formValues]); 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormValues(prevState => ({
       ...prevState,
       [name]: value,
     }));
-    
+
     if (name === 'cin') {
       const agent = agents.find(agent => agent.cin === value);
-
       if (agent) {
-        setSelectedAgent({ id : agent.id , prenom: agent.prenom, nom: agent.nom });
+        setSelectedAgent(agent);
         setFormValues(prevState => ({
-            ...prevState,
-            agent_id: agent.id,
+          ...prevState,
+          agent: agent.id,
         }));
-        
-        
       } else {
         setSelectedAgent(null);
       }
@@ -79,66 +93,40 @@ const AddContrat = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    console.log(formValues)
     e.preventDefault();
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/api/contrats/create/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formValues),
-      });
-      console.log(response);
-      
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
+      console.log('Submitting form with values:', formValues);
+      const response = await postWithAuth('/api/contrats/create/', formValues);
+      console.log('Response:', response);
 
       setFormValues({
-        agent_id : 0,
         cin: '',
+        agent: 0,
         type_contrat: '',
         date_creation_contrat: '',
         duree_contrat: '',
       });
       setSelectedAgent(null);
 
-      const Toast = Swal.mixin({
+      Swal.fire({
+        icon: 'success',
+        title: 'Contrat ajouté avec succès !',
         toast: true,
         position: 'top-end',
-        iconColor: 'green',
-        customClass: {
-          popup: 'colored-toast',
-        },
         showConfirmButton: false,
         timer: 2000,
         timerProgressBar: true,
-      });
-
-      Toast.fire({
-        icon: 'success',
-        title: 'Contrat ajouté avec succès !'
       });
     } catch (error) {
-      console.error("Failed to add Contrat", error);
-      const errorMessage = "Une erreur est survenue lors de l'ajout du contrat.";
-
-      const Toast = Swal.mixin({
+      console.error("Failed to add contract", error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Une erreur est survenue lors de l\'ajout du contrat.',
         toast: true,
-        position: "top-end",
-        iconColor: "red",
-        customClass: {
-          popup: "colored-toast",
-        },
+        position: 'top-end',
         showConfirmButton: false,
         timer: 2000,
         timerProgressBar: true,
-      });
-
-      Toast.fire({
-        icon: "error",
-        text: errorMessage,
       });
     }
   };
@@ -255,8 +243,9 @@ const AddContrat = () => {
                 />
               </div>
             </div>
-            <button type="submit" className="bg-graydark mt-6 w-full py-3 dark:bg-gray-100 shadow-md flex items-center justify-center px-6 rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:bg-gray-700">
-              <PlusIcon /> Ajouter Contrat
+            <button type="submit" className="bg-graydark mt-6 w-full py-3 dark:bg-gray-100 shadow-md flex items-center justify-center px-6 rounded-md text-white bg-gray-600 hover:bg-gray-700">
+              <PlusIcon className="mr-2 h-5 w-5" />
+              Ajouter
             </button>
           </form>
         </div>
@@ -265,4 +254,4 @@ const AddContrat = () => {
   );
 };
 
-export default AddContrat;
+export default withAuth(AddContrat);
