@@ -24,6 +24,14 @@ interface FormValues {
   duree_contrat: string;
 }
 
+interface Contrat {
+  id: number;
+  agent: Agent;
+  type_contrat: string;
+  date_creation_contrat: string;
+  duree_contrat: number;
+}
+
 const AddContrat = () => {
   const [formValues, setFormValues] = useState<FormValues>({
     cin: '',
@@ -33,10 +41,27 @@ const AddContrat = () => {
     duree_contrat: '',
   });
 
+  const [contrats, setContrats] = useState<Contrat[]>([]);
+
   const [agents, setAgents] = useState<Agent[]>([]);
+
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
   const [selectedRole, setSelectedRole] = useState<string>('');
   useEffect(() => {
+
+    const fettchContracts = async () => {
+      try {
+        const response  = await fetchWithAuth('/api/contrats/');
+        if (response && response.results) {
+          setContrats(response.results);
+        }
+      } catch (error) {
+        console.error("Failed to contracts", error);
+      }
+    }
+
+    fettchContracts()
+
     const fetchAgents = async () => {
       try {
         const response = await fetchWithAuth('/api/agents/');
@@ -95,7 +120,29 @@ const AddContrat = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
+
+      const exist = contrats.some(contrat => contrat.agent.cin === formValues.cin);
+      if (exist){
+        Swal.fire({
+          icon: 'error',
+          title: 'Cet utilisateur a déjà un contrat.',
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+        });
+        return
+      }
+      
+
       console.log('Submitting form with values:', formValues);
+      if (formValues.type_contrat === 'CDI'){
+        setFormValues(prevState => ({
+          ...prevState,
+          duree_contrat: '0',
+        }));
+      }
       const response = await postWithAuth('/api/contrats/create/', formValues);
       console.log('Response:', response);
 
@@ -230,18 +277,24 @@ const AddContrat = () => {
                   required
                 />
               </div>
-              <div className="form-group">
-                <label htmlFor="duree_contrat" className="block text-gray-700">Durée (mois)</label>
-                <input
-                  type="number"
-                  className="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
-                  id="duree_contrat"
-                  name="duree_contrat"
-                  value={formValues.duree_contrat}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
+
+              {
+                formValues.type_contrat !== 'CDI'  &&
+              
+                <div className="form-group">
+                  <label htmlFor="duree_contrat" className="block text-gray-700">Durée (mois)</label>
+                  <input
+                    type="number"
+                    className="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
+                    id="duree_contrat"
+                    name="duree_contrat"
+                    value={formValues.duree_contrat}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              }
+
             </div>
             <button type="submit" className="bg-graydark mt-6 w-full py-3 dark:bg-gray-100 shadow-md flex items-center justify-center px-6 rounded-md text-white bg-gray-600 hover:bg-gray-700">
               <PlusIcon className="mr-2 h-5 w-5" />

@@ -153,7 +153,7 @@ function ContratTable({ endpoint, searchResults }: { endpoint: string; searchRes
   return (
     <div className="rounded-sm bg-transparent px-3 pb-2.5 pt-6 dark:border-strokedark dark:bg-boxdark sm:px-7 xl:pb-1">
       <div className="flex flex-col">
-        <div className="grid grid-cols-4 rounded-sm text-black dark:text-white bg-gray-2 dark:bg-meta-4 sm:grid-cols-6">
+        <div className="grid grid-cols-4 rounded-sm text-black dark:text-white bg-gray-2 dark:bg-meta-4 sm:grid-cols-7">
           <div className="p-2 xl:p-3">
             <h5 className="text-sm font-medium uppercase xsm:text-base">Nom</h5>
           </div>
@@ -248,7 +248,7 @@ function ContratTable({ endpoint, searchResults }: { endpoint: string; searchRes
           <>
             {contrats.map((contrat: Contrat, key: number) => (
               <div
-                className={`grid grid-cols-4 sm:grid-cols-6 text-base ${key === contrats.length - 1 ? "" : "border-b border-stroke dark:border-strokedark"
+                className={`grid grid-cols-4 sm:grid-cols-7 text-base ${key === contrats.length - 1 ? "" : "border-b border-stroke dark:border-strokedark"
                   }`}
                 key={key}
               >
@@ -280,7 +280,7 @@ function ContratTable({ endpoint, searchResults }: { endpoint: string; searchRes
                 </div>
                 <div className="flex items-center justify-center p-2.5 xl:p-5">
                   <p className="text-black dark:text-white">
-                    {contrat.duree_contrat}
+                    {contrat.duree_contrat === 0 ? "-" : contrat.duree_contrat}
                   </p>
                 </div>
                 <div className="hidden items-center justify-center gap-4 p-2.5 sm:flex xl:p-5">
