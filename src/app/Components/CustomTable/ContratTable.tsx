@@ -36,9 +36,18 @@ function ContratTable({ endpoint, searchResults }: { endpoint: string; searchRes
     duree_contrat: 0,
   });
 
-  const handleEditInputChange = (event: React.ChangeEvent<HTMLInputElement>, fieldName: string) => {
-    setEditFormData({ ...editFormData, [fieldName]: event.target.value });
+  const handleEditInputChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    fieldName: string
+  ) => {
+    const { value, type } = event.target;
+  
+    setEditFormData((prev) => ({
+      ...prev,
+      [fieldName]: value,
+    }));
   };
+  
 
   const handleDeleteInputChange = (event: React.ChangeEvent<HTMLInputElement>, fieldName: string) => {
     if (fieldName === 'nom') {
@@ -171,9 +180,8 @@ function ContratTable({ endpoint, searchResults }: { endpoint: string; searchRes
           <>
             {searchResults.map((contrat: Contrat, key: number) => (
               <div
-                className={`grid grid-cols-4 sm:grid-cols-6 text-base ${
-                  key === contrats.length - 1 ? "" : "border-b border-stroke dark:border-strokedark"
-                }`}
+                className={`grid grid-cols-4 sm:grid-cols-6 text-base ${key === contrats.length - 1 ? "" : "border-b border-stroke dark:border-strokedark"
+                  }`}
                 key={key}
               >
                 <div className="flex items-center justify-center p-2.5 xl:p-5">
@@ -181,13 +189,13 @@ function ContratTable({ endpoint, searchResults }: { endpoint: string; searchRes
                     {contrat.agent.nom}
                   </p>
                 </div>
-                
+
                 <div className="flex items-center justify-center p-2.5 xl:p-5">
                   <p className="hidden text-black dark:text-white sm:block">
                     {contrat.agent.prenom}
                   </p>
                 </div>
-                
+
                 <div className="flex items-center justify-center p-2.5 xl:p-5">
                   <p className="hidden text-black dark:text-white sm:block">
                     {contrat.agent.cin}
@@ -240,9 +248,8 @@ function ContratTable({ endpoint, searchResults }: { endpoint: string; searchRes
           <>
             {contrats.map((contrat: Contrat, key: number) => (
               <div
-                className={`grid grid-cols-4 sm:grid-cols-6 text-base ${
-                  key === contrats.length - 1 ? "" : "border-b border-stroke dark:border-strokedark"
-                }`}
+                className={`grid grid-cols-4 sm:grid-cols-6 text-base ${key === contrats.length - 1 ? "" : "border-b border-stroke dark:border-strokedark"
+                  }`}
                 key={key}
               >
                 <div className="flex items-center justify-center p-2.5 xl:p-5">
@@ -255,7 +262,7 @@ function ContratTable({ endpoint, searchResults }: { endpoint: string; searchRes
                     {contrat.agent.prenom}
                   </p>
                 </div>
-                
+
                 <div className="flex items-center justify-center p-2.5 xl:p-5">
                   <p className="hidden text-black dark:text-white sm:block">
                     {contrat.agent.cin}
@@ -353,26 +360,29 @@ function ContratTable({ endpoint, searchResults }: { endpoint: string; searchRes
         onClose={() => setAlert((prev) => ({ ...prev, isOpen: false }))}
       >
         <div className="p-4">
-          <div className="flex flex-col">
-            <label htmlFor="editTypeContrat" className="text-sm font-medium">
-              Type de Contrat :
-            </label>
-            <input
-              id="editTypeContrat"
-              type="text"
-              value={editFormData.type_contrat}
-              onChange={(event) => handleEditInputChange(event, 'type_contrat')}
-              className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              placeholder="Type de Contrat"
-            />
-          </div>
+        <div className="flex flex-col">
+        <label htmlFor="editTypeContrat" className="text-sm font-medium">
+          Type de Contrat :
+        </label>
+        <select
+          id="editTypeContrat"
+          value={editFormData.type_contrat}
+          onChange={(event) => handleEditInputChange(event, 'type_contrat')}
+          className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+        >
+     
+          <option value="anapec">ANAPEC</option>
+          <option value="cdi">CDI</option>
+          <option value="cdd">CDD</option>
+        </select>
+      </div>
           <div className="flex flex-col mt-4">
             <label htmlFor="editDateCreation" className="text-sm font-medium">
               Date de Création :
             </label>
             <input
               id="editDateCreation"
-              type="text"
+              type="date"
               value={editFormData.date_creation_contrat}
               onChange={(event) => handleEditInputChange(event, 'date_creation_contrat')}
               className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
@@ -394,6 +404,7 @@ function ContratTable({ endpoint, searchResults }: { endpoint: string; searchRes
           </div>
         </div>
       </Modal>
+
     </div>
   );
 }
