@@ -5,6 +5,9 @@ import DefaultLayout from '../Layout/DefaultLayout';
 import { PlusIcon } from 'lucide-react';
 import Swal from 'sweetalert2';
 import { postWithAuth } from '@/utils/api';
+import { calculateAge } from '@/utils/calculateAge';
+import { validateCINLength } from '@/utils/cinValidation';
+import { validatePhoneNumber } from '@/utils/phoneValidation';
 
 function PersonnelForm() {
     const [formValues, setFormValues] = React.useState({
@@ -28,6 +31,31 @@ function PersonnelForm() {
     };
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
+      e.preventDefault();
+
+      const age = calculateAge(formValues.date_naissance);
+      if (age < 20) {
+        Swal.fire({
+          icon: "error",
+          title: "Erreur",
+          text: "L'âge du responsable doit être supérieur ou égal à 20 ans.",
+        });
+        return;
+      }
+
+      if (!validateCINLength(formValues.cin)) {
+        return;
+      }
+     // phone validation
+      if (!validatePhoneNumber(formValues.numerotel)) {
+        Swal.fire({
+          icon: "error",
+          title: "Erreur",
+          text: "Le numéro de téléphone doit commencer par 0 et contenir 10 chiffres.",
+        });
+        return;
+      }
+
       try {
         await postWithAuth("/api/create_personnel/", {
           agent: {
@@ -42,6 +70,7 @@ function PersonnelForm() {
             numerotel: formValues.numerotel,
             role: "Personnel",
           },
+          poste:null,
           etat: "Candidat",
         });
         
@@ -55,6 +84,7 @@ function PersonnelForm() {
           addresse: "",
           numerotel: "",
           date_naissance: "",
+          // poste:null,
         });
 
         const Toast = Swal.mixin({

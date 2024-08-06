@@ -1,4 +1,5 @@
 export interface Agent {
+  // agent: any;
   address: string;
   cin: string;
   date_joined: string;

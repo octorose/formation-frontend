@@ -10,6 +10,9 @@ import Swal from "sweetalert2";
 import { refreshToken } from "@/utils/RefreshToken";
 import PhaseRenderer from "../phaserenderer/PhaseRenderer";
 import { deleteWithAuth, fetchWithAuth, putWithAuth } from "@/utils/api";
+import { validateCINLength } from "@/utils/cinValidation";
+import { validatePhoneNumber } from "@/utils/phoneValidation";
+import { calculateAge } from "@/utils/calculateAge";
 
 interface Agent {
   address: string;
@@ -109,8 +112,12 @@ function CustomTable({
 
       try {
         const response = await deleteWithAuth(`/api/delete_personnel/${Candidate.id}/`);
-        if (!response.ok) {
-          throw new Error("Failed to delete candidate");
+        if (!response) {
+          Toast.fire({
+            icon: 'success',
+            title: 'Candidat supprimé avec succès !',
+            iconColor: 'green',
+          });
         }
         // const data = await response.json();
         fetchData();
@@ -125,7 +132,7 @@ function CustomTable({
       });
     }
   };
-
+ 
   const handleDeleteInputChange = (
     event: React.ChangeEvent<HTMLInputElement>,
     key: string
@@ -140,7 +147,7 @@ function CustomTable({
     try {
       setIsLoading(true);
         const fetchedData = await fetchWithAuth(
-          `/api/personnel/?page=${currentPage}`
+          `api/personnel/?page=${currentPage}`
         );
         setData(fetchedData);
         setIsLoading(false);
@@ -158,8 +165,41 @@ function CustomTable({
   }
   const updateCandidate = async (Candidate: any) => {
     console.log(Candidate);
+    if (!validateCINLength(Candidate.agent.cin)) {
+      Toast.fire({
+        icon: 'error',
+        title: 'Le CIN doit commencer par une ou deux lettres suivies de 4 à 6 chiffres.',
+        iconColor: 'red',
+      });
+      return;
+    }
+    if (!validatePhoneNumber(Candidate.agent.numerotel)) {
+      Toast.fire({
+        icon: 'error',
+        title: 'Numéro de téléphone invalide !',
+        iconColor: 'red',
+      });
+      return;
+    }
+   
+    if (!calculateAge(Candidate.agent.date_naissance)) {
+      Toast.fire({
+        icon: 'error',
+        title: 'Âge invalide !',
+        iconColor: 'red',
+      });
+      return;
+    }
     try {
       const response = await putWithAuth(`/api/update_personnel/${Candidate.id}/`, Candidate);
+      Toast.fire({
+        icon: 'success',
+        title: 'Candidats mis à jour avec succès !',
+        iconColor: 'green',
+      });
+
+      fetchData();
+      setAlert((prev) => ({ ...prev, isOpen: false }));
       fetchData();
 
       // const data = await response.json();
@@ -452,18 +492,22 @@ function CustomTable({
           setAlert2((prev) => ({ ...prev, isOpen: false }));
         }}
       >
-        <div className="grid grid-cols-2 gap-5 p-4">
-          <div className="text-slate-900">
-            <div>
-              <h2 className="font-semibold">Name</h2>
+        <div className="p-4">
+          <div className="flex flex-col">
+            <label htmlFor="deleteName" className="text-sm font-medium">
+              Nom :
+            </label>
               <input
-                type="text"
-                onChange={(event) => handleDeleteInputChange(event, "Nom")}
-                className="w-full p-2 border border-neutral-200 rounded-lg"
-              />
+              id="deleteName"
+              type="text"
+             
+              onChange={(event) => handleDeleteInputChange(event, 'Nom')}
+              className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              placeholder={`Tapez "${ CandidatetoEdit?.agent?.nom}"`}
+            />
             </div>
           </div>
-        </div>
+      
       </Modal>
     </div>
   );
