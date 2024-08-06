@@ -8,7 +8,7 @@ function page() {
   return (
     <DefaultLayout importexport={false}>
       <div className="flex flex-col items-center justify-center">
-        <h1 className="text-4xl font-bold text-gray-800">
+        <h1 className="text-4xl font-bold mb-4 text-gray-800">
           Affectation des Operateur
         </h1>
       </div>

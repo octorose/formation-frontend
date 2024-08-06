@@ -155,63 +155,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 : setSidebarExpanded(true);
                             }}
                           >
-                            <FaChalkboardTeacher/>
-                            Formateur
-                            <DynamicArrow open={open} />
-                          </Link>
-                          <div
-                            className={`translate transform overflow-hidden  ${
-                              !open && "hidden"
-                            }`}
-                          >
-                            <ul className="mb-5.5 mt-4 flex flex-col gap-2.5 pl-6">
-                              <li>
-                                <Link
-                                  href="/#"
-                                  className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
-                                    pathname === "/#" && "text-white"
-                                  }`}
-                                >
-                                  Details
-                                </Link>
-                              </li>
-                              <li>
-                                <Link
-                                  href="/AddFormateur"
-                                  className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
-                                    pathname === "/#" && "text-white"
-                                  }`}
-                                >
-                                  Add Manually
-                                </Link>
-                              </li>
-                            </ul>
-                          </div>
-                        </React.Fragment>
-                      );
-                    }}
-                  </SidebarLinkGroup>
-                  <SidebarLinkGroup
-                    activeCondition={
-                      pathname === "/forms" || pathname.includes("forms")
-                    }
-                  >
-                    {(handleClick, open) => {
-                      return (
-                        <React.Fragment>
-                          <Link
-                            href="/calendar"
-                            className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                              pathname.includes("calendar") &&
-                              "bg-graydark dark:bg-meta-4"
-                            }`}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              sidebarExpanded
-                                ? handleClick()
-                                : setSidebarExpanded(true);
-                            }}
-                          >
                             <CandidatIcon />
                             Candidates
                             <DynamicArrow open={open} />
@@ -269,7 +212,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 : setSidebarExpanded(true);
                             }}
                           >
-                            <SparkleIcon width={15}/>
+                            <SparkleIcon width={15} />
                             Polyvalence
                             <DynamicArrow open={open} />
                           </Link>
@@ -383,7 +326,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 : setSidebarExpanded(true);
                             }}
                           >
-                            <FlagIcon width={20}/>
+                            <FlagIcon width={20} />
                             Postes
                             <DynamicArrow open={open} />
                           </Link>
@@ -413,7 +356,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                   Add Poste
                                 </Link>
                               </li>
-                             
                             </ul>
                           </div>
                         </React.Fragment>
@@ -571,8 +513,65 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 : setSidebarExpanded(true);
                             }}
                           >
+                            <FaChalkboardTeacher />
+                            Formateurs
+                            <DynamicArrow open={open} />
+                          </Link>
+                          <div
+                            className={`translate transform overflow-hidden  ${
+                              !open && "hidden"
+                            }`}
+                          >
+                            <ul className="mb-5.5 mt-4 flex flex-col gap-2.5 pl-6">
+                              <li>
+                                <Link
+                                  href="/#"
+                                  className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
+                                    pathname === "/#" && "text-white"
+                                  }`}
+                                >
+                                  Details
+                                </Link>
+                              </li>
+                              <li>
+                                <Link
+                                  href="/AddFormateur"
+                                  className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
+                                    pathname === "/#" && "text-white"
+                                  }`}
+                                >
+                                  Add Manually
+                                </Link>
+                              </li>
+                            </ul>
+                          </div>
+                        </React.Fragment>
+                      );
+                    }}
+                  </SidebarLinkGroup>
+                  <SidebarLinkGroup
+                    activeCondition={
+                      pathname === "/forms" || pathname.includes("forms")
+                    }
+                  >
+                    {(handleClick, open) => {
+                      return (
+                        <React.Fragment>
+                          <Link
+                            href="/calendar"
+                            className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                              pathname.includes("calendar") &&
+                              "bg-graydark dark:bg-meta-4"
+                            }`}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              sidebarExpanded
+                                ? handleClick()
+                                : setSidebarExpanded(true);
+                            }}
+                          >
                             <GroupIcon />
-                            Superviseur
+                            Superviseurs
                             <DynamicArrow open={open} />
                           </Link>
                           <div
@@ -629,7 +628,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                             }}
                           >
                             <CandidatIcon />
-                            Responsable Ecole formation
+                            Responsables Ecole formation
                             <DynamicArrow open={open} />
                           </Link>
                           <div
@@ -803,7 +802,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                       );
                     }}
                   </SidebarLinkGroup>
-             
+
                   <SidebarLinkGroup
                     activeCondition={
                       pathname === "/forms" || pathname.includes("forms")
@@ -884,8 +883,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                     </Link>
                   </li>
                 </div>
-               
-              ):(
+              ) : (
                 <></>
               )}
             </ul>

@@ -256,7 +256,7 @@ function FormateurForm() {
                   className="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
                   id="Type"
                   name="Type"
-                  value={formValues.Type}
+                  value={role == "Superviseur" ? "Pratique" : role == "ResponsableEcoleFormation" || "RH" ? "Theorique" : formValues.Type}
                   onChange={handleChange}
                   required
                   disabled={role !== "Supervisor"}
