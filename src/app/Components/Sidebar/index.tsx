@@ -1,7 +1,10 @@
 "use client";
 
+
 import React, { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
+import { confirmAlert } from 'react-confirm-alert'; 
+import 'react-confirm-alert/src/react-confirm-alert.css';
 import Link from "next/link";
 import Image from "next/image";
 import SidebarLinkGroup from "./SidebarLinkGroup";
@@ -15,6 +18,7 @@ import { get } from "http";
 import { getRoleFromToken } from "@/utils/getRoleFromToken";
 import HistoryIcon from "../../../../public/assets/Icons/HistoryIcon";
 import { GroupIcon } from "lucide-react";
+import Confirmation from "../Confirmation/Confirmation";
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -27,6 +31,27 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const pathname = usePathname(); 
   const trigger = useRef<any>(null);
   const sidebar = useRef<any>(null);
+  const handleTestLogiqueClick = (e:any) => {
+    e.preventDefault();
+  
+    confirmAlert({
+      title: 'Confirmation',
+      message: 'Êtes-vous sûr de vouloir commencer le test logique?',
+      buttons: [
+        {
+          label: 'Oui',
+          onClick: () => {
+            window.location.href = "/TestLogic";
+          }
+        },
+        {
+          label: 'Non',
+          onClick: () => {}
+        }
+      ]
+    });
+  };
+  
 
   let storedSidebarExpanded = "true";
 
@@ -668,59 +693,63 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             </h3>
 
             <ul className="mb-6 flex flex-col gap-1.5">
-              <SidebarLinkGroup
-                activeCondition={
-                  pathname === "/auth" || pathname.includes("auth")
-                }
-              >
-                {(handleClick, open) => {
-                  return (
-                    <React.Fragment>
-                      <Link
-                        href="#"
-                        className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                          (pathname === "/auth" || pathname.includes("auth")) &&
-                          "bg-graydark dark:bg-meta-4"
-                        }`}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          sidebarExpanded
-                            ? handleClick()
-                            : setSidebarExpanded(true);
-                        }}
-                      >
-                        Test Logique 
-                        <DynamicArrow open={open} />
-                      </Link>
+            <SidebarLinkGroup
+  activeCondition={
+    pathname === "/auth" || pathname.includes("auth")
+  }
+>
+  {(handleClick, open) => {
+    return (
+      <React.Fragment>
+        <Link
+          href="#"
+          className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+            (pathname === "/auth" || pathname.includes("auth")) &&
+            "bg-graydark dark:bg-meta-4"
+          }`}
+          onClick={(e) => {
+            e.preventDefault();
+            if (sidebarExpanded) {
+              handleClick();
+            } else {
+              setSidebarExpanded(true);
+            }
+          }}
+        >
+          <Confirmation />
+          <DynamicArrow open={open} />
+        </Link>
 
-                      <div
-                        className={`translate transform overflow-hidden ${
-                          !open && "hidden"
-                        }`}
-                      >
-                        <ul className="mb-5.5 mt-4 flex flex-col gap-2.5 pl-6">
-                          <li>
-                            <Link
-                              href="/"
-                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white"
-                            >
-                              Some
-                            </Link>
-                          </li>
-                          <li>
-                            <Link
-                              href="/"
-                              className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white"
-                            >
-                              Thing
-                            </Link>
-                          </li>
-                        </ul>
-                      </div>
-                    </React.Fragment>
-                  );
-                }}
-              </SidebarLinkGroup>
+        <div
+          className={`translate transform overflow-hidden ${
+            !open && "hidden"
+          }`}
+        >
+          <ul className="mb-5.5 mt-4 flex flex-col gap-2.5 pl-6">
+            <li>
+              <Link
+                href="/"
+                className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white"
+              >
+                Some
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/"
+                className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white"
+              >
+                Thing
+              </Link>
+            </li>
+          </ul>
+        </div>
+      </React.Fragment>
+    );
+  }}
+</SidebarLinkGroup>
+
+
             </ul>
           </div>
         </nav>
