@@ -1,6 +1,6 @@
 // pages/index.tsx
 "use client";
-import React, { use, useEffect, useState } from "react";
+import React, {  useEffect, useState } from "react";
 import DefaultLayout from "@/Components/Layout/DefaultLayout";
 import { Tabs } from "../Components/Tabs/tab";
 import Candidats from "@/Components/Candidats/Candidats";
