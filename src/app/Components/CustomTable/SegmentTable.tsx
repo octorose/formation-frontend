@@ -16,7 +16,7 @@ interface Lignes {
 interface Superviseur {
   id: number;
   agent: Agent;
-  lignes: Lignes[];
+  ligne: Lignes;
 }
 
 interface ApiResponse<T> {
@@ -24,7 +24,7 @@ interface ApiResponse<T> {
   count: number;
 }
 
-function SupervisorsTable({
+function SegmentsTable({
   endpoint,
   searchResults,
 }: {
@@ -32,11 +32,11 @@ function SupervisorsTable({
   searchResults: any[];
 }) {
   const [currentPage, setCurrentPage] = useState(1);
-  const [supervisors, setSupervisors] = useState<Superviseur[]>([]);
+  const [Segments, setSegments] = useState<Superviseur[]>([]);
   const [editMode, setEditMode] = useState(Array(15).fill(false));
   const { alert, setAlert } = useAlert();
   const [ligneOptions, setLigneOptions] = useState<Lignes[]>([]);
-  const [totalSupervisors, setTotalSupervisors] = useState(0);
+  const [totalSegments, setTotalSegments] = useState(0);
   const [SupervisortoDelete, setSupervisortoDelete] = useState({} as any);
   const [SupervisortoEdit, setSupervisortoEdit] = useState({} as any);
   const { alert: alert2, setAlert: setAlert2 } = useAlert();
@@ -52,44 +52,43 @@ function SupervisorsTable({
 
   const updateCandidate = async (Candidate: any) => {
     console.log(Candidate);
-    
-    try{
-      await putWithAuth(`${endpoint}/update/${Candidate.id}/`, {
-      agent: {
-        nom: Candidate.agent.nom,
-        prenom: Candidate.agent.prenom,
-        email: Candidate.agent.email,
-        password: Candidate.agent.password,
-        addresse: Candidate.agent.addresse,
-        numerotel: Candidate.agent.numerotel,
-        date_naissance: Candidate.agent.date_naissance,
-        role: "Superviseur",
-      },
-      lignes_ids: Candidate.lignes,
-    });
-    Toast.fire({
-      icon: 'success',
-      title: 'superviseur mis à jour avec succès !',
-      iconColor: 'green',
-    });
 
-    fetchData();
-    setAlert((prev) => ({ ...prev, isOpen: false }));
-  } catch (error) {
-    console.error('Échec de la mise à jour du superviseur',error);
-    Toast.fire({
-      icon: 'error',
-      title: 'Une erreur est survenue lors de la mise à jour du responsable.',
-      iconColor: 'red',
-    });
-  }
-    
+    try {
+      await putWithAuth(`${endpoint}/update/${Candidate.id}/`, {
+        agent: {
+          nom: Candidate.agent.nom,
+          prenom: Candidate.agent.prenom,
+          email: Candidate.agent.email,
+          password: Candidate.agent.password,
+          addresse: Candidate.agent.addresse,
+          numerotel: Candidate.agent.numerotel,
+          date_naissance: Candidate.agent.date_naissance,
+          role: "Superviseur",
+        },
+        lignes: Candidate.lignes,
+      });
+      Toast.fire({
+        icon: "success",
+        title: "superviseur mis à jour avec succès !",
+        iconColor: "green",
+      });
+
+      fetchData();
+      setAlert((prev) => ({ ...prev, isOpen: false }));
+    } catch (error) {
+      console.error("Échec de la mise à jour du superviseur", error);
+      Toast.fire({
+        icon: "error",
+        title: "Une erreur est survenue lors de la mise à jour du responsable.",
+        iconColor: "red",
+      });
+    }
   };
 
   const PersonalInfo = {
     nom: SupervisortoEdit?.agent?.nom,
     prenom: SupervisortoEdit?.agent?.prenom,
-    lignes: SupervisortoEdit?.ligne_name,
+    ligne: SupervisortoEdit?.ligne?.name,
   };
 
   const fetchData = async () => {
@@ -97,9 +96,9 @@ function SupervisorsTable({
       `${endpoint}?page=${currentPage}`
     );
     console.log(response);
-    
-    setSupervisors(response.results);
-    setTotalSupervisors(response.count);
+
+    setSegments(response.results);
+    setTotalSegments(response.count);
   };
 
   useEffect(() => {
@@ -137,20 +136,17 @@ function SupervisorsTable({
     //@ts-ignore
     if (SupervisortoDelete?.Nom === supervisor.agent.nom) {
       try {
-        const response = await deleteWithAuth(
-          `${endpoint}/${supervisor.id}/`
-        );
+        const response = await deleteWithAuth(`${endpoint}/${supervisor.id}/`);
         if (!response || response.status === 204) {
           Toast.fire({
-            icon: 'success',
-            title: 'Superviseur supprimé avec succès !',
-            iconColor: 'green',
+            icon: "success",
+            title: "Superviseur supprimé avec succès !",
+            iconColor: "green",
           });
         }
         // const data = await response.json();
         fetchData();
         setAlert2((prev) => ({ ...prev, isOpen: false }));
-     
       } catch (error) {
         console.error(error);
       }
@@ -161,21 +157,21 @@ function SupervisorsTable({
       });
     }
   };
-   const fetchLignes = async () => {
-     try {
-       const response = await fetchWithAuth("/api/lignes/");
-       const lignesData = response.results.map((ligne: any) => ({
-         id: ligne.id,
-         name: ligne.name,
-       }));
-       console.log(response);
+  const fetchLignes = async () => {
+    try {
+      const response = await fetchWithAuth("/api/lignes/");
+      const lignesData = response.results.map((ligne: any) => ({
+        id: ligne.id,
+        name: ligne.name,
+      }));
+      console.log(response);
 
-       setLigneOptions(lignesData);
-     } catch (error) {
-       console.error("Failed to fetch lignes", error);
-       // Handle error if needed
-     }
-   };
+      setLigneOptions(lignesData);
+    } catch (error) {
+      console.error("Failed to fetch lignes", error);
+      // Handle error if needed
+    }
+  };
 
   return (
     <div className="rounded-sm bg-transparent px-5 pb-2.5 pt-6 dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
@@ -191,10 +187,10 @@ function SupervisorsTable({
           </div>
           <div className="p-2.5 text-center xl:p-5">
             <h5 className="text-sm font-medium uppercase xsm:text-base">
-              Ligne Names
+              nom de ligne
             </h5>
           </div>
-          
+
           <div className="hidden p-2.5 text-center sm:block xl:p-5">
             <h5 className="text-sm font-medium uppercase xsm:text-base">
               Actions
@@ -206,7 +202,7 @@ function SupervisorsTable({
             {searchResults.map((supervisor: Superviseur, key: number) => (
               <div
                 className={`grid grid-cols-3 sm:grid-cols-4 text-base ${
-                  key === supervisors.length - 1
+                  key === Segments.length - 1
                     ? ""
                     : "border-b border-stroke dark:border-strokedark"
                 }`}
@@ -226,15 +222,15 @@ function SupervisorsTable({
 
                 <div className="flex items-center justify-center p-2.5 xl:p-5">
                   <p className="text-black dark:text-white">
-                    {supervisor.lignes.map((ligne) => ligne.name).join(", ")}
+                    {supervisor.ligne.name}
                   </p>
                 </div>
-                
+
                 <div className="hidden items-center justify-center gap-4 p-2.5 sm:flex xl:p-5">
                   <button
                     className="text-black dark:text-white"
                     onClick={() => {
-                      setSupervisortoEdit(supervisor);
+                      setSupervisortoEdit(supervisor.ligne.name+"wa");
                       setAlert((prev) => ({ ...prev, isOpen: true }));
                     }}
                   >
@@ -255,10 +251,10 @@ function SupervisorsTable({
           </>
         ) : (
           <>
-            {supervisors.map((supervisor: Superviseur, key: number) => (
+            {Segments.map((supervisor: Superviseur, key: number) => (
               <div
                 className={`grid grid-cols-3 sm:grid-cols-4 text-base ${
-                  key === supervisors.length - 1
+                  key === Segments.length - 1
                     ? ""
                     : "border-b border-stroke dark:border-strokedark"
                 }`}
@@ -276,10 +272,15 @@ function SupervisorsTable({
                   </p>
                 </div>
 
-                <div className="flex items-center justify-center p-2.5 xl:p-5">
-                  <p className="text-black dark:text-white">
-                    {supervisor.lignes.map((ligne) => ligne.name).join(", ")}
-                  </p>
+                <div
+                  className="flex items-center justify-center p-2.5 xl:p-5"
+                >
+                  
+                  <div className="flex items-center justify-center p-2.5 xl:p-5">
+                    <p className="text-black dark:text-white">
+                      {supervisor.ligne.name}
+                    </p>
+                  </div>
                 </div>
 
                 <div className="hidden items-center justify-center gap-4 p-2.5 sm:flex xl:p-5">
@@ -288,6 +289,8 @@ function SupervisorsTable({
                     onClick={() => {
                       setSupervisortoEdit(supervisor);
                       setAlert((prev) => ({ ...prev, isOpen: true }));
+                      setSupervisortoEdit((prev:any) => ({...prev, ligne: supervisor.ligne.name}))
+                      
                     }}
                   >
                     <Edit2Icon />
@@ -310,7 +313,7 @@ function SupervisorsTable({
 
       <ResponsivePagination
         current={currentPage}
-        total={Math.ceil(totalSupervisors / 10)}
+        total={Math.ceil(totalSegments / 10)}
         onPageChange={handlePageChange}
       />
       <Modal
@@ -332,29 +335,27 @@ function SupervisorsTable({
           setAlert2((prev) => ({ ...prev, isOpen: false }));
         }}
       >
-         <div className="p-4">
+        <div className="p-4">
           <div className="flex flex-col">
             <label htmlFor="deleteName" className="text-sm font-medium">
               Nom :
             </label>
-              <input
+            <input
               id="deleteName"
               type="text"
-             
-              onChange={(event) => handleDeleteInputChange(event, 'Nom')}
+              onChange={(event) => handleDeleteInputChange(event, "Nom")}
               className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              placeholder={`Tapez "${ SupervisortoDelete?.agent?.nom}"`}
+              placeholder={`Tapez "${SupervisortoDelete?.agent?.nom}"`}
             />
-            </div>
           </div>
-      
+        </div>
       </Modal>
       <Modal
         isOpen={alert.isOpen}
         onSubmit={() => {
-          // console.log(SupervisortoEdit);
+          console.log(SupervisortoEdit);
 
-          updateCandidate(SupervisortoEdit);
+        //   updateCandidate(SupervisortoEdit);
         }}
         onCancel={() => {
           setAlert((prev) => ({ ...prev, isOpen: false }));
@@ -384,4 +385,4 @@ function SupervisorsTable({
   );
 }
 
-export default SupervisorsTable;
+export default SegmentsTable;

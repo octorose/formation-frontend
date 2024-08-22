@@ -122,7 +122,7 @@ function PosteForm() {
       <div className="flex items-center justify-center bg-gradient-to-br">
         <div className="w-full max-w-20xl p-10 bg-white shadow-lg rounded-lg">
           <h1 className="text-2xl font-bold text-center text-blue-800 mb-8">
-            Ajouter Poste
+            Ajouter une position
           </h1>
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -184,7 +184,7 @@ function PosteForm() {
               type="submit"
               className="bg-graydark mt-6 w-full py-3 dark:bg-gray-100 shadow-md flex items-center justify-center px-6 rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:bg-gray-700"
             >
-              <PlusIcon /> Ajouter Poste
+              <PlusIcon /> Ajouter Position
             </button>
           </form>
         </div>

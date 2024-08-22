@@ -1,28 +1,25 @@
 "use client";
-import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
-import DefaultLayout from "../Layout/DefaultLayout";
-import { PlusIcon } from "lucide-react";
-import Swal from "sweetalert2";
-import { postWithAuth, fetchWithAuth } from "@/utils/api"; // Assuming you have API utility functions
+import { fetchWithAuth, postWithAuth } from "@/utils/api";
 import { calculateAge } from "@/utils/calculateAge";
 import { validateCINLength } from "@/utils/cinValidation";
+import { getRoleFromToken } from "@/utils/getRoleFromToken";
 import { validatePhoneNumber } from "@/utils/phoneValidation";
+import { PlusIcon } from "lucide-react";
+import React, { useEffect } from "react";
+import Swal from "sweetalert2";
+import DefaultLayout from "../Layout/DefaultLayout";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { getRoleIdFromToken } from "@/utils/getRoleIdFromToken";
+import { log } from "console";
 
-interface FormValues {
-  nom: string;
-  username: string;
-  prenom: string;
-  email: string;
-  password: string;
-  cin: string;
-  addresse: string;
-  numerotel: string;
-  date_naissance: string;
-  lignes: number[]; // Array of selected ligne IDs
-}
-
-function SupervisorForm() {
-  const [formValues, setFormValues] = useState<FormValues>({
+function SegmetForm() {
+  const [formValues, setFormValues] = React.useState({
     nom: "",
     username: "",
     prenom: "",
@@ -32,74 +29,69 @@ function SupervisorForm() {
     addresse: "",
     numerotel: "",
     date_naissance: "",
-    lignes: [], // Initialize as empty array
+    ligne: "",
   });
-const [selectedLignes, setSelectedLignes] = useState<number[]>([]);
-  const [ligneOptions, setLigneOptions] = useState<
-    { id: number; name: string }[]
-  >([]);
-
+  const role = getRoleFromToken();
+  const [productionLines, setProductionLines] = React.useState([]);
+  interface ProductionLine {
+    id: string;
+    name: string;
+  }
+  
+  const [productionLine, setProductionLine] =  React.useState("");
+  
+  interface ProductionLine {
+    id: string;
+    name: string;
+  }
   useEffect(() => {
     fetchLignes();
+
   }, []);
 
-  const handleLigneChange = (ligneId: number) => {
-    if (selectedLignes.includes(ligneId)) {
-      setSelectedLignes(selectedLignes.filter((id) => id !== ligneId));
-      setFormValues((prevValues) => ({
-        ...prevValues,
-        lignes: selectedLignes.filter((id) => id !== ligneId),
-      }));
-    } else {
-      setSelectedLignes([...selectedLignes, ligneId]);
-      setFormValues((prevValues) => ({
-        ...prevValues,
-        lignes: [...selectedLignes, ligneId],
-      }));
-    }
-  };
-
-  const fetchLignes = async () => {
-    try {
-      const response = await fetchWithAuth("/api/lignes/");
-      const lignesData = response.results.map((ligne: any) => ({
-        id: ligne.id,
-        name: ligne.name,
-      }));
-      console.log(response);
-      
-      setLigneOptions(lignesData);
-    } catch (error) {
-      console.error("Failed to fetch lignes", error);
-      // Handle error if needed
-    }
-  };
-
   const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    const { name, value } = e.target;
-    if (name === "lignes") {
-      const selectedLignes = Array.from((e.target as HTMLSelectElement).selectedOptions, (option) =>
-        Number(option.value)
-      );
-      setFormValues((prevValues) => ({
-        ...prevValues,
-        lignes: selectedLignes,
-      }));
-    } else {
-      setFormValues((prevValues) => ({
-        ...prevValues,
-        [name]: value,
-      }));
-    }
+    const { name, value, type } = e.target;
+    const updatedValue =
+      type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
+
+    setFormValues((prevState) => ({
+      ...prevState,
+      [name]: updatedValue,
+    }));
   };
+    const handleLineChange = async (value: string) => {
+      setProductionLine(value);
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    e.preventDefault();
+      setFormValues((prevState) => ({
+        ...prevState,
+        ligne: value,
+      }));
+    };
+   const fetchLignes = async () => {
 
-    // Age validation
+
+     try {
+       const response = await fetchWithAuth(`api/lignes/`);
+       if (response && response.results && Array.isArray(response.results)) {
+         setProductionLines(response.results);
+         console.log(response.results);
+         
+         if (response.results.length > 0) {
+           setProductionLine(response.results[0]);
+         }
+       } else {
+         throw new Error("Invalid response format");
+       }
+     } catch (error: any) {
+       console.error("Failed to fetch production lines:", error.message);
+     }
+   };
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    console.log(formValues);
+    
     const age = calculateAge(formValues.date_naissance);
     if (age < 20) {
       Swal.fire({
@@ -107,6 +99,10 @@ const [selectedLignes, setSelectedLignes] = useState<number[]>([]);
         title: "Erreur",
         text: "L'âge du responsable doit être supérieur ou égal à 20 ans.",
       });
+      return;
+    }
+
+    if (!validateCINLength(formValues.cin)) {
       return;
     }
     if (!validatePhoneNumber(formValues.numerotel)) {
@@ -117,12 +113,8 @@ const [selectedLignes, setSelectedLignes] = useState<number[]>([]);
       });
       return;
     }
-    // CIN length validation
-    if (!validateCINLength(formValues.cin)) {
-      return;
-    }
     try {
-      const response = await postWithAuth("/api/create_supervisor/", {
+      await postWithAuth("/api/segments/create/", {
         agent: {
           username: formValues.username,
           email: formValues.email,
@@ -133,11 +125,11 @@ const [selectedLignes, setSelectedLignes] = useState<number[]>([]);
           addresse: formValues.addresse,
           cin: formValues.cin,
           numerotel: formValues.numerotel,
-          role: "Superviseur",
+          role: "Segment",
         },
-        lignes_ids: formValues.lignes,
+        ligne: formValues.ligne,
       });
-      console.log(formValues);
+      // console.log(formValues);
       
       setFormValues({
         nom: "",
@@ -149,58 +141,37 @@ const [selectedLignes, setSelectedLignes] = useState<number[]>([]);
         addresse: "",
         numerotel: "",
         date_naissance: "",
-        lignes: [], // Reset lignes after submission
+        ligne: "",
       });
 
-      const Toast = Swal.mixin({
+      Swal.fire({
+        icon: "success",
+        title: "Formateur ajouté avec succès !",
         toast: true,
         position: "top-end",
-        iconColor: "green",
-        customClass: {
-          popup: "colored-toast",
-        },
         showConfirmButton: false,
         timer: 2000,
         timerProgressBar: true,
       });
-
-  
-        Toast.fire({
-          icon: "success",
-          title: "Superviseur ajouté avec succès !",
-        });
-        setSelectedLignes([]); // Reset selected lignes after submission
-      }
-        
-      
-     catch (error) {
-      console.error("Failed to add supervisor", error);
-
-      const Toast = Swal.mixin({
-        toast: true,
-        position: "top-end",
-        iconColor: "red",
-        customClass: {
-          popup: "colored-toast",
-        },
-        showConfirmButton: false,
-        timer: 2000,
-        timerProgressBar: true,
-      });
-
-      Toast.fire({
+    } catch (error) {
+      console.error("Failed to add formateur", error);
+      Swal.fire({
         icon: "error",
-        title: "Une erreur est survenue lors de l'ajout du Superviseur.",
+        title: "Une erreur est survenue lors de l'ajout du formateur.",
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
       });
     }
   };
-
   return (
-    <DefaultLayout importexport={false}>
+    <DefaultLayout>
       <div className="flex items-center justify-center bg-gradient-to-br">
         <div className="w-full max-w-20xl p-10 bg-white shadow-lg rounded-lg">
           <h1 className="text-2xl font-bold text-center text-blue-800 mb-8">
-            Ajouter Superviseur
+            Ajouter Formateur
           </h1>
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -262,7 +233,7 @@ const [selectedLignes, setSelectedLignes] = useState<number[]>([]);
               </div>
               <div className="form-group">
                 <label htmlFor="password" className="block text-gray-700">
-                  Password
+                  Mot de passe
                 </label>
                 <input
                   type="password"
@@ -285,6 +256,8 @@ const [selectedLignes, setSelectedLignes] = useState<number[]>([]);
                   name="cin"
                   value={formValues.cin}
                   onChange={handleChange}
+                  min={5}
+                  max={6}
                   required
                 />
               </div>
@@ -316,7 +289,6 @@ const [selectedLignes, setSelectedLignes] = useState<number[]>([]);
                   required
                 />
               </div>
-
               <div className="form-group">
                 <label htmlFor="date_naissance" className="block text-gray-700">
                   Date de naissance
@@ -331,34 +303,30 @@ const [selectedLignes, setSelectedLignes] = useState<number[]>([]);
                   required
                 />
               </div>
-
               <div className="form-group">
-                <label htmlFor="lignes" className="block text-gray-700">
-                  Lignes
+                <label htmlFor="Type" className="block text-gray-700">
+                  Ligne
                 </label>
-                <div className="mt-1 p-4 flex gap-5  w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12">
-                  {ligneOptions.map((ligne) => (
-                    <div key={ligne.id} className=" ">
-                      <input
-                        type="checkbox"
-                        id={`ligne-${ligne.id}`}
-                        name={`lignes`}
-                        value={ligne.id.toString()}
-                        checked={selectedLignes.includes(ligne.id)}
-                        onChange={() => handleLigneChange(ligne.id)}
-                        className="mr-2"
-                      />
-                      <label htmlFor={`ligne-${ligne.id}`}>{ligne.name}</label>
-                    </div>
+                <select
+                  className="w-full p-2 border border-gray-300 rounded-lg"
+                  onChange={(e) => {
+                    handleLineChange(e.target.value);
+                  }}
+                >
+                  <option value="">Sélectionnez une ligne de production</option>
+                  {productionLines.map((ligne: ProductionLine) => (
+                    <option key={ligne.id} value={ligne.id}>
+                      {ligne.name}
+                    </option>
                   ))}
-                </div>
+                </select>
               </div>
             </div>
             <button
               type="submit"
               className="bg-graydark mt-6 w-full py-3 dark:bg-gray-100 shadow-md flex items-center justify-center px-6 rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:bg-gray-700"
             >
-              <PlusIcon /> Ajouter Superviseur
+              <PlusIcon /> Ajouter Formateur
             </button>
           </form>
         </div>
@@ -367,4 +335,4 @@ const [selectedLignes, setSelectedLignes] = useState<number[]>([]);
   );
 }
 
-export default SupervisorForm;
+export default SegmetForm;

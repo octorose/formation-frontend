@@ -24,7 +24,7 @@ function Login() {
         localStorage.setItem("access", data.access);
       })
       .then(() => {
-        window.location.href = "/dashboard";
+        window.location.href = "/Dashboard";
       })
       .catch((error) => {
         console.error("Error:", error);

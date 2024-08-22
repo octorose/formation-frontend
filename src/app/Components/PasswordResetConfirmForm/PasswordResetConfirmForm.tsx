@@ -48,7 +48,7 @@ const ResetPasswordConfirmForm: React.FC<ResetPasswordConfirmFormProps> = ({
       setSuccess("Password has been reset successfully.");
       setError(null);
       setTimeout(() => {
-        router.push("/SignIn");
+        router.push("/Signin");
       }, 3000);
     } catch (error) {
       if (error instanceof Error) {

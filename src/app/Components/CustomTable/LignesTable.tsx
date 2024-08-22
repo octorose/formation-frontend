@@ -192,8 +192,8 @@ const LigneCards = ({}) => {
         alertTitle={"Modifications sur la ligne"}
         type="success"
         alertDescription={"Edit "}
-        submitBtnName={"Submit"}
-        cancelBtnName="Cancel"
+        submitBtnName={"Modifier"}
+        cancelBtnName="Annuler"
         onSubmit={() => {
           if (LignetoEdit) {
             updateLigne(LignetoEdit);

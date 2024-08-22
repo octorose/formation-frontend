@@ -105,39 +105,39 @@ function Dash() {
       );
       const totalOperators = getPersonnelSum(personnelSumByEtat, "Operateur");
   return (
-          <div className="w-full  overflow-hidden   rounded-2xl p-10 text-xl md:text-4xl font-bold text-white bg-gradient-to-br from-white to-slate-300">
-        <div className="flex flex-row justify-between text-graydark">
-          <p>Indicateurs De Performance Globale </p>
-          {/* <SearchComponent
+    <div className="w-full  overflow-hidden   rounded-2xl p-10 text-xl md:text-4xl font-bold text-white bg-gradient-to-br from-white to-slate-300">
+      <div className="flex flex-row justify-between text-graydark">
+        <p>Indicateurs De Performance Globale </p>
+        {/* <SearchComponent
             onResults={handleSearchResults}
             onLoading={handleLoading}
             onError={handleError}
           /> */}
-        </div>
-        <div className="flex text-graydark my-5">
-          <div className="h-70 w-1/2 flex-col gap-3 rounded-lg shadow-lg justify-between">
-            <div className="flex rounded-xl gap-1 h-1/2 w-full justify-center items-center">
-              <DataCard title="New Groups" value={12} />
-              <div className="bg-black h-[60%] w-1"></div>
-              <DataCard title="Total Candidats" value={totalCandidates} />
-            </div>
-            <div className="bg-black h-1 mx-auto w-11/12"></div>
-            <div className="flex gap-1 h-1/2 w-full justify-center items-center">
-              <DataCard title="Totale En Formation" value={totalInFormation} />
-              <div className="bg-black h-[60%] w-1"></div>
-              <DataCard title="Totale Operateurs" value={totalOperators} />
-            </div>
+      </div>
+      <div className="flex text-graydark my-5">
+        <div className="h-70 w-1/2 flex-col gap-3 rounded-lg shadow-lg justify-between">
+          <div className="flex gap-1 h-1/2 w-full justify-center items-center">
+            <DataCard title="Totale En Formation" value={totalInFormation} />
+            <div className="bg-black h-[60%] w-1"></div>
+            <DataCard title="Totale Operateurs" value={totalOperators} />
           </div>
-          <div className="h-70 w-1/2">
-            {personnelData.length > 0 ? (
-              <CardBarChart personnelData={personnelData} />
-            ) : (
-              <Loader />
-            )}
+          <div className="bg-black h-1 mx-auto w-11/12"></div>
+          <div className="flex rounded-xl gap-1 h-1/2 w-full ">
+            {/* <DataCard title="" value={12} /> */}
+            {/* <div className="bg-black h-[60%] w-1"></div> */}
+            <DataCard title="Totale Candidats" value={totalCandidates} />
           </div>
         </div>
+        <div className="h-70 w-1/2">
+          {personnelData.length > 0 ? (
+            <CardBarChart personnelData={personnelData} />
+          ) : (
+            <Loader />
+          )}
         </div>
-  )
+      </div>
+    </div>
+  );
 }
 
 export default Dash

@@ -255,4 +255,4 @@ const AddResponsableEcole = () => {
   );
 };
 
-export default withAuth(AddResponsableEcole);
+export default withAuth(AddResponsableEcole, ["RH","Superviseur"]);
