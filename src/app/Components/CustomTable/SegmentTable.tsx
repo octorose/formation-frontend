@@ -13,7 +13,7 @@ interface Lignes {
   name: string;
 }
 
-interface Superviseur {
+interface Segment {
   id: number;
   agent: Agent;
   ligne: Lignes;
@@ -32,7 +32,7 @@ function SegmentsTable({
   searchResults: any[];
 }) {
   const [currentPage, setCurrentPage] = useState(1);
-  const [Segments, setSegments] = useState<Superviseur[]>([]);
+  const [Segments, setSegments] = useState<Segment[]>([]);
   const [editMode, setEditMode] = useState(Array(15).fill(false));
   const { alert, setAlert } = useAlert();
   const [ligneOptions, setLigneOptions] = useState<Lignes[]>([]);
@@ -54,7 +54,7 @@ function SegmentsTable({
     console.log(Candidate);
 
     try {
-      await putWithAuth(`${endpoint}/update/${Candidate.id}/`, {
+      await putWithAuth(`${endpoint}/${Candidate.id}/update/`, {
         agent: {
           nom: Candidate.agent.nom,
           prenom: Candidate.agent.prenom,
@@ -63,20 +63,20 @@ function SegmentsTable({
           addresse: Candidate.agent.addresse,
           numerotel: Candidate.agent.numerotel,
           date_naissance: Candidate.agent.date_naissance,
-          role: "Superviseur",
+          role: "Segment",
         },
         lignes: Candidate.lignes,
       });
       Toast.fire({
         icon: "success",
-        title: "superviseur mis à jour avec succès !",
+        title: "Segment mis à jour avec succès !",
         iconColor: "green",
       });
 
       fetchData();
       setAlert((prev) => ({ ...prev, isOpen: false }));
     } catch (error) {
-      console.error("Échec de la mise à jour du superviseur", error);
+      console.error("Échec de la mise à jour du Segment", error);
       Toast.fire({
         icon: "error",
         title: "Une erreur est survenue lors de la mise à jour du responsable.",
@@ -92,7 +92,7 @@ function SegmentsTable({
   };
 
   const fetchData = async () => {
-    const response: ApiResponse<Superviseur> = await fetchWithAuth(
+    const response: ApiResponse<Segment> = await fetchWithAuth(
       `${endpoint}?page=${currentPage}`
     );
     console.log(response);
@@ -140,11 +140,10 @@ function SegmentsTable({
         if (!response || response.status === 204) {
           Toast.fire({
             icon: "success",
-            title: "Superviseur supprimé avec succès !",
+            title: "Segment supprimé avec succès !",
             iconColor: "green",
           });
         }
-        // const data = await response.json();
         fetchData();
         setAlert2((prev) => ({ ...prev, isOpen: false }));
       } catch (error) {
@@ -199,7 +198,7 @@ function SegmentsTable({
         </div>
         {searchResults !== undefined && searchResults.length > 0 ? (
           <>
-            {searchResults.map((supervisor: Superviseur, key: number) => (
+            {searchResults.map((supervisor: Segment, key: number) => (
               <div
                 className={`grid grid-cols-3 sm:grid-cols-4 text-base ${
                   key === Segments.length - 1
@@ -251,7 +250,7 @@ function SegmentsTable({
           </>
         ) : (
           <>
-            {Segments.map((supervisor: Superviseur, key: number) => (
+            {Segments.map((supervisor: Segment, key: number) => (
               <div
                 className={`grid grid-cols-3 sm:grid-cols-4 text-base ${
                   key === Segments.length - 1
@@ -324,7 +323,7 @@ function SegmentsTable({
         }}
         alertTitle={"Delete Candidate"}
         alertDescription={
-          `Si vous etes sur retaper le nom du superviseur "` +
+          `Si vous etes sur retaper le nom du Segment "` +
           SupervisortoDelete?.agent?.nom +
           `" pour comfirmer la suppression`
         }
@@ -353,20 +352,20 @@ function SegmentsTable({
       <Modal
         isOpen={alert.isOpen}
         onSubmit={() => {
-          console.log(SupervisortoEdit);
+          // console.log(SupervisortoEdit);
 
-        //   updateCandidate(SupervisortoEdit);
+          updateCandidate(SupervisortoEdit);
         }}
         onCancel={() => {
           setAlert((prev) => ({ ...prev, isOpen: false }));
         }}
         alertTitle={
-          "Edit " + SupervisortoEdit?.agent?.nom + " Details" ||
-          "Candidate" + "Details"
+          "Modifier " + SupervisortoEdit?.agent?.nom + " " + SupervisortoEdit?.agent?.prenom
+
         }
-        alertDescription={"Edit "}
-        submitBtnName={"Submit"}
-        cancelBtnName="Cancel"
+        alertDescription={"Modifier les informations du Segment"}
+        submitBtnName={"Modifier"}
+        cancelBtnName="Annuler"
         type="success"
         onClose={() => {
           setAlert((prev) => ({ ...prev, isOpen: false }));

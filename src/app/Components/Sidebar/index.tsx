@@ -14,9 +14,15 @@ import SettingIcon from "../../../../public/assets/Icons/SettingIcon";
 import { get } from "http";
 import { getRoleFromToken } from "@/utils/getRoleFromToken";
 import HistoryIcon from "../../../../public/assets/Icons/HistoryIcon";
+
+
+import { PlusIcon } from "lucide-react";
+
+
 import { GroupIcon, PenSquareIcon, PopsicleIcon, RowsIcon, SparkleIcon } from "lucide-react";
 import { FaChalkboardTeacher } from "react-icons/fa";
 import { FlagIcon } from "@heroicons/react/24/outline";
+
 
 interface SidebarProps {
   sidebarOpen: boolean;

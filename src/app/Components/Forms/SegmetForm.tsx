@@ -146,7 +146,7 @@ function SegmetForm() {
 
       Swal.fire({
         icon: "success",
-        title: "Formateur ajouté avec succès !",
+        title: "Segment ajouté avec succès !",
         toast: true,
         position: "top-end",
         showConfirmButton: false,
@@ -154,10 +154,10 @@ function SegmetForm() {
         timerProgressBar: true,
       });
     } catch (error) {
-      console.error("Failed to add formateur", error);
+      console.error("Failed to add Segment", error);
       Swal.fire({
         icon: "error",
-        title: "Une erreur est survenue lors de l'ajout du formateur.",
+        title: "Une erreur est survenue lors de l'ajout du Segment.",
         toast: true,
         position: "top-end",
         showConfirmButton: false,
@@ -171,7 +171,7 @@ function SegmetForm() {
       <div className="flex items-center justify-center bg-gradient-to-br">
         <div className="w-full max-w-20xl p-10 bg-white shadow-lg rounded-lg">
           <h1 className="text-2xl font-bold text-center text-blue-800 mb-8">
-            Ajouter Formateur
+            Ajouter Segment
           </h1>
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -326,7 +326,7 @@ function SegmetForm() {
               type="submit"
               className="bg-graydark mt-6 w-full py-3 dark:bg-gray-100 shadow-md flex items-center justify-center px-6 rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:bg-gray-700"
             >
-              <PlusIcon /> Ajouter Formateur
+              <PlusIcon /> Ajouter Segment
             </button>
           </form>
         </div>
