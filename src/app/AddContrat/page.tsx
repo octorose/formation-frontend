@@ -185,19 +185,25 @@ const AddContrat = () => {
     <DefaultLayout importexport={false}>
       <div className="flex items-center justify-center bg-gradient-to-br">
         <div className="w-full max-w-4xl p-10 bg-white shadow-lg rounded-lg">
-          <h1 className="text-2xl font-bold text-center text-blue-800 mb-8">Ajouter Contrat</h1>
+          <h1 className="text-2xl font-bold text-center text-blue-800 mb-8">
+            Ajouter Contrat
+          </h1>
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="form-group">
-                <label htmlFor="role" className="block text-gray-700">Rôle</label>
+                <label htmlFor="role" className="block text-gray-700">
+                  Rôle
+                </label>
                 <select
-                  className="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
+                  className="mt-1 px-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
                   id="role"
                   name="role"
                   value={selectedRole}
                   onChange={handleRoleChange}
                 >
-                  <option value="" disabled>-- Sélectionner un Rôle --</option>
+                  <option value="" disabled>
+                    -- Sélectionner un Rôle --
+                  </option>
                   {uniqueRoles.map((role, index) => (
                     <option key={index} value={role}>
                       {role}
@@ -206,9 +212,11 @@ const AddContrat = () => {
                 </select>
               </div>
               <div className="form-group">
-                <label htmlFor="cin" className="block text-gray-700">CIN</label>
+                <label htmlFor="cin" className="block text-gray-700">
+                  CIN
+                </label>
                 <select
-                  className="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
+                  className="mt-1 px-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
                   id="cin"
                   name="cin"
                   value={formValues.cin}
@@ -216,7 +224,7 @@ const AddContrat = () => {
                   required
                 >
                   <option value="">--Please choose an option--</option>
-                  {filteredAgents.map(agent => (
+                  {filteredAgents.map((agent) => (
                     <option key={agent.cin} value={agent.cin}>
                       {agent.cin}
                     </option>
@@ -226,10 +234,12 @@ const AddContrat = () => {
               {selectedAgent && (
                 <>
                   <div className="form-group">
-                    <label htmlFor="prenom" className="block text-gray-700">Prénom</label>
+                    <label htmlFor="prenom" className="block text-gray-700">
+                      Prénom
+                    </label>
                     <input
                       type="text"
-                      className="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
+                      className="mt-1 px-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
                       id="prenom"
                       name="prenom"
                       value={selectedAgent.prenom}
@@ -237,10 +247,12 @@ const AddContrat = () => {
                     />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="nom" className="block text-gray-700">Nom</label>
+                    <label htmlFor="nom" className="block text-gray-700">
+                      Nom
+                    </label>
                     <input
                       type="text"
-                      className="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
+                      className="mt-1 px-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
                       id="nom"
                       name="nom"
                       value={selectedAgent.nom}
@@ -250,26 +262,35 @@ const AddContrat = () => {
                 </>
               )}
               <div className="form-group">
-                <label htmlFor="type_contrat" className="block text-gray-700">Type de contrat</label>
+                <label htmlFor="type_contrat" className="block text-gray-700">
+                  Type de contrat
+                </label>
                 <select
-                  className="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
+                  className="mt-1 px-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
                   id="type_contrat"
                   name="type_contrat"
                   value={formValues.type_contrat}
                   onChange={handleChange}
                   required
                 >
-                  <option value="" disabled>-- Sélectionner un Type de contrat --</option>
+                  <option value="" disabled>
+                    -- Sélectionner un Type de contrat --
+                  </option>
                   <option value="ANAPEC">ANAPEC</option>
                   <option value="CDI">CDI</option>
                   <option value="CDD">CDD</option>
                 </select>
               </div>
               <div className="form-group">
-                <label htmlFor="date_creation_contrat" className="block text-gray-700">Date de création</label>
+                <label
+                  htmlFor="date_creation_contrat"
+                  className="block text-gray-700"
+                >
+                  Date de création
+                </label>
                 <input
                   type="date"
-                  className="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
+                  className="mt-1 px-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
                   id="date_creation_contrat"
                   name="date_creation_contrat"
                   value={formValues.date_creation_contrat}
@@ -278,14 +299,17 @@ const AddContrat = () => {
                 />
               </div>
 
-              {
-                formValues.type_contrat !== 'CDI'  &&
-              
+              {formValues.type_contrat !== "CDI" && (
                 <div className="form-group">
-                  <label htmlFor="duree_contrat" className="block text-gray-700">Durée (mois)</label>
+                  <label
+                    htmlFor="duree_contrat"
+                    className="block text-gray-700"
+                  >
+                    Durée (mois)
+                  </label>
                   <input
                     type="number"
-                    className="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
+                    className="mt-1 px-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
                     id="duree_contrat"
                     name="duree_contrat"
                     value={formValues.duree_contrat}
@@ -293,10 +317,12 @@ const AddContrat = () => {
                     required
                   />
                 </div>
-              }
-
+              )}
             </div>
-            <button type="submit" className="bg-graydark mt-6 w-full py-3 dark:bg-gray-100 shadow-md flex items-center justify-center px-6 rounded-md text-white bg-gray-600 hover:bg-gray-700">
+            <button
+              type="submit"
+              className="bg-graydark mt-6 w-full py-3 dark:bg-gray-100 shadow-md flex items-center justify-center px-6 rounded-md text-white bg-gray-600 hover:bg-gray-700"
+            >
               <PlusIcon className="mr-2 h-5 w-5" />
               Ajouter
             </button>
