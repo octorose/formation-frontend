@@ -396,6 +396,8 @@ export const data = {
     hasInput: false,
 
 },
+
+
     ],
     ar: [
         {
@@ -785,7 +787,8 @@ export const data = {
                 minPoints: 1,
             },
             hasInput: false,
-        }
+        },
+        
     ]
 }
 
