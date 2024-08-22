@@ -307,4 +307,4 @@ const AddContrat = () => {
   );
 };
 
-export default withAuth(AddContrat);
+export default withAuth(AddContrat, ['RH']);
