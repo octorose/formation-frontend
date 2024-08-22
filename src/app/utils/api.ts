@@ -6,7 +6,7 @@ interface TokenResponse {
   refresh: string;
 }
 
-const refreshToken = async (refreshToken: string): Promise<string> => {
+const refreshToken = async (refreshToken: string) => {
   const response = await fetch(`${API_URL}/api/token/refresh/`, {
     method: "POST",
     headers: {
@@ -20,7 +20,7 @@ const refreshToken = async (refreshToken: string): Promise<string> => {
     localStorage.setItem("access_token", data.access);
     return data.access;
   } else {
-    throw new Error("Failed to refresh token");
+    return { error: "Failed to refresh token" };
   }
 };
 
@@ -56,7 +56,7 @@ const fetchWithAuth = async (
         },
       });
       if (!newResponse.ok) {
-        throw new Error("Failed to fetch data");
+        throw new Error("Failed to refresh token");
       }
       return newResponse.json();
     }
@@ -116,7 +116,6 @@ const postWithAuth = async (
 
     return response.json();
   } catch (error: any) {
-    // Specify 'any' for the error type
     throw new Error(`POST request failed: ${(error as Error).message}`);
   }
 };
@@ -153,17 +152,22 @@ const deleteWithAuth = async (
       if (!newResponse.ok) {
         throw new Error("Failed to fetch data");
       }
-      return newResponse.json();
+      return newResponse;
+    }
+
+    if (response.status === 204) {
+      // Suppression réussie, pas de contenu à retourner
+      return null;
     }
 
     if (!response.ok) {
       throw new Error("Failed to fetch data");
     }
 
-    return response.json();
+    return response;
   } catch (error: any) {
-    // Specify 'any' for the error type
-    throw new Error(`DELETE request failed: ${(error as Error).message}`);
+    console.error(`DELETE request failed: ${error.message}`);
+    throw new Error(`DELETE request failed: ${error.message}`);
   }
 };
 

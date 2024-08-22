@@ -18,14 +18,14 @@ import Image from "next/image";
 
 const Quiz = () => {
   const [index, setIndex] = useState(() => {
-    const savedIndex = localStorage.getItem('quizIndex');
+    const savedIndex = localStorage.getItem("quizIndex");
     return savedIndex !== null ? parseInt(savedIndex, 10) : 0;
   });
 
   const [checkedBoxes, setCheckedBoxes] = useState([0]);
   const [lock, setLock] = useState(false);
   const [score, setScore] = useState(() => {
-  const savedScore = localStorage.getItem('quizScore');
+    const savedScore = localStorage.getItem("quizScore");
     return savedScore !== null ? parseInt(savedScore, 10) : 0;
   });
   const [result, setResult] = useState(false);
@@ -35,23 +35,22 @@ const Quiz = () => {
   const [timeLeft, setTimeLeft] = useState(60);
   const [errorMessage, setErrorMessage] = useState("");
   const [answerSelected, setAnswerSelected] = useState(false);
-  const [selectedOptionIndex, setSelectedOptionIndex] = useState<null | number>(null);
+  const [selectedOptionIndex, setSelectedOptionIndex] = useState<null | number>(
+    null
+  );
   const [userAnswers, setUserAnswers] = useState([]);
-  const [language, setLanguage] = useState('fr'); // Ajout de l'état pour la langue
+  const [language, setLanguage] = useState("fr"); // Ajout de l'état pour la langue
 
-  
-  const questions = language === 'fr' ? data.fr : data.ar;
+  const questions = language === "fr" ? data.fr : data.ar;
   const toggleLanguage = () => {
     // Fonction pour changer la langue
-    setLanguage(language === 'fr' ? 'ar' : 'fr'); // Inverse entre 'fr' et 'ar'
+    setLanguage(language === "fr" ? "ar" : "fr"); // Inverse entre 'fr' et 'ar'
   };
-  
-
 
   useEffect(() => {
     // Sauvegarder l'index et le score dans localStorage à chaque changement
-    localStorage.setItem('quizIndex', index.toString());
-    localStorage.setItem('quizScore', score.toString());
+    localStorage.setItem("quizIndex", index.toString());
+    localStorage.setItem("quizScore", score.toString());
   }, [index, score]);
 
   useEffect(() => {
@@ -74,7 +73,7 @@ const Quiz = () => {
         return prevTime - 1;
       });
     }, 1000);
-  
+
     // Nettoyer le timer lorsque le composant est démonté ou lorsque le timer n'est plus nécessaire
     return () => clearInterval(timer);
   }, [index]);
@@ -84,7 +83,6 @@ const Quiz = () => {
       setSelectedOptionIndex(selectedOptionIndex);
       setAnswerSelected(true);
 
-      
       if (selectedOptionIndex === questions[index].ans) {
         setScore((prevScore) => prevScore + 1);
       }
@@ -95,36 +93,41 @@ const Quiz = () => {
 
   const next = () => {
     // Vérifier si la question actuelle nécessite une réponse textuelle (questions 30 et 31)
-    if ((index === 30 && raison.trim() === "") || (index === 31 && objectif.trim() === "")) {
-        setErrorMessage('Veuillez entrer une réponse');
-        return;
+    if (
+      (index === 30 && raison.trim() === "") ||
+      (index === 31 && objectif.trim() === "")
+    ) {
+      setErrorMessage("Veuillez entrer une réponse");
+      return;
     }
 
     // Vérifier si une réponse est sélectionnée pour toutes les autres questions sauf 30 et 31
-    if (!answerSelected && questions[index].ans !== -1 && index < questions.length - 1 && index !== 30 && index !== 31) {
-        setErrorMessage('Veuillez choisir une réponse');
-        return;
+    if (
+      !answerSelected &&
+      questions[index].ans !== -1 &&
+      index < questions.length - 1 &&
+      index !== 30 &&
+      index !== 31
+    ) {
+      setErrorMessage("Veuillez choisir une réponse");
+      return;
     }
 
     // Si ce n'est pas la dernière question, passer à la question suivante
     if (index < questions.length - 1) {
-        setIndex(index + 1);
-        setTimeLeft(20); // Réinitialiser le temps
-        setAnswerSelected(false); // Réinitialiser l'état de la réponse sélectionnée
-        setHeight(""); // Réinitialiser l'état de la réponse texte si nécessaire
-        setRaison(""); // Réinitialiser l'état de la réponse textuelle
-        setObjectif(""); // Réinitialiser l'état de la réponse textuelle
-        setLock(false); // Assurez que `lock` est réinitialisé si nécessaire
-        setErrorMessage(''); // Effacer le message d'erreur
+      setIndex(index + 1);
+      setTimeLeft(20); // Réinitialiser le temps
+      setAnswerSelected(false); // Réinitialiser l'état de la réponse sélectionnée
+      setHeight(""); // Réinitialiser l'état de la réponse texte si nécessaire
+      setRaison(""); // Réinitialiser l'état de la réponse textuelle
+      setObjectif(""); // Réinitialiser l'état de la réponse textuelle
+      setLock(false); // Assurez que `lock` est réinitialisé si nécessaire
+      setErrorMessage(""); // Effacer le message d'erreur
     } else {
-        // Si c'est la dernière question, afficher le résultat
-        setResult(true);
+      // Si c'est la dernière question, afficher le résultat
+      setResult(true);
     }
-};
-
-
-
-
+  };
 
   const reset = () => {
     // Réinitialiser toutes les valeurs au début du quiz
@@ -135,40 +138,40 @@ const Quiz = () => {
     setErrorMessage(""); // Réinitialiser errorMessage ici
   };
 
-  const handleHeightChange = (e:any) => {
+  const handleHeightChange = (e: any) => {
     const value = e.target.value;
     const number = parseFloat(value);
-    if (!isNaN(number) && number >= 1.40 && number <= 2.10) {
-        setHeight(value);
-        setErrorMessage('');
+    if (!isNaN(number) && number >= 1.4 && number <= 2.1) {
+      setHeight(value);
+      setErrorMessage("");
     } else {
-        setHeight(value);
-        setErrorMessage('Veuillez entrer une taille valide (entre 1.40 m et 2.10 m)');
+      setHeight(value);
+      setErrorMessage(
+        "Veuillez entrer une taille valide (entre 1.40 m et 2.10 m)"
+      );
     }
-}
+  };
 
-
-  const handleRaisonChange = (e:any) => {
+  const handleRaisonChange = (e: any) => {
     const value = e.target.value;
     setRaison(value); // Met à jour la valeur dans le state
     setErrorMessage("Veuillez repondre"); // Efface tout message d'erreur précédent
-};
+  };
 
-const handleObjectifChange = (e:any) => {
-  const value = e.target.value;
-  setObjectif(value); // Met à jour la valeur dans le state
-  setErrorMessage("Veuillez repondre"); // Efface tout message d'erreur précédent
-};
+  const handleObjectifChange = (e: any) => {
+    const value = e.target.value;
+    setObjectif(value); // Met à jour la valeur dans le state
+    setErrorMessage("Veuillez repondre"); // Efface tout message d'erreur précédent
+  };
 
-const changeLanguage = (lang: string) => {
-  setLanguage(lang);
-  setIndex(0);
-  setScore(0);
-  setResult(false);
-  setTimeLeft(60);
-  setErrorMessage("");
-};
-
+  const changeLanguage = (lang: string) => {
+    setLanguage(lang);
+    setIndex(0);
+    setScore(0);
+    setResult(false);
+    setTimeLeft(60);
+    setErrorMessage("");
+  };
 
   const toggleCheckbox = (index: number) => {
     if (checkedBoxes.includes(index)) {
@@ -181,8 +184,12 @@ const changeLanguage = (lang: string) => {
   return (
     <div className="container">
       <h1>Test Logique</h1>
-      <div className={`language-toggle ${language === 'fr' ? 'fr' : 'ar'}`} onClick={toggleLanguage}>
-        <span>{language.toUpperCase()}</span> {/* Affichage de la langue sélectionnée */}
+      <div
+        className={`language-toggle ${language === "fr" ? "fr" : "ar"}`}
+        onClick={toggleLanguage}
+      >
+        <span>{language.toUpperCase()}</span>{" "}
+        {/* Affichage de la langue sélectionnée */}
       </div>
       <hr />
       {errorMessage && <div className="error-message">{errorMessage}</div>}
@@ -959,87 +966,86 @@ const changeLanguage = (lang: string) => {
           )}
           {index === 30 && (
             <div className="question-container">
-            <textarea
-              rows={8} // Augmentez le nombre de lignes pour agrandir la zone de texte
-              cols={60} // Augmentez le nombre de colonnes pour agrandir la zone de texte
-              value={raison}
-              onChange={handleRaisonChange}
-              placeholder="Entrez votre réponse ici..."
-              style={{
-                padding: "15px", // Augmentez le padding pour plus d'espace intérieur
-                fontSize: "18px", // Augmentez la taille de la police pour une meilleure lisibilité
-                border: "1px solid #ccc",
-                borderRadius: "5px",
-                marginBottom: "20px", // Augmentez la marge inférieure pour plus d'espace
-              }}
-            />
-            <br></br>
-            <div style={{ display: "flex", justifyContent: "center" }}>
-              <button
-                onClick={() => {
-                  next();
-                  console.log("hh");
-                }}
+              <textarea
+                rows={8} // Augmentez le nombre de lignes pour agrandir la zone de texte
+                cols={60} // Augmentez le nombre de colonnes pour agrandir la zone de texte
+                value={raison}
+                onChange={handleRaisonChange}
+                placeholder="Entrez votre réponse ici..."
                 style={{
-                  width: "150px", // Ajustez la largeur du bouton si nécessaire
-                  height: "45px", // Ajustez la hauteur du bouton si nécessaire
-                  background: "#110636",
-                  color: "#fff",
-                  fontSize: "18px", // Ajustez la taille de la police du bouton si nécessaire
-                  fontWeight: "500",
-                  borderRadius: "8px",
-                  cursor: "pointer",
+                  padding: "15px", // Augmentez le padding pour plus d'espace intérieur
+                  fontSize: "18px", // Augmentez la taille de la police pour une meilleure lisibilité
+                  border: "1px solid #ccc",
+                  borderRadius: "5px",
+                  marginBottom: "20px", // Augmentez la marge inférieure pour plus d'espace
                 }}
-              >
-                Next
-              </button>
+              />
+              <br></br>
+              <div style={{ display: "flex", justifyContent: "center" }}>
+                <button
+                  onClick={() => {
+                    next();
+                    console.log("hh");
+                  }}
+                  style={{
+                    width: "150px", // Ajustez la largeur du bouton si nécessaire
+                    height: "45px", // Ajustez la hauteur du bouton si nécessaire
+                    background: "#110636",
+                    color: "#fff",
+                    fontSize: "18px", // Ajustez la taille de la police du bouton si nécessaire
+                    fontWeight: "500",
+                    borderRadius: "8px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Next
+                </button>
+              </div>
             </div>
-          </div>
-          
           )}
           {index === 31 && (
             <div className="question-container">
-            <textarea
-              rows={8} // Augmentez le nombre de lignes pour agrandir la zone de texte
-              cols={60} // Augmentez le nombre de colonnes pour agrandir la zone de texte
-              value={objectif}
-              onChange={handleObjectifChange}
-              placeholder="Entrez votre réponse ici..."
-              style={{
-                padding: "15px", // Augmentez le padding pour plus d'espace intérieur
-                fontSize: "18px", // Augmentez la taille de la police pour une meilleure lisibilité
-                border: "1px solid #ccc",
-                borderRadius: "5px",
-                marginBottom: "20px", // Augmentez la marge inférieure pour plus d'espace
-              }}
-            />
-            <br></br>
-            <div style={{ display: "flex", justifyContent: "center" }}>
-              <button
-                onClick={() => {
-                  next();
-                  console.log("hh");
-                }}
+              <textarea
+                rows={8} // Augmentez le nombre de lignes pour agrandir la zone de texte
+                cols={60} // Augmentez le nombre de colonnes pour agrandir la zone de texte
+                value={objectif}
+                onChange={handleObjectifChange}
+                placeholder="Entrez votre réponse ici..."
                 style={{
-                  width: "150px", 
-                  height: "45px",
-                  background: "#110636",
-                  color: "#fff",
-                  fontSize: "18px", 
-                  fontWeight: "500",
-                  borderRadius: "8px",
-                  cursor: "pointer",
+                  padding: "15px", // Augmentez le padding pour plus d'espace intérieur
+                  fontSize: "18px", // Augmentez la taille de la police pour une meilleure lisibilité
+                  border: "1px solid #ccc",
+                  borderRadius: "5px",
+                  marginBottom: "20px", // Augmentez la marge inférieure pour plus d'espace
                 }}
-              >
-                Next
-              </button>
+              />
+              <br></br>
+              <div style={{ display: "flex", justifyContent: "center" }}>
+                <button
+                  onClick={() => {
+                    next();
+                    console.log("hh");
+                  }}
+                  style={{
+                    width: "150px",
+                    height: "45px",
+                    background: "#110636",
+                    color: "#fff",
+                    fontSize: "18px",
+                    fontWeight: "500",
+                    borderRadius: "8px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Next
+                </button>
+              </div>
             </div>
-          </div>
           )}
 
           {index === 32 && (
             <div className="question-container">
-              <h3>Cochez le maximum de cercles  :</h3>
+              <h3>Cochez le maximum de cercles :</h3>
 
               <div className="checkbox-grid">
                 {/* Boucle pour générer les 200 cases à cocher */}
@@ -1072,7 +1078,7 @@ const changeLanguage = (lang: string) => {
                   fontSize: "16px",
                   border: "1px solid #ccc",
                   borderRadius: "5px",
-                  textAlign:"center",
+                  textAlign: "center",
                   display: "flex",
                 }}
               />
@@ -1089,7 +1095,9 @@ const changeLanguage = (lang: string) => {
                 Next
               </button>
             </div>
-          ) : questions[index].id >= 30 ? (<></>) :(
+          ) : questions[index].id >= 30 ? (
+            <></>
+          ) : (
             <div>
               <ul className="quiz-options">
                 <li
@@ -1123,11 +1131,8 @@ const changeLanguage = (lang: string) => {
                   {questions[index].option5}
                 </li>
               </ul>
-              
-              <button 
-              onClick={next}
-              disabled={selectedOptionIndex === null}
-              >
+
+              <button onClick={next} disabled={selectedOptionIndex === null}>
                 Next
               </button>
             </div>

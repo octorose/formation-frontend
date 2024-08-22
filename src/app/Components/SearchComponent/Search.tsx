@@ -20,7 +20,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [fetchTimeout, setFetchTimeout] = useState<NodeJS.Timeout | null>(null);
-  const url = `${process.env.NEXT_PUBLIC_API_URL}${endpoint}?query=${debouncedQuery}`;
+  const url = `${endpoint}?query=${debouncedQuery}`;
 
   useEffect(() => {
     if (debouncedQuery.trim() !== "") {
