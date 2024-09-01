@@ -23,6 +23,7 @@ import TestTable from "@/Components/CustomTable/TestTable";
 
 import Postes from "@/Components/Postes/Postes";
 import Segments from "@/Components/SegmentCard/Segments";
+import GroupsTable from '../Components/CustomTable/GroupeTable';
 interface Module {
   id: number;
   name: string;
@@ -37,34 +38,16 @@ const Home = () => {
   const [totalModules, setTotalModules] = useState(0);
 
   const tabsRH = [
-  
     {
       title: "Tableau de bord",
       value: "Dashboard",
       content: <Dash />,
     },
     {
-      title: "Personnel",
+      title: "Candidats",
       value: "Candidats",
       content: <Candidats />,
     },
-    // {
-    //   title: "Modules",
-    //   value: "Modules",
-    //   content: (
-    //     <div className="w-full overflow-hidden rounded-2xl text-xl md:text-4xl font-bold text-white bg-gradient-to-br from-white to-slate-300">
-    //       <div className="flex flex-row justify-between py-5 px-10 items-center text-graydark">
-    //         <p>Modules</p>
-    //         <button  className="bg-graydark px-5 py-3 dark:bg-gray-100 text-white text-base rounded-md gap-2 shadow-md flex items-center justify-center hover:bg-gray-700 transition duration-300">
-
-    //           <PlusIcon/>new Module
-    //         </button>
-    //       </div>
-
-    //       <Cards />
-    //     </div>
-    //   ),
-    // },
     {
       title: "Segments",
       value: "Segments",
@@ -81,14 +64,36 @@ const Home = () => {
       content: <ResponsableEcole />,
     },
     {
-      title: "Contrats", 
+      title: "Contrats",
       value: "Contrats",
-      content: <Contrats />, 
+      content: <Contrats />,
     },
     {
       title: "Tests",
       value: "Tests",
-      content: <TestTable endpoint="/api/tests" />,  
+      content: <TestTable endpoint="/api/tests" />,
+    },
+    {
+      title: "Groupes",
+      value: "Groupes",
+      content: <GroupsTable endpoint="/api/groups" searchResults={[]} />,
+    }
+  ];
+  const tabsSegment = [
+    {
+      title: "Tableau de bord",
+      value: "Dashboard",
+      content: <Dash />,
+    },
+    {
+      title: "Superviseurs",
+      value: "Supervisors",
+      content: <Supervisors />,
+    },
+    {
+      title: "Postes",
+      value: "Postes",
+      content: <Postes />,
     },
   ];
   const tabsSupervisor = [
@@ -135,7 +140,7 @@ const Home = () => {
   ];
   const role = getRoleFromToken();
   return (
-    <DefaultLayout importexport={true}>
+    <DefaultLayout importexport={false}>
       <div className="h-full">
         {role == "RH" ? (
           <Tabs
@@ -153,6 +158,22 @@ const Home = () => {
           activeTabClassName="bg-blue-200 dark:bg-blue-800 border-5 text-black dark:text-white"
         />
         
+        ) : role == "Personnel" ? (
+          <div>
+            <h1
+              className="text-2xl font-bold text-neutral-800 dark:text-neutral-200" style={{textAlign: 'center'}}>
+              Bienvenue chez Leoni HRCore votre espace de travail personnel
+            </h1>
+            <h2 className="text-xl font-bold text-neutral-800 dark:text-neutral-200" style={{textAlign: 'center'}}>
+              Clickez sur les onglets pour accéder aux différentes fonctionnalités quand vous êtes prêt
+            </h2>
+
+          </div>
+        ) : role == "Segment" ? (
+          <Tabs
+            tabs={tabsRH}
+            activeTabClassName="bg-blue-200 dark:bg-blue-800 border-5 text-black dark:text-white"
+          />
         ) : (
           <></>
         )}
@@ -167,4 +188,6 @@ export default withAuth(Home, [
   "ResponsableEcoleFormation",
   "Formateur",
   "ResponsableFormation",
+  "Personnel",
+  "Segment",
 ]);

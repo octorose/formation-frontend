@@ -1,22 +1,16 @@
 import React, { useEffect, useState } from "react";
 import ResponsivePagination from "react-responsive-pagination";
-import { deleteWithAuth, fetchWithAuth, putWithAuth } from "@/utils/api";
-import { Agent } from "@/interfaces/Agent";
+import { deleteWithAuth, fetchWithAuth, patchWithAuth, putWithAuth } from "@/utils/api";
 import { Edit2Icon, Trash2Icon } from "lucide-react";
 import useAlert from "@/Hooks/useAlert";
 import Modal from "../GlobalModal/Modal";
 import Swal from "sweetalert2";
-import PhaseRenderer from "../phaserenderer/PhaseRenderer";
 
-interface Lignes {
+interface Group {
   id: number;
   name: string;
-}
-
-interface Segment {
-  id: number;
-  agent: Agent;
-  ligne: Lignes;
+  Effectif: number;
+  created_at: string;
 }
 
 interface ApiResponse<T> {
@@ -24,7 +18,7 @@ interface ApiResponse<T> {
   count: number;
 }
 
-function SegmentsTable({
+function GroupsTable({
   endpoint,
   searchResults,
 }: {
@@ -32,78 +26,25 @@ function SegmentsTable({
   searchResults: any[];
 }) {
   const [currentPage, setCurrentPage] = useState(1);
-  const [Segments, setSegments] = useState<Segment[]>([]);
-  const [editMode, setEditMode] = useState(Array(15).fill(false));
+  const [Groups, setGroups] = useState<Group[]>([]);
   const { alert, setAlert } = useAlert();
-  const [ligneOptions, setLigneOptions] = useState<Lignes[]>([]);
-  const [totalSegments, setTotalSegments] = useState(0);
-  const [SupervisortoDelete, setSupervisortoDelete] = useState({} as any);
-  const [SupervisortoEdit, setSupervisortoEdit] = useState({} as any);
+  const [totalGroups, setTotalGroups] = useState(0);
+  const [GroupToDelete, setGroupToDelete] = useState({} as any);
+  const [GroupToEdit, setGroupToEdit] = useState({} as any);
   const { alert: alert2, setAlert: setAlert2 } = useAlert();
-  const handleEdit = (index: any) => {
-    const updatedEditMode = [...editMode];
-    if (updatedEditMode[index]) {
-      updatedEditMode[index] = false;
-    } else {
-      updatedEditMode[index] = true;
-    }
-    setEditMode(updatedEditMode);
-  };
-
-  const updateCandidate = async (Candidate: any) => {
-    console.log(Candidate);
-
-    try {
-      await putWithAuth(`${endpoint}/${Candidate.id}/update/`, {
-        agent: {
-          nom: Candidate.agent.nom,
-          prenom: Candidate.agent.prenom,
-          email: Candidate.agent.email,
-          password: Candidate.agent.password,
-          addresse: Candidate.agent.addresse,
-          numerotel: Candidate.agent.numerotel,
-          date_naissance: Candidate.agent.date_naissance,
-          role: "Segment",
-        },
-        lignes: Candidate.lignes,
-      });
-      Toast.fire({
-        icon: "success",
-        title: "Segment mis à jour avec succès !",
-        iconColor: "green",
-      });
-
-      fetchData();
-      setAlert((prev) => ({ ...prev, isOpen: false }));
-    } catch (error) {
-      console.error("Échec de la mise à jour du Segment", error);
-      Toast.fire({
-        icon: "error",
-        title: "Une erreur est survenue lors de la mise à jour du responsable.",
-        iconColor: "red",
-      });
-    }
-  };
-
-  const PersonalInfo = {
-    nom: SupervisortoEdit?.agent?.nom,
-    prenom: SupervisortoEdit?.agent?.prenom,
-    ligne: SupervisortoEdit?.ligne?.name,
-  };
 
   const fetchData = async () => {
-    const response: ApiResponse<Segment> = await fetchWithAuth(
-      `${endpoint}?page=${currentPage}`
+    const response = await fetchWithAuth(
+      `${endpoint}`
     );
     console.log(response);
 
-    setSegments(response.results);
-    setTotalSegments(response.count);
+    setGroups(response);
+    setTotalGroups(response);
   };
 
   useEffect(() => {
     fetchData();
-    fetchLignes();
   }, [currentPage, endpoint]);
 
   const handlePageChange = (newPage: number) => {
@@ -122,53 +63,61 @@ function SegmentsTable({
     timerProgressBar: true,
   });
 
-  const handleDeleteInputChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    key: string
-  ) => {
-    setSupervisortoDelete((prevSupervisorNameToDelete: any) => ({
-      ...prevSupervisorNameToDelete,
-      [key]: event.target.value,
-    }));
-  };
-
-  const handleDelete = async (supervisor: any) => {
-    //@ts-ignore
-    if (SupervisortoDelete?.Nom === supervisor.agent.nom) {
+  const handleDelete = async (group: any) => {
+    if (GroupToDelete?.name === group.name) {
       try {
-        const response = await deleteWithAuth(`${endpoint}/${supervisor.id}/`);
+        const response = await deleteWithAuth(`${endpoint}/${group.id}/delete/`);
         if (!response || response.status === 204) {
           Toast.fire({
             icon: "success",
-            title: "Segment supprimé avec succès !",
+            title: "Group and associated candidates deleted successfully!",
             iconColor: "green",
           });
         }
-        fetchData();
+        fetchData(); // Refresh the table after deletion
         setAlert2((prev) => ({ ...prev, isOpen: false }));
       } catch (error) {
         console.error(error);
+        Toast.fire({
+          icon: "error",
+          title: "An error occurred while deleting the group and candidates.",
+          iconColor: "red",
+        });
       }
     } else {
       Toast.fire({
         icon: "error",
-        title: "Invalid Supervisor name",
+        title: "Invalid group name",
       });
     }
   };
-  const fetchLignes = async () => {
-    try {
-      const response = await fetchWithAuth("/api/lignes/");
-      const lignesData = response.results.map((ligne: any) => ({
-        id: ligne.id,
-        name: ligne.name,
-      }));
-      console.log(response);
 
-      setLigneOptions(lignesData);
+  const handleEdit = (group: any) => {
+    setGroupToEdit(group);
+    setAlert((prev) => ({ ...prev, isOpen: true }));
+  };
+
+  const updateGroup = async (group: any) => {
+    try {
+      await patchWithAuth(`${endpoint}/${group.id}/update/`, {
+        name: group.name,
+        Effectif: group.Effectif,
+      });
+      Toast.fire({
+        icon: "success",
+        title: "Group updated successfully!",
+        iconColor: "green",
+      });
+
+      fetchData();
+      setAlert((prev) => ({ ...prev, isOpen: false }));
     } catch (error) {
-      console.error("Failed to fetch lignes", error);
-      // Handle error if needed
+      console.error("Failed to update the group", error);
+      Toast.fire({
+        icon: "error",
+        title: "An error occurred while updating the group.",
+        iconColor: "red",
+      });
     }
   };
 
@@ -177,16 +126,18 @@ function SegmentsTable({
       <div className="flex flex-col">
         <div className="grid grid-cols-3 rounded-sm text-black dark:text-white bg-gray-2 dark:bg-meta-4 sm:grid-cols-4">
           <div className="p-2.5 xl:p-5">
-            <h5 className="text-sm font-medium uppercase xsm:text-base">Nom</h5>
+            <h5 className="text-sm font-medium uppercase xsm:text-base">
+              Name
+            </h5>
           </div>
           <div className="p-2.5 xl:p-5">
             <h5 className="text-sm font-medium uppercase xsm:text-base">
-              Prenom
+              Created At
             </h5>
           </div>
           <div className="p-2.5 text-center xl:p-5">
             <h5 className="text-sm font-medium uppercase xsm:text-base">
-              nom de ligne
+              Effectif
             </h5>
           </div>
 
@@ -198,10 +149,10 @@ function SegmentsTable({
         </div>
         {searchResults !== undefined && searchResults.length > 0 ? (
           <>
-            {searchResults.map((supervisor: Segment, key: number) => (
+            {searchResults.map((group: Group, key: number) => (
               <div
                 className={`grid grid-cols-3 sm:grid-cols-4 text-base ${
-                  key === Segments.length - 1
+                  key === Groups.length - 1
                     ? ""
                     : "border-b border-stroke dark:border-strokedark"
                 }`}
@@ -209,36 +160,31 @@ function SegmentsTable({
               >
                 <div className="flex items-center justify-center p-2.5 xl:p-5">
                   <p className="hidden text-black dark:text-white sm:block">
-                    {supervisor.agent.nom}
+                    {group.name}
                   </p>
                 </div>
 
                 <div className="flex items-center justify-center p-2.5 xl:p-5">
                   <p className="text-black dark:text-white">
-                    {supervisor.agent.prenom}
+                    {new Date(group.created_at).toLocaleDateString()}
                   </p>
                 </div>
 
                 <div className="flex items-center justify-center p-2.5 xl:p-5">
-                  <p className="text-black dark:text-white">
-                    {supervisor.ligne.name}
-                  </p>
+                  <p className="text-black dark:text-white">{group.Effectif}</p>
                 </div>
 
                 <div className="hidden items-center justify-center gap-4 p-2.5 sm:flex xl:p-5">
                   <button
                     className="text-black dark:text-white"
-                    onClick={() => {
-                      setSupervisortoEdit(supervisor.ligne.name+"wa");
-                      setAlert((prev) => ({ ...prev, isOpen: true }));
-                    }}
+                    onClick={() => handleEdit(group)}
                   >
                     <Edit2Icon />
                   </button>
                   <button
                     className="text-black dark:text-white"
                     onClick={() => {
-                      setSupervisortoDelete(supervisor);
+                      setGroupToDelete(group);
                       setAlert2((prev) => ({ ...prev, isOpen: true }));
                     }}
                   >
@@ -250,54 +196,42 @@ function SegmentsTable({
           </>
         ) : (
           <>
-            {Segments.map((supervisor: Segment, key: number) => (
+            {Groups?.map((group: Group, key: number) => (
               <div
                 className={`grid grid-cols-3 sm:grid-cols-4 text-base ${
-                  key === Segments.length - 1
+                  key === Groups.length - 1
                     ? ""
                     : "border-b border-stroke dark:border-strokedark"
                 }`}
                 key={key}
               >
-                <div className="flex items-center gap-3 p-2.5 xl:p-5">
+                <div className="flex items-center justify-center p-2.5 xl:p-5">
                   <p className="hidden text-black dark:text-white sm:block">
-                    {supervisor.agent?.nom}
+                    {group.name}
                   </p>
                 </div>
 
                 <div className="flex items-center justify-center p-2.5 xl:p-5">
                   <p className="text-black dark:text-white">
-                    {supervisor.agent?.prenom}
+                    {new Date(group.created_at).toLocaleDateString()}
                   </p>
                 </div>
 
-                <div
-                  className="flex items-center justify-center p-2.5 xl:p-5"
-                >
-                  
-                  <div className="flex items-center justify-center p-2.5 xl:p-5">
-                    <p className="text-black dark:text-white">
-                      {supervisor.ligne.name}
-                    </p>
-                  </div>
+                <div className="flex items-center justify-center p-2.5 xl:p-5">
+                  <p className="text-black dark:text-white">{group.Effectif}</p>
                 </div>
 
                 <div className="hidden items-center justify-center gap-4 p-2.5 sm:flex xl:p-5">
                   <button
                     className="text-black dark:text-white"
-                    onClick={() => {
-                      setSupervisortoEdit(supervisor);
-                      setAlert((prev) => ({ ...prev, isOpen: true }));
-                      setSupervisortoEdit((prev:any) => ({...prev, ligne: supervisor.ligne.name}))
-                      
-                    }}
+                    onClick={() => handleEdit(group)}
                   >
                     <Edit2Icon />
                   </button>
                   <button
                     className="text-black dark:text-white"
                     onClick={() => {
-                      setSupervisortoDelete(supervisor);
+                      setGroupToDelete(group);
                       setAlert2((prev) => ({ ...prev, isOpen: true }));
                     }}
                   >
@@ -312,20 +246,18 @@ function SegmentsTable({
 
       <ResponsivePagination
         current={currentPage}
-        total={Math.ceil(totalSegments / 10)}
+        total={Math.ceil(totalGroups / 10)}
         onPageChange={handlePageChange}
       />
       <Modal
         isOpen={alert2.isOpen}
-        onSubmit={() => handleDelete(SupervisortoDelete)}
+        onSubmit={() => handleDelete(GroupToDelete)}
         onCancel={() => {
           setAlert2((prev) => ({ ...prev, isOpen: false }));
         }}
-        alertTitle={"Delete Candidate"}
+        alertTitle={"Delete Group"}
         alertDescription={
-          `Si vous etes sur retaper le nom du Segment "` +
-          SupervisortoDelete?.agent?.nom +
-          `" pour comfirmer la suppression`
+          `If you are sure, type the group name to confirm deletion.`
         }
         submitBtnName={"Delete"}
         cancelBtnName="Cancel"
@@ -337,51 +269,69 @@ function SegmentsTable({
         <div className="p-4">
           <div className="flex flex-col">
             <label htmlFor="deleteName" className="text-sm font-medium">
-              Nom :
+              Name:
             </label>
             <input
               id="deleteName"
               type="text"
-              onChange={(event) => handleDeleteInputChange(event, "Nom")}
+              onChange={(event) =>
+                setGroupToDelete({ ...GroupToDelete, name: event.target.value })
+              }
               className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              placeholder={`Tapez "${SupervisortoDelete?.agent?.nom}"`}
+              placeholder={`Type "${GroupToDelete?.name}"`}
             />
           </div>
         </div>
       </Modal>
       <Modal
         isOpen={alert.isOpen}
-        onSubmit={() => {
-          // console.log(SupervisortoEdit);
-
-          updateCandidate(SupervisortoEdit);
-        }}
+        onSubmit={() => updateGroup(GroupToEdit)}
         onCancel={() => {
           setAlert((prev) => ({ ...prev, isOpen: false }));
         }}
-        alertTitle={
-          "Modifier " + SupervisortoEdit?.agent?.nom + " " + SupervisortoEdit?.agent?.prenom
-
-        }
-        alertDescription={"Modifier les informations du Segment"}
-        submitBtnName={"Modifier"}
-        cancelBtnName="Annuler"
+        alertTitle={"Edit " + GroupToEdit?.name}
+        alertDescription={"Edit the group's information"}
+        submitBtnName={"Update"}
+        cancelBtnName="Cancel"
         type="success"
         onClose={() => {
           setAlert((prev) => ({ ...prev, isOpen: false }));
         }}
       >
-        <PhaseRenderer
-          fields={PersonalInfo}
-          editMode={editMode}
-          handleEdit={handleEdit}
-          CandidatetoEdit={SupervisortoEdit}
-          setCandidatetoEdit={setSupervisortoEdit}
-          lignes={ligneOptions}
-        />
+        <div className="p-4">
+          <div className="flex flex-col">
+            <label htmlFor="groupName" className="text-sm font-medium">
+              Name:
+            </label>
+            <input
+              id="groupName"
+              type="text"
+              value={GroupToEdit?.name || ""}
+              onChange={(event) =>
+                setGroupToEdit({ ...GroupToEdit, name: event.target.value })
+              }
+              className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            />
+            <label htmlFor="groupEffectif" className="text-sm font-medium mt-4">
+              Effectif:
+            </label>
+            <input
+              id="groupEffectif"
+              type="number"
+              value={GroupToEdit?.Effectif || 0}
+              onChange={(event) =>
+                setGroupToEdit({
+                  ...GroupToEdit,
+                  Effectif: Number(event.target.value),
+                })
+              }
+              className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            />
+          </div>
+        </div>
       </Modal>
     </div>
   );
 }
 
-export default SegmentsTable;
+export default GroupsTable;

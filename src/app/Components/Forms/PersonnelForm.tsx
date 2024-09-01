@@ -1,15 +1,21 @@
 "use client"
 
-import React from 'react'
+import React, { use, useEffect } from 'react'
 import DefaultLayout from '../Layout/DefaultLayout';
 import { PlusIcon } from 'lucide-react';
 import Swal from 'sweetalert2';
-import { postWithAuth } from '@/utils/api';
+import { fetchWithAuth, postWithAuth } from '@/utils/api';
 import { calculateAge } from '@/utils/calculateAge';
 import { validateCINLength } from '@/utils/cinValidation';
 import { validatePhoneNumber } from '@/utils/phoneValidation';
+import { group } from 'console';
 
 function PersonnelForm() {
+  const [groups, setGroups] = React.useState([]);
+  useEffect(() => {
+    fetchGroups();
+  }
+  , []);
     const [formValues, setFormValues] = React.useState({
       nom: "",
       username: "",
@@ -20,6 +26,7 @@ function PersonnelForm() {
       addresse: "",
       numerotel: "",
       date_naissance: "",
+      group_id: "",
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,6 +78,7 @@ function PersonnelForm() {
             role: "Personnel",
           },
           poste:null,
+          group_id: formValues.group_id,
           etat: "Candidat",
         });
         
@@ -85,6 +93,7 @@ function PersonnelForm() {
           numerotel: "",
           date_naissance: "",
           // poste:null,
+          group_id: "",
         });
 
         const Toast = Swal.mixin({
@@ -124,6 +133,17 @@ function PersonnelForm() {
         });
       }
     };
+    const fetchGroups = async () => {
+      try {
+        const res = await fetchWithAuth("/api/groups/");
+    
+      
+        
+        setGroups(res);
+      } catch (error) {
+        console.error("Failed to fetch groups", error);
+      }
+    }
   return (
     <DefaultLayout importexport={false}>
       <div className="flex items-center justify-center bg-gradient-to-br">
@@ -259,6 +279,32 @@ function PersonnelForm() {
                   onChange={handleChange}
                   required
                 />
+              </div>
+              <div className="form-group">
+                <label htmlFor="group" className="block text-gray-700">
+                  Groupe
+                </label>
+                <select
+                  id="group"
+                  name="group"
+                  value={formValues.group_id}
+                  onChange={(e) => {
+                    setFormValues((prevState) => ({
+                      ...prevState,
+                      group_id: e.target.value,
+                    }));
+                    // console.log(e.target.value);
+                    
+                  }}
+                  className="mt-1 px-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
+                >
+                  <option value="">Choisir un groupe</option>
+                  {groups.map((group: any) => (
+                    <option key={group.id} value={group.id}>
+                      {group.name}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
             <button

@@ -22,7 +22,7 @@ function FormateurForm() {
     numerotel: "",
     date_naissance: "",
     isAffecteur: false,
-    Type: "",
+    Type: "Pratique",
   });
 
   const role = getRoleFromToken();

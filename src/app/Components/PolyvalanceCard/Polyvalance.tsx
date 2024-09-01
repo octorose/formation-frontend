@@ -17,7 +17,8 @@ import { Poste } from "@/interfaces/Poste";
 import useAlert from "@/Hooks/useAlert";
 import Modal from "../GlobalModal/Modal";
 import Swal from "sweetalert2";
-import Polyvalance from '@/Components/PolyvalanceCard/Polyvalance';
+import Polyvalance from "@/Components/PolyvalanceCard/Polyvalance";
+import { getRoleFromToken } from "@/utils/getRoleFromToken";
 
 interface ScoreGridProps {
   score: number | undefined;
@@ -46,7 +47,7 @@ interface ProductionLine {
 }
 
 interface RatedEmployee extends Employee {
- polyvalence: Polyvalence;
+  polyvalence: Polyvalence;
 }
 
 interface UnRatedEmployee extends Employee {
@@ -128,28 +129,49 @@ export default function Polyvalence() {
 
   useEffect(() => {
     fetchLignes();
+    if (getRoleFromToken() === "RH") {
+      fetchRHLignes();
+      
+    }
   }, []);
 
-const fetchRatedOperateurs = async () => {
-  setRatedLoading(true);
-  setError("");
-  try {
-    const response = await fetchWithAuth(
-      `/api/rated-operators/${productionLine}/`
-    );
-    setRatedOperateurs(
-      response.map((operator: any) => ({
-        ...operator,
-        polyvalenceId: operator.polyvalence.id, // Ensure you have the Polyvalence ID
-      }))
-    );
-  } catch (error: any) {
-    setError(error.message);
-    setRatedOperateurs([]);
-  } finally {
-    setRatedLoading(false);
-  }
-};
+  const fetchRatedOperateurs = async () => {
+    setRatedLoading(true);
+    setError("");
+    try {
+      const response = await fetchWithAuth(
+        `/api/rated-operators/${productionLine}/`
+      );
+      setRatedOperateurs(
+        response.map((operator: any) => ({
+          ...operator,
+          polyvalenceId: operator.polyvalence.id, // Ensure you have the Polyvalence ID
+        }))
+      );
+    } catch (error: any) {
+      setError(error.message);
+      setRatedOperateurs([]);
+    } finally {
+      setRatedLoading(false);
+    }
+  };
+
+  const fetchRHLignes = async () => {
+    setRatedLoading(true);
+    setError("");
+    try {
+      const response = await fetchWithAuth(`api/lignes/`);
+      setProductionLines(response.results);
+      if (response.results.length > 0) {
+        setProductionLine(response.results[0].id);
+      }
+    } catch (error: any) {
+      setError(error.message);
+      setRatedOperateurs([]);
+    } finally {
+      setRatedLoading(false);
+    }
+  };
 
   const fetchLignes = async () => {
     setRatedLoading(true);
@@ -185,62 +207,62 @@ const fetchRatedOperateurs = async () => {
       setUnratedLoading(false);
     }
   };
-const AddPolyvalence = async (payload: any) => {
-  try {
-    const res = await postWithAuth(`api/polyvalences/`, payload);
-    console.log(res);
-    setAlert2((prev) => ({ ...prev, isOpen: false }));
-    const Toast = Swal.mixin({
-      toast: true,
-      position: "top-end",
-      iconColor: "green",
-      customClass: {
-        popup: "colored-toast",
-      },
-      showConfirmButton: false,
-      timer: 2000,
-      timerProgressBar: true,
-    });
-    Toast.fire({
-      icon: "success",
-      title: "Polyvalence ajouté avec succès !",
-    });
-    fetchRatedOperateurs();
-    fetchUnratedOperateurs();
-  } catch (err) {
-    console.log(err);
-  }
-};
+  const AddPolyvalence = async (payload: any) => {
+    try {
+      const res = await postWithAuth(`api/polyvalences/`, payload);
+      console.log(res);
+      setAlert2((prev) => ({ ...prev, isOpen: false }));
+      const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        iconColor: "green",
+        customClass: {
+          popup: "colored-toast",
+        },
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+      });
+      Toast.fire({
+        icon: "success",
+        title: "Polyvalence ajouté avec succès !",
+      });
+      fetchRatedOperateurs();
+      fetchUnratedOperateurs();
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
-const updateCandidate = async (payload: any) => {
-  try {
-    const res = await putWithAuth(
-      `api/polyvalences/${operatortoedit?.id}/`,
-      payload
-    );
-    console.log(res);
-    setAlert((prev) => ({ ...prev, isOpen: false }));
-    const Toast = Swal.mixin({
-      toast: true,
-      position: "top-end",
-      iconColor: "green",
-      customClass: {
-        popup: "colored-toast",
-      },
-      showConfirmButton: false,
-      timer: 2000,
-      timerProgressBar: true,
-    });
+  const updateCandidate = async (payload: any) => {
+    try {
+      const res = await putWithAuth(
+        `api/polyvalences/${operatortoedit?.id}/`,
+        payload
+      );
+      console.log(res);
+      setAlert((prev) => ({ ...prev, isOpen: false }));
+      const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        iconColor: "green",
+        customClass: {
+          popup: "colored-toast",
+        },
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+      });
 
-    Toast.fire({
-      icon: "success",
-      title: "Polyvalence ajouté avec succès !",
-    });
-    fetchRatedOperateurs();
-  } catch (err) {
-    console.log(err);
-  }
-};
+      Toast.fire({
+        icon: "success",
+        title: "Polyvalence ajouté avec succès !",
+      });
+      fetchRatedOperateurs();
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const handleLineChange = async (value: string) => {
     setProductionLine(value);
@@ -433,9 +455,7 @@ const updateCandidate = async (payload: any) => {
         onCancel={() => {
           setAlert((prev) => ({ ...prev, isOpen: false }));
         }}
-        alertTitle={
-          "Modifier la polyvalence"
-        }
+        alertTitle={"Modifier la polyvalence"}
         alertDescription={"Modifier "}
         submitBtnName={"Modifier"}
         cancelBtnName="Annuler"
@@ -512,9 +532,7 @@ const updateCandidate = async (payload: any) => {
         onCancel={() => {
           setAlert2((prev) => ({ ...prev, isOpen: false }));
         }}
-        alertTitle={
-          "Ajouter Polyvalence"
-        }
+        alertTitle={"Ajouter Polyvalence"}
         alertDescription={"Ajouter "}
         submitBtnName={"Ajouter"}
         cancelBtnName="Annuler"

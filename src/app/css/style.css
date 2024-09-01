@@ -35,6 +35,30 @@
 
 /* third-party libraries CSS */
 
+.button {
+    background-color: #260d96;
+    color: white;
+    border: none;
+    padding: 10px 30px;
+    margin: 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px; /* Taille du texte du bouton */
+  }
+  
+  .button:hover {
+    background-color: #0d8013;
+  }
+  
+  .button-secondary {
+    background-color: #dc3545;
+  }
+  
+  .button-secondary:hover {
+    background-color: #c82333;
+  }
+  
+  
 .tableCheckbox:checked ~ div span {
     @apply opacity-100;
 }
@@ -241,3 +265,13 @@ input[type="search"]::-webkit-search-cancel-button {
 [x-cloak] {
     display: none !important;
 }
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .animate-spin {
+    animation: spin 1s linear infinite;
+  }
+  

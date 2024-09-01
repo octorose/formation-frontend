@@ -66,8 +66,8 @@ const AddContrat = () => {
       try {
         const response = await fetchWithAuth('/api/agents/');
         // Check if the response is an object and has the 'results' property
-        if (response && response.results) {
-          const agentsData = response.results.map((agent: any) => ({
+        if (response ) {
+          const agentsData = response.map((agent: any) => ({
             id: agent.id,
             cin: agent.cin,
             prenom: agent.prenom,

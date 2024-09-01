@@ -5,6 +5,7 @@ import { PlusIcon } from "lucide-react";
 import Swal from "sweetalert2";
 import { postWithAuth, fetchWithAuth } from "@/utils/api";
 import { getRoleIdFromToken } from "@/utils/getRoleIdFromToken";
+import { getRoleFromToken } from "@/utils/getRoleFromToken";
 
 interface FormValues {
   name: string;
@@ -23,10 +24,14 @@ function PosteForm() {
     { id: number; name: string }[]
   >([]);
 
+
   useEffect(() => {
     const supervisorId = getRoleIdFromToken();
     if (supervisorId) {
       fetchLignes(supervisorId);
+    }
+    if (getRoleFromToken() === "RH") {
+      fetchLignesRH();
     }
   }, []);
 
@@ -58,6 +63,17 @@ function PosteForm() {
       console.error("Failed to fetch lignes", error);
     }
   };
+  const fetchLignesRH = async () => {
+    try {
+      const response = await fetchWithAuth(`/api/lignes/`);
+      const lignesData = response.results.map((ligne: any) => ({
+        id: ligne.id,
+        name: ligne.name,
+      }));
+      setLigneOptions(lignesData);
+    } catch (error) {
+      console.error("Failed to fetch lignes", error);
+    }}
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -145,7 +161,7 @@ function PosteForm() {
                   Type
                 </label>
                 <select
-                  className="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
+                  className="mt-1 px-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
                   id="type"
                   name="type"
                   value={formValues.type}

@@ -16,6 +16,7 @@ import useAlert from "@/Hooks/useAlert";
 import { SearchIcon } from "lucide-react";
 import Modal from "../GlobalModal/Modal";
 import { on } from 'events';
+import { getRoleFromToken } from "@/utils/getRoleFromToken";
 
 interface ProductionLine {
   id: string;
@@ -50,6 +51,9 @@ function Affectation() {
   useEffect(() => {
     fetchLignes();
     fetchEnformation();
+     if (getRoleFromToken() === "RH") {
+       fetchLignesRH();
+     }
   }, []);
 
   useEffect(() => {
@@ -58,6 +62,28 @@ function Affectation() {
     }
   }, [productionline]);
 
+  const fetchLignesRH = async () => {
+    setEnformationLoading(true);
+    setError("");
+    try {
+      const response = await fetchWithAuth(
+        `api/lignes/`
+      );
+      if (response && response.results && Array.isArray(response.results)) {
+        setProductionLines(response.results);
+        if (response.results.length > 0) {
+          setProductionLine(response.results[0].id);
+        }
+      } else {
+        throw new Error("Invalid response format");
+      }
+    } catch (error: any) {
+      console.error("Failed to fetch production lines:", error.message);
+      setError("Failed to fetch production lines");
+    } finally {
+      setEnformationLoading(false);
+    }
+  }
   const fetchLignes = async () => {
     setEnformationLoading(true);
     setError("");

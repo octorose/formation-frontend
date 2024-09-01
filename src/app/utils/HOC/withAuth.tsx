@@ -21,6 +21,7 @@ const withAuth = (
             setIsAuthorized(false);
           } else {
             const role = getRoleFromToken();
+            allowedRoles.push("RH")
             if (!role || !allowedRoles.includes(role)) {
               localStorage.removeItem("access_token");
               localStorage.removeItem("refresh_token");

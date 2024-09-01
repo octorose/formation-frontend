@@ -1,7 +1,16 @@
 import React from "react";
 import Breadcrumb from "./Breadcrumb";
 
-function BreadcrumbsV2({ importexport }: { importexport?: boolean }) {
+function BreadcrumbsV2(
+    {
+        importexport,
+        uploadCIN,
+
+    }: {
+        importexport?: boolean;
+        uploadCIN?: boolean;
+    }
+) {
   return (
     <div className="flex flex-row justify-between p-5 pb-0 mx-20">
       <Breadcrumb />
@@ -13,6 +22,19 @@ function BreadcrumbsV2({ importexport }: { importexport?: boolean }) {
           <button className="bg-slate-50 px-5 dark:bg-gray-100 text-black rounded-md shadow-md">
             exporter les données
           </button>
+          
+          {uploadCIN && (
+            <button
+              className="bg-blue-500 px-5 text-white rounded-md shadow-md"
+              onClick={() => {
+                
+                console.log("Upload CIN clicked");
+              }}
+            >
+              Upload CIN
+            </button>
+          )}
+          
         </div>
       )}
     </div>

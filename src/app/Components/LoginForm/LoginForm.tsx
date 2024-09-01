@@ -5,6 +5,7 @@ import { Input } from "@/Components/Custominput/Custominput";
 import { cn } from "@/utils/cn";
 import { useUser } from "@/Context/UserContext";
 import { decodeToken } from "@/utils/jwt";
+import { getRoleFromToken } from "@/utils/getRoleFromToken";
 
 interface LoginFormProps {}
 
@@ -13,11 +14,8 @@ const LoginForm: React.FC<LoginFormProps> = () => {
   const [motDePasse, setMotDePasse] = useState("");
   const [afficherMotDePasse, setAfficherMotDePasse] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
-  const { setRole } = useUser();
-
-  const handleSubmit = async (
-    e: React.FormEvent<HTMLFormElement>
-  ) => {
+  const { setRole, role } = useUser();
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       const response = await fetch("http://localhost:8000/api/token/", {
@@ -30,24 +28,20 @@ const LoginForm: React.FC<LoginFormProps> = () => {
           password: motDePasse,
         }),
       });
-
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.detail || "Quelque chose s'est mal passé");
       }
-
       const data = await response.json();
       const decodedToken = decodeToken(data.access);
-
-      // Stocker le rôle dans le contexte
       setRole(decodedToken.role);
-
-      // Stocker les jetons dans le local storage
       localStorage.setItem("access_token", data.access);
       localStorage.setItem("refresh_token", data.refresh);
-
-      // Redirection vers le tableau de bord
-      window.location.href = "/Dashboard";
+      if (getRoleFromToken() == "Personnel") {
+        window.location.href = "/Dashboard";
+      } else {
+        window.location.href = "/Dashboard";
+      }
     } catch (error) {
       if (error instanceof Error) {
         setErreur(error.message);
@@ -58,11 +52,9 @@ const LoginForm: React.FC<LoginFormProps> = () => {
       }
     }
   };
-
   const toggleAfficherMotDePasse = () => {
     setAfficherMotDePasse(!afficherMotDePasse);
   };
-
   return (
     <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 z-20 shadow-input bg-white dark:bg-black">
       <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
@@ -71,7 +63,6 @@ const LoginForm: React.FC<LoginFormProps> = () => {
       <p className="text-neutral-600 text-sm max-w-sm mt-2 dark:text-neutral-300">
         Connectez-vous pour commencer
       </p>
-
       <form className="my-8" onSubmit={handleSubmit}>
         <LabelInputContainer className="mb-4">
           <Label htmlFor="nomUtilisateur">Nom d&lsquo;utilisateur</Label>
@@ -125,7 +116,6 @@ const LoginForm: React.FC<LoginFormProps> = () => {
     </div>
   );
 };
-
 const BottomGradient = () => {
   return (
     <>
@@ -134,7 +124,6 @@ const BottomGradient = () => {
     </>
   );
 };
-
 const LabelInputContainer = ({
   children,
   className,
