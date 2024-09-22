@@ -1,7 +1,10 @@
 "use client";
 
+
 import React, { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
+import { confirmAlert } from 'react-confirm-alert'; 
+import 'react-confirm-alert/src/react-confirm-alert.css';
 import Link from "next/link";
 import Image from "next/image";
 import SidebarLinkGroup from "./SidebarLinkGroup";
@@ -21,7 +24,8 @@ import { PlusIcon } from "lucide-react";
 
 import { GroupIcon, PenSquareIcon, PopsicleIcon, RowsIcon, SparkleIcon } from "lucide-react";
 import { FaChalkboardTeacher } from "react-icons/fa";
-import { FlagIcon } from "@heroicons/react/24/outline";
+import { FlagIcon, QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
+import Confirmation from "../Confirmation/Confirmation";
 
 
 interface SidebarProps {
@@ -32,9 +36,11 @@ interface SidebarProps {
 const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const [role, setRole] = useState<string | null>(null);
 
-  const pathname = usePathname();
+  const pathname = usePathname(); 
   const trigger = useRef<any>(null);
   const sidebar = useRef<any>(null);
+
+  
 
   let storedSidebarExpanded = "true";
 
@@ -161,7 +167,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 : setSidebarExpanded(true);
                             }}
                           >
-                            <FaChalkboardTeacher/>
+                            <FaChalkboardTeacher />
                             Formateur
                             <DynamicArrow open={open} />
                           </Link>
@@ -189,6 +195,14 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                   }`}
                                 >
                                   Add Manually
+                                </Link>
+                                <Link
+                                  href="/AddFormateur"
+                                  className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
+                                    pathname === "/#" && "text-white"
+                                  }`}
+                                >
+                                  Add With IA
                                 </Link>
                               </li>
                             </ul>
@@ -275,7 +289,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 : setSidebarExpanded(true);
                             }}
                           >
-                            <SparkleIcon width={15}/>
+                            <SparkleIcon width={15} />
                             Polyvalence
                             <DynamicArrow open={open} />
                           </Link>
@@ -389,7 +403,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 : setSidebarExpanded(true);
                             }}
                           >
-                            <FlagIcon width={20}/>
+                            <FlagIcon width={20} />
                             Postes
                             <DynamicArrow open={open} />
                           </Link>
@@ -419,7 +433,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                   Add Poste
                                 </Link>
                               </li>
-                             
                             </ul>
                           </div>
                         </React.Fragment>
@@ -549,6 +562,17 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 >
                                   Add Manually
                                 </Link>
+
+                                <li>
+                                  <Link
+                                    href="/AddPersonnelIA"
+                                    className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
+                                      pathname === "/#" && "text-white"
+                                    }`}
+                                  >
+                                    Add Candidats With IA
+                                  </Link>
+                                </li>
                               </li>
                             </ul>
                           </div>
@@ -842,7 +866,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                       );
                     }}
                   </SidebarLinkGroup>
-             
+
                   <SidebarLinkGroup
                     activeCondition={
                       pathname === "/forms" || pathname.includes("forms")
@@ -923,8 +947,22 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                     </Link>
                   </li>
                 </div>
-               
-              ):(
+              ) : getRoleFromToken() == "Personnel" ? (
+                <div>
+                  <li>
+                    <Link
+                      href="/settings"
+                      className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                        pathname.includes("settings") &&
+                        "bg-graydark dark:bg-meta-4"
+                      }`}
+                    >
+                      <QuestionMarkCircleIcon />
+                      <Confirmation />
+                    </Link>
+                  </li>
+                </div>
+              ) : (
                 <></>
               )}
             </ul>
@@ -952,12 +990,14 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                         }`}
                         onClick={(e) => {
                           e.preventDefault();
-                          sidebarExpanded
-                            ? handleClick()
-                            : setSidebarExpanded(true);
+                          if (sidebarExpanded) {
+                            handleClick();
+                          } else {
+                            setSidebarExpanded(true);
+                          }
                         }}
                       >
-                        Maybe We Will need Something here
+                        other
                         <DynamicArrow open={open} />
                       </Link>
 

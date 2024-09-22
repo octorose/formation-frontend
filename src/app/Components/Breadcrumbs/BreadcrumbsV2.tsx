@@ -4,9 +4,11 @@ import Breadcrumb from './Breadcrumb';
 function BreadcrumbsV2(
     {
         importexport,
+        uploadCIN,
 
     }: {
         importexport?: boolean;
+        uploadCIN?: boolean;
     }
 ) {
   return (
@@ -25,6 +27,19 @@ function BreadcrumbsV2(
           >
             export data
           </button>
+          
+          {uploadCIN && (
+            <button
+              className="bg-blue-500 px-5 text-white rounded-md shadow-md"
+              onClick={() => {
+                
+                console.log("Upload CIN clicked");
+              }}
+            >
+              Upload CIN
+            </button>
+          )}
+          
         </div>
       )}
     </div>
