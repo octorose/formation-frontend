@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import useNotifications from "@/Hooks/usenotifications";
 
 const DropdownNotification = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -7,6 +8,8 @@ const DropdownNotification = () => {
 
   const trigger = useRef<any>(null);
   const dropdown = useRef<any>(null);
+
+  const { notifications, isConnected } = useNotifications(); // Destructure the hook to get the latest notification and connection status
 
   useEffect(() => {
     const clickHandler = ({ target }: MouseEvent) => {
@@ -21,7 +24,7 @@ const DropdownNotification = () => {
     };
     document.addEventListener("click", clickHandler);
     return () => document.removeEventListener("click", clickHandler);
-  });
+  }, [dropdownOpen]);
 
   // close if the esc key is pressed
   useEffect(() => {
@@ -31,7 +34,7 @@ const DropdownNotification = () => {
     };
     document.addEventListener("keydown", keyHandler);
     return () => document.removeEventListener("keydown", keyHandler);
-  });
+  }, [dropdownOpen]);
 
   return (
     <li className="relative">
@@ -80,69 +83,26 @@ const DropdownNotification = () => {
         </div>
 
         <ul className="flex h-auto flex-col overflow-y-auto">
-          <li>
-            <Link
-              className="flex flex-col gap-2.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
-              href="#"
-            >
-              <p className="text-sm">
-                <span className="text-black dark:text-white">
-                  Edit your information in a swipe
-                </span>{" "}
-                Sint occaecat cupidatat non proident, sunt in culpa qui officia
-                deserunt mollit anim.
-              </p>
-
-              <p className="text-xs">12 May, 2025</p>
-            </Link>
-          </li>
-          <li>
-            <Link
-              className="flex flex-col gap-2.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
-              href="#"
-            >
-              <p className="text-sm">
-                <span className="text-black dark:text-white">
-                  It is a long established fact
-                </span>{" "}
-                that a reader will be distracted by the readable.
-              </p>
-
-              <p className="text-xs">24 Feb, 2025</p>
-            </Link>
-          </li>
-          <li>
-            <Link
-              className="flex flex-col gap-2.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
-              href="#"
-            >
-              <p className="text-sm">
-                <span className="text-black dark:text-white">
-                  There are many variations
-                </span>{" "}
-                of passages of Lorem Ipsum available, but the majority have
-                suffered
-              </p>
-
-              <p className="text-xs">04 Jan, 2025</p>
-            </Link>
-          </li>
-          <li>
-            <Link
-              className="flex flex-col gap-2.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
-              href="#"
-            >
-              <p className="text-sm">
-                <span className="text-black dark:text-white">
-                  There are many variations
-                </span>{" "}
-                of passages of Lorem Ipsum available, but the majority have
-                suffered
-              </p>
-
-              <p className="text-xs">01 Dec, 2024</p>
-            </Link>
-          </li>
+          {notifications.length > 0 ? (
+            notifications.map((notification, index) => (
+              <li key={index}>
+                <Link
+                  className="flex flex-col gap-2.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
+                  href="#"
+                >
+                  <p className="text-sm text-black dark:text-white">
+                    {typeof notification === "string"
+                      ? notification
+                      : JSON.stringify(notification)}
+                  </p>
+                </Link>
+              </li>
+            ))
+          ) : (
+            <li className="flex justify-center text-sm py-4">
+              {isConnected ? "No new notifications" : "Connecting..."}
+            </li>
+          )}
         </ul>
       </div>
     </li>

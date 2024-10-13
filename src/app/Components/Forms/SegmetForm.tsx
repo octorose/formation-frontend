@@ -114,7 +114,7 @@ function SegmetForm() {
       return;
     }
     try {
-      await postWithAuth("/api/segments/create/", {
+      await postWithAuth("api/segments/create/", {
         agent: {
           username: formValues.username,
           email: formValues.email,

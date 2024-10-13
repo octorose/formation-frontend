@@ -34,7 +34,7 @@ function PersonnelFormIA() {
 
   const fetchGroups = async () => {
     try {
-      const res = await fetchWithAuth("/api/groups/");
+      const res = await fetchWithAuth("api/groups/");
       setGroups(res);
     } catch (error) {
       console.error("Failed to fetch groups", error);
@@ -93,7 +93,7 @@ function PersonnelFormIA() {
     formData.append("file", file);
 
     try {
-      const response = await fetch(`${API_URL}/api/extract-ocr/`, {
+      const response = await fetch(`${API_URL}api/extract-ocr/`, {
         method: "POST",
         body: formData,
       });
@@ -138,7 +138,7 @@ const handleAddClick = async (e: React.FormEvent<HTMLFormElement>) => {
         .toISOString()
         .split("T")[0];
 
-      await postWithAuth("/api/create_personnel/", {
+      await postWithAuth("api/create_personnel/", {
         agent: {
           username: ocrData.username,
           email: ocrData.email,

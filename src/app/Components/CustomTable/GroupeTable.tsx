@@ -37,7 +37,7 @@ function GroupsTable({
     const response = await fetchWithAuth(
       `${endpoint}`
     );
-    console.log(response);
+    console.log("Effectif", response);
 
     setGroups(response);
     setTotalGroups(response);

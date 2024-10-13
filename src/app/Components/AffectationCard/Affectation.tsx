@@ -15,8 +15,9 @@ import Image from "next/image";
 import useAlert from "@/Hooks/useAlert";
 import { SearchIcon } from "lucide-react";
 import Modal from "../GlobalModal/Modal";
-import { on } from 'events';
+import { on } from "events";
 import { getRoleFromToken } from "@/utils/getRoleFromToken";
+import { log } from "console";
 
 interface ProductionLine {
   id: string;
@@ -25,8 +26,8 @@ interface ProductionLine {
 interface Affectation {
   id: number;
   agent: Agent;
-  poste : number;
-  ligne : number;
+  poste: number;
+  ligne: number;
 }
 interface payload {
   poste: string;
@@ -35,7 +36,7 @@ interface payload {
 function Affectation() {
   const [searchQuery, setSearchQuery] = useState("");
   const { alert, setAlert } = useAlert();
-  const {alert:alert2, setAlert:setAlert2} = useAlert();
+  const { alert: alert2, setAlert: setAlert2 } = useAlert();
   const [Enformation, setEnformation] = useState<Agent[]>([]);
   const [productionLines, setProductionLines] = useState<ProductionLine[]>([]);
   const [operators, setOperators] = useState([]);
@@ -51,9 +52,9 @@ function Affectation() {
   useEffect(() => {
     fetchLignes();
     fetchEnformation();
-     if (getRoleFromToken() === "RH") {
-       fetchLignesRH();
-     }
+    if (getRoleFromToken() === "RH") {
+      fetchLignesRH();
+    }
   }, []);
 
   useEffect(() => {
@@ -66,9 +67,7 @@ function Affectation() {
     setEnformationLoading(true);
     setError("");
     try {
-      const response = await fetchWithAuth(
-        `api/lignes/`
-      );
+      const response = await fetchWithAuth(`api/lignes/`);
       if (response && response.results && Array.isArray(response.results)) {
         setProductionLines(response.results);
         if (response.results.length > 0) {
@@ -83,18 +82,20 @@ function Affectation() {
     } finally {
       setEnformationLoading(false);
     }
-  }
+  };
   const fetchLignes = async () => {
     setEnformationLoading(true);
     setError("");
     try {
+      console.log(getRoleIdFromToken());
+
       const response = await fetchWithAuth(
-        `api/supervisor-lignes/${getRoleIdFromToken()}/`
+        `api/formateur-lignes/${getRoleIdFromToken()}/`
       );
-      if (response && response.results && Array.isArray(response.results)) {
-        setProductionLines(response.results);
-        if (response.results.length > 0) {
-          setProductionLine(response.results[0].id);
+      if (response && response.lignes && Array.isArray(response.lignes)) {
+        setProductionLines(response.lignes);
+        if (response.lignes.length > 0) {
+          setProductionLine(response.lignes[0].id);
         }
       } else {
         throw new Error("Invalid response format");
@@ -113,7 +114,7 @@ function Affectation() {
     setError("");
     try {
       const response = await patchWithAuth(
-        `/api/personnel/${candidattoAssigne?.id}/update-to-operator/`,
+        `api/personnel/${candidattoAssigne?.id}/update-to-operator/`,
         payload
       );
       setOperators(response);
@@ -127,23 +128,23 @@ function Affectation() {
       setOperatorsLoading(false);
       setEnformationLoading(false);
     }
-  }
+  };
 
-const fetchPostesByLigne = async () => {
-  setError("");
-  try {
-    const response = await fetchWithAuth(`api/posts/${payload.ligne}/`);
-    console.log("fetchPostesByLigne response:", response);
-    setPostes(response);
-  } catch (error: any) {
-    console.error("Failed to fetch operators:", error.message);
-    console.log("fetchOperators error response:", error.response);
-    setError("Failed to fetch operators");
-  } 
-}
-useEffect(() => {
-  fetchPostesByLigne();
-}, [payload.ligne]);
+  const fetchPostesByLigne = async () => {
+    setError("");
+    try {
+      const response = await fetchWithAuth(`api/posts/${payload.ligne}/`);
+      console.log("fetchPostesByLigne response:", response);
+      setPostes(response);
+    } catch (error: any) {
+      console.error("Failed to fetch operators:", error.message);
+      console.log("fetchOperators error response:", error.response);
+      setError("Failed to fetch operators");
+    }
+  };
+  useEffect(() => {
+    fetchPostesByLigne();
+  }, [payload.ligne]);
   const fetchEnformation = async () => {
     setEnformationLoading(true);
     setError("");
@@ -193,7 +194,7 @@ useEffect(() => {
               onValueChange={(value) => setProductionLine(value)}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Sélectionnez une ligne de production" />
+                <SelectValue placeholder= {productionline ? productionLines.find(line => line.id === productionline)?.name : "Sélectionnez une ligne de production"} />
               </SelectTrigger>
               <SelectContent>
                 {productionLines.map((line: ProductionLine) => (

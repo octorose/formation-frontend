@@ -31,7 +31,7 @@ function Segments() {
               onResults={handleSearchResults}
               onLoading={handleLoading}
               onError={handleError}
-              endpoint="/api/Segments-search"
+              endpoint="api/Segments-search"
             />
           </div>
         </div>

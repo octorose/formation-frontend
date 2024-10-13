@@ -163,7 +163,7 @@ function SupervisorsTable({
   };
    const fetchLignes = async () => {
      try {
-       const response = await fetchWithAuth("/api/lignes/");
+       const response = await fetchWithAuth("api/lignes/");
        const lignesData = response.results.map((ligne: any) => ({
          id: ligne.id,
          name: ligne.name,

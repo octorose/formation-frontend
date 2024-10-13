@@ -140,7 +140,7 @@ export default function Polyvalence() {
     setError("");
     try {
       const response = await fetchWithAuth(
-        `/api/rated-operators/${productionLine}/`
+        `api/rated-operators/${productionLine}/`
       );
       setRatedOperateurs(
         response.map((operator: any) => ({

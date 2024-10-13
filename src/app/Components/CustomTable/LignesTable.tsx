@@ -63,8 +63,8 @@ const LigneCards = ({}) => {
   const fetchData = async () => {
     try {
       setIsLoading(true);
-      const response = await fetchWithAuth(`/api/lignes?page=${currentPage}`);
-      const supres = await fetchWithAuth(`/api/supervisors`);
+      const response = await fetchWithAuth(`api/lignes?page=${currentPage}`);
+      const supres = await fetchWithAuth(`api/supervisors`);
       setModules(response);
       setSupervisors(supres.results);
       setData(response.results);

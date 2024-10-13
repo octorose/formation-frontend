@@ -61,7 +61,7 @@ const [selectedLignes, setSelectedLignes] = useState<number[]>([]);
 
   const fetchLignes = async () => {
     try {
-      const response = await fetchWithAuth("/api/lignes/");
+      const response = await fetchWithAuth("api/lignes/");
       const lignesData = response.results.map((ligne: any) => ({
         id: ligne.id,
         name: ligne.name,
@@ -122,7 +122,7 @@ const [selectedLignes, setSelectedLignes] = useState<number[]>([]);
       return;
     }
     try {
-      const response = await postWithAuth("/api/create_supervisor/", {
+      const response = await postWithAuth("api/create_supervisor/", {
         agent: {
           username: formValues.username,
           email: formValues.email,

@@ -1,4 +1,3 @@
-
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 interface TokenResponse {
@@ -7,7 +6,7 @@ interface TokenResponse {
 }
 
 const refreshToken = async (refreshToken: string) => {
-  const response = await fetch(`${API_URL}/api/token/refresh/`, {
+  const response = await fetch(`${API_URL}api/token/refresh/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -217,7 +216,7 @@ const patchWithAuth = async (
   } catch (error: any) {
     throw new Error(`PATCH request failed: ${(error as Error).message}`);
   }
-}
+};
 
 const putWithAuth = async (
   url: string,
@@ -232,7 +231,7 @@ const putWithAuth = async (
       headers: {
         ...options.headers,
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${accessToken}`,
+        Authorization: `Bearer ${accessToken}`,
       },
       body: JSON.stringify(data),
     });
@@ -247,7 +246,7 @@ const putWithAuth = async (
         headers: {
           ...options.headers,
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${newAccessToken}`,
+          Authorization: `Bearer ${newAccessToken}`,
         },
         body: JSON.stringify(data),
       });
@@ -268,4 +267,10 @@ const putWithAuth = async (
   }
 };
 
-export { fetchWithAuth, postWithAuth, deleteWithAuth, putWithAuth , patchWithAuth};
+export {
+  fetchWithAuth,
+  postWithAuth,
+  deleteWithAuth,
+  putWithAuth,
+  patchWithAuth,
+};

@@ -28,9 +28,9 @@ function Formateur() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetchWithAuth("/api/formateurs/");
+        const response = await fetchWithAuth("api/formateurs/");
         const fetchedData = await response.json();
-        setPersonnelData(fetchedData);
+        setPersonnelData(fetchedData.results);
       } catch (error) {
         console.error(error);
       }
@@ -80,7 +80,7 @@ function Formateur() {
               onResults={handleSearchResults}
               onLoading={handleLoading}
               onError={handleError}
-              endpoint="/api/search-formateurs/"
+              endpoint="api/search-formateurs/"
             />
           </div>
         </div>

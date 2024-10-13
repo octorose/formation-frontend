@@ -196,7 +196,7 @@ function PostesTable({
   const fetchLignes = async (supervisorId: number) => {
     try {
       const response = await fetchWithAuth(
-        `/api/supervisor-lignes/${supervisorId}/`
+        `api/supervisor-lignes/${supervisorId}/`
       );
       const lignesData = response.results.map((ligne: any) => ({
         id: ligne.id,
@@ -213,7 +213,7 @@ function PostesTable({
   return (
     <div className="rounded-sm bg-transparent px-5 pb-2.5 pt-6 dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
       <div className="flex flex-col">
-        <div className="grid grid-cols-3 rounded-sm text-black dark:text-white bg-gray-2 dark:bg-meta-4 sm:grid-cols-5">
+        <div className="grid grid-cols-3 rounded-sm text-black dark:text-white bg-gray-2 dark:bg-meta-4 sm:grid-cols-4">
           <div className="p-2.5 xl:p-5">
             <h5 className="text-sm font-medium uppercase xsm:text-base">Nom</h5>
           </div>
@@ -237,7 +237,7 @@ function PostesTable({
           <>
             {searchResults.map((poste: Poste, key: number) => (
               <div
-                className={`grid grid-cols-3 sm:grid-cols-5 text-base ${
+                className={`grid grid-cols-3 sm:grid-cols-4 text-base ${
                   key === postes.length - 1
                     ? ""
                     : "border-b border-stroke dark:border-strokedark"
@@ -290,7 +290,7 @@ function PostesTable({
           <>
             {postes.map((poste: Poste, key: number) => (
               <div
-                className={`grid grid-cols-3 sm:grid-cols-5 text-base ${
+                className={`grid grid-cols-3 sm:grid-cols-4 text-base ${
                   key === postes.length - 1
                     ? ""
                     : "border-b border-stroke dark:border-strokedark"

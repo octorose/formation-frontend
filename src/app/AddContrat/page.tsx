@@ -51,7 +51,7 @@ const AddContrat = () => {
 
     const fettchContracts = async () => {
       try {
-        const response  = await fetchWithAuth('/api/contrats/');
+        const response  = await fetchWithAuth('api/contrats/');
         if (response && response.results) {
           setContrats(response.results);
         }
@@ -64,7 +64,7 @@ const AddContrat = () => {
 
     const fetchAgents = async () => {
       try {
-        const response = await fetchWithAuth('/api/agents/');
+        const response = await fetchWithAuth('api/agents/');
         // Check if the response is an object and has the 'results' property
         if (response ) {
           const agentsData = response.map((agent: any) => ({
@@ -143,7 +143,7 @@ const AddContrat = () => {
           duree_contrat: '0',
         }));
       }
-      const response = await postWithAuth('/api/contrats/create/', formValues);
+      const response = await postWithAuth('api/contrats/create/', formValues);
       console.log('Response:', response);
 
       setFormValues({

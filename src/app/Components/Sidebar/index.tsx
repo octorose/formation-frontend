@@ -211,6 +211,14 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 >
                                   Ajouter avec IA
                                 </Link>
+                                <Link
+                                  href="/DeclareAbsence"
+                                  className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
+                                    pathname === "/#" && "text-white"
+                                  }`}
+                                >
+                                  Declarer Absence
+                                </Link>
                               </li>
                             </ul>
                           </div>
@@ -219,63 +227,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                     }}
                   </SidebarLinkGroup>
 
-                  <SidebarLinkGroup
-                    activeCondition={
-                      pathname === "/forms" || pathname.includes("forms")
-                    }
-                  >
-                    {(handleClick, open) => {
-                      return (
-                        <React.Fragment>
-                          <Link
-                            href="/calendar"
-                            className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                              pathname.includes("calendar") &&
-                              "bg-graydark dark:bg-meta-4"
-                            }`}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              sidebarExpanded
-                                ? handleClick()
-                                : setSidebarExpanded(true);
-                            }}
-                          >
-                            <SparkleIcon width={15} />
-                            Polyvalence
-                            <DynamicArrow open={open} />
-                          </Link>
-                          <div
-                            className={`translate transform overflow-hidden  ${
-                              !open && "hidden"
-                            }`}
-                          >
-                            <ul className="mb-5.5 mt-4 flex flex-col gap-2.5 pl-6">
-                              <li>
-                                <Link
-                                  href="/#"
-                                  className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
-                                    pathname === "/#" && "text-white"
-                                  }`}
-                                >
-                                  Détails Globaux
-                                </Link>
-                              </li>
-                              <li>
-                                <Link
-                                  href="/AddPolyvalence"
-                                  className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
-                                    pathname === "/#" && "text-white"
-                                  }`}
-                                >
-                                  Ajouter Polyvalence
-                                </Link>
-                              </li>
-                            </ul>
-                          </div>
-                        </React.Fragment>
-                      );
-                    }}
-                  </SidebarLinkGroup>
 
                   <SidebarLinkGroup
                     activeCondition={
@@ -308,16 +259,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                             }`}
                           >
                             <ul className="mb-5.5 mt-4 flex flex-col gap-2.5 pl-6">
-                              <li>
-                                <Link
-                                  href="/#"
-                                  className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
-                                    pathname === "/#" && "text-white"
-                                  }`}
-                                >
-                                  Formateur
-                                </Link>
-                              </li>
                               <li>
                                 <Link
                                   href="/AffectationOperateur"
@@ -951,7 +892,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                             <ul className="mb-5.5 mt-4 flex flex-col gap-2.5 pl-6">
                               <li>
                                 <Link
-                                  href="/#"
+                                  href="/SwitchtoFormateur"
                                   className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
                                     pathname === "/#" && "text-white"
                                   }`}
@@ -967,6 +908,220 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                   }`}
                                 >
                                   Opérateur
+                                </Link>
+                              </li>
+                            </ul>
+                          </div>
+                        </React.Fragment>
+                      );
+                    }}
+                  </SidebarLinkGroup>
+
+                  <SidebarLinkGroup
+                    activeCondition={
+                      pathname === "/forms" || pathname.includes("forms")
+                    }
+                  >
+                    {(handleClick, open) => {
+                      return (
+                        <React.Fragment>
+                          <Link
+                            href="/calendar"
+                            className={`group relative flex items-center gap-3 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                              pathname.includes("calendar") &&
+                              "bg-graydark dark:bg-meta-4"
+                            }`}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              sidebarExpanded
+                                ? handleClick()
+                                : setSidebarExpanded(true);
+                            }}
+                          >
+                            <FaChalkboardTeacher width={25} />
+                            Polyvalences
+                            <DynamicArrow open={open} />
+                          </Link>
+                          <div
+                            className={`transition-all duration-300 ease-in-out ${
+                              !open ? "max-h-0 overflow-hidden" : "max-h-screen"
+                            }`}
+                          >
+                            <ul className="mb-5.5 mt-4 flex flex-col gap-3 pl-6">
+                              <li>
+                                <Link
+                                  href="/#"
+                                  className={`group relative flex items-center gap-3 rounded-md px-4 py-2 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
+                                    pathname === "/#" && "text-white"
+                                  }`}
+                                >
+                                  Détails
+                                </Link>
+                              </li>
+                              <li>
+                                <Link
+                                  href="/AddPolyvalence"
+                                  className={`group relative flex items-center gap-3 rounded-md px-4 py-2 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
+                                    pathname === "/AddPolyvalence" &&
+                                    "text-white"
+                                  }`}
+                                >
+                                  Ajouter Polyvalence
+                                </Link>
+                              </li>
+                            </ul>
+                          </div>
+                        </React.Fragment>
+                      );
+                    }}
+                  </SidebarLinkGroup>
+                </div>
+              ) : getRoleFromToken() == "Superviseur" ? (
+                <div>
+                  <SidebarLinkGroup
+                    activeCondition={
+                      pathname === "/forms" || pathname.includes("forms")
+                    }
+                  >
+                    {(handleClick, open) => {
+                      return (
+                        <React.Fragment>
+                          <Link
+                            href="/calendar"
+                            className={`group relative flex items-center gap-3 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                              pathname.includes("calendar") &&
+                              "bg-graydark dark:bg-meta-4"
+                            }`}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              sidebarExpanded
+                                ? handleClick()
+                                : setSidebarExpanded(true);
+                            }}
+                          >
+                            <PersonStandingIcon width={25} />
+                            Operateurs
+                            <DynamicArrow open={open} />
+                          </Link>
+                          <div
+                            className={`transition-all duration-300 ease-in-out ${
+                              !open ? "max-h-0 overflow-hidden" : "max-h-screen"
+                            }`}
+                          >
+                            <ul className="mb-5.5 mt-4 flex flex-col gap-3 pl-6">
+                              <li>
+                                <Link
+                                  href="/DeclareAbsence"
+                                  className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
+                                    pathname === "/#" && "text-white"
+                                  }`}
+                                >
+                                  Declarer Absence
+                                </Link>
+                              </li>
+                            </ul>
+                          </div>
+                        </React.Fragment>
+                      );
+                    }}
+                  </SidebarLinkGroup>
+
+                  <SidebarLinkGroup
+                    activeCondition={
+                      pathname === "/forms" || pathname.includes("forms")
+                    }
+                  >
+                    {(handleClick, open) => {
+                      return (
+                        <React.Fragment>
+                          <Link
+                            href="#"
+                            className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                              pathname.includes("calendar") &&
+                              "bg-graydark dark:bg-meta-4"
+                            }`}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              sidebarExpanded
+                                ? handleClick()
+                                : setSidebarExpanded(true);
+                            }}
+                          >
+                            <PenSquareIcon width={20} />
+                            Affectation
+                            <DynamicArrow open={open} />
+                          </Link>
+                          <div
+                            className={`translate transform overflow-hidden  ${
+                              !open && "hidden"
+                            }`}
+                          >
+                            <ul className="mb-5.5 mt-4 flex flex-col gap-2.5 pl-6">
+                              <li>
+                                <Link
+                                  href="/AffectationOperateur"
+                                  className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
+                                    pathname === "/#" && "text-white"
+                                  }`}
+                                >
+                                  Opérateur
+                                </Link>
+                              </li>
+                            </ul>
+                          </div>
+                        </React.Fragment>
+                      );
+                    }}
+                  </SidebarLinkGroup>
+                  <SidebarLinkGroup
+                    activeCondition={
+                      pathname === "/forms" || pathname.includes("forms")
+                    }
+                  >
+                    {(handleClick, open) => {
+                      return (
+                        <React.Fragment>
+                          <Link
+                            href="/calendar"
+                            className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                              pathname.includes("calendar") &&
+                              "bg-graydark dark:bg-meta-4"
+                            }`}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              sidebarExpanded
+                                ? handleClick()
+                                : setSidebarExpanded(true);
+                            }}
+                          >
+                            <FlagIcon width={20} />
+                            Positions
+                            <DynamicArrow open={open} />
+                          </Link>
+                          <div
+                            className={`translate transform overflow-hidden ${
+                              !open && "hidden"
+                            }`}
+                          >
+                            <ul className="mb-5.5 mt-4 flex flex-col gap-2.5 pl-6">
+                              <li>
+                                <Link
+                                  href="/#"
+                                  className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
+                                    pathname === "/#" && "text-white"
+                                  }`}
+                                >
+                                  Critères des Positions
+                                </Link>
+                              </li>
+                              <li>
+                                <Link
+                                  href="/AddPoste"
+                                  className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
+                                    pathname === "/#" && "text-white"
+                                  }`}
+                                >
+                                  Ajouter Poste
                                 </Link>
                               </li>
                             </ul>
@@ -1103,23 +1258,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                     {(handleClick, open) => {
                       return (
                         <React.Fragment>
-                          <Link
-                            href="/calendar"
-                            className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                              pathname.includes("calendar") &&
-                              "bg-graydark dark:bg-meta-4"
-                            }`}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              sidebarExpanded
-                                ? handleClick()
-                                : setSidebarExpanded(true);
-                            }}
-                          >
-                            <HistoryIcon />
-                            History
-                            <DynamicArrow open={open} />
-                          </Link>
                           <div
                             className={`translate transform overflow-hidden ${
                               !open && "hidden"
@@ -1201,9 +1339,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                       Test Module 1
                     </Link>
                   </li>
-                  <li>
-
-                  </li>
+                  <li></li>
                 </div>
               ) : getRoleFromToken() == "Segment" ? (
                 <div>

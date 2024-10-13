@@ -111,7 +111,7 @@ function CustomTable({
     if (CandidateNameToDelete?.Nom === Candidate.agent.nom) {
 
       try {
-        const response = await deleteWithAuth(`/api/delete_personnel/${Candidate.id}/`);
+        const response = await deleteWithAuth(`api/delete_personnel/${Candidate.id}/`);
         if (!response) {
           Toast.fire({
             icon: 'success',
@@ -191,7 +191,7 @@ function CustomTable({
       return;
     }
     try {
-      const response = await putWithAuth(`/api/update_personnel/${Candidate.id}/`, Candidate);
+      const response = await putWithAuth(`api/update_personnel/${Candidate.id}/`, Candidate);
       Toast.fire({
         icon: 'success',
         title: 'Candidats mis à jour avec succès !',

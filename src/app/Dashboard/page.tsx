@@ -39,6 +39,11 @@ const Home = () => {
 
   const tabsRH = [
     {
+      title: "Formateurs",
+      value: "Formateurs",
+      content: <Formateur />,
+    },
+    {
       title: "Tableau de bord",
       value: "Dashboard",
       content: <Dash />,
@@ -71,13 +76,13 @@ const Home = () => {
     {
       title: "Tests",
       value: "Tests",
-      content: <TestTable endpoint="/api/tests" />,
+      content: <TestTable endpoint="api/tests" />,
     },
     {
       title: "Groupes",
       value: "Groupes",
-      content: <GroupsTable endpoint="/api/groups" searchResults={[]} />,
-    }
+      content: <GroupsTable endpoint="api/groups" searchResults={[]} />,
+    },
   ];
   const tabsSegment = [
     {
@@ -172,6 +177,11 @@ const Home = () => {
         ) : role == "Segment" ? (
           <Tabs
             tabs={tabsRH}
+            activeTabClassName="bg-blue-200 dark:bg-blue-800 border-5 text-black dark:text-white"
+          />
+        ) : role == "Superviseur" ? (
+          <Tabs
+            tabs={tabsSupervisor}
             activeTabClassName="bg-blue-200 dark:bg-blue-800 border-5 text-black dark:text-white"
           />
         ) : (

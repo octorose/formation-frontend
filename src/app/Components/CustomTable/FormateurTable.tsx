@@ -39,6 +39,10 @@ interface Agent {
 }
 
 interface FormateurData {
+  count: number;
+  next: string;
+  previous: string;
+  results: any[];
   agent: Agent;
   isAffecteur: boolean;
   id: number;
@@ -81,7 +85,7 @@ function FormateursTable({
   const [filteredData, setFilteredData] = useState<FormateurData[]>([]);
   const [FormateurNameToDelete, setFormateurNameToDelete] = useState();
   const [FormateurtoEdit, setFormateurtoEdit] = useState({} as any);
-  const totalPages = Math.ceil(data2.length / perpage);
+  const totalPages = Math.ceil((data2 as any)?.count / perpage);
   const { alert, setAlert } = useAlert();
   const { alert: alert2, setAlert: setAlert2 } = useAlert();
   const handleEdit = (index: any) => {
@@ -148,9 +152,9 @@ function FormateursTable({
     try {
       setIsLoading(true);
       const fetchedData = await fetchWithAuth(
-        `api/formateurs/?page=${currentPage}`
+        `api/formateurs?page=${currentPage}`
       );
-      setData(fetchedData.results);
+      setData(fetchedData);
       console.log(fetchedData.results);
       setIsLoading(false);
     } catch (error) {
@@ -160,11 +164,9 @@ function FormateursTable({
   
   const filterData = () => {
     const role = getRoleFromToken();
-    if (role === "Superviseur") {
-      setFilteredData(data2.filter((formateur) => formateur.Type === "Pratique"));
-    } else if (role === "ResponsableEcoleFormation") {
-      setFilteredData(data2.filter((formateur) => formateur.Type === "Theorique"));
-    }
+    //@ts-ignore
+      setFilteredData(data2.results)
+    
   };
   
   useEffect(() => {
@@ -297,24 +299,24 @@ const filteredHeaders = headers.filter(header =>
                         >
                           {item.Type}
                         </td>
-                        {role === "Superviseur" && (
-                          <td
-                            onClick={() => {
-                              setAlert((prev) => ({ ...prev, isOpen: true }));
-                              setFormateurtoEdit(item);
-                            }}
-                          >
-                            {item.isAffecteur ? (
-                              <p className="text-green-600">Oui</p>
-                            ) : (
-                              <p className="text-red-600">Non</p>
-                            )}
-                          </td>
-                        )}
+
+                        <td
+                          onClick={() => {
+                            setAlert((prev) => ({ ...prev, isOpen: true }));
+                            setFormateurtoEdit(item);
+                          }}
+                        >
+                          {item.isAffecteur ? (
+                            <p className="text-green-600">Oui</p>
+                          ) : (
+                            <p className="text-red">Non</p>
+                          )}
+                        </td>
+
                         <button
                           onClick={() => {
                             setAlert2((prev) => ({ ...prev, isOpen: true }));
-                            setFormateurNameToDelete(item);
+                            setFormateurtoEdit(item);
                           }}
                         >
                           <TrashIcon className="w-5 text-red-600" />
@@ -366,20 +368,20 @@ const filteredHeaders = headers.filter(header =>
                         >
                           {item.Type}
                         </td>
-                        {role === "Superviseur" && (
-                          <td
-                            onClick={() => {
-                              setAlert((prev) => ({ ...prev, isOpen: true }));
-                              setFormateurtoEdit(item);
-                            }}
-                          >
-                            {item.isAffecteur ? (
-                              <p className="text-green-600">Oui</p>
-                            ) : (
-                              <p className="text-red-600">Non</p>
-                            )}
-                          </td>
-                        )}
+
+                        <td
+                          onClick={() => {
+                            setAlert((prev) => ({ ...prev, isOpen: true }));
+                            setFormateurtoEdit(item);
+                          }}
+                        >
+                          {item.isAffecteur ? (
+                            <p className="text-green-600">Oui</p>
+                          ) : (
+                            <p className="text-red">Non</p>
+                          )}
+                        </td>
+
                         <button
                           onClick={() => {
                             setAlert2((prev) => ({ ...prev, isOpen: true }));
@@ -439,9 +441,7 @@ const filteredHeaders = headers.filter(header =>
           setAlert2((prev) => ({ ...prev, isOpen: false }));
         }}
         alertTitle={"Supprimer Formateur"}
-        alertDescription={
-          `Veuillez taper le nom de Formateur "${FormateurtoEdit?.agent?.nom}" pour confirmer votre demande` 
-        }
+        alertDescription={`Veuillez taper le nom de Formateur "${FormateurtoEdit?.agent?.nom}" pour confirmer votre demande`}
         submitBtnName={"Supprimer"}
         cancelBtnName="Annuler"
         type="error"

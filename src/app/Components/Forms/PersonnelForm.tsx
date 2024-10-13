@@ -64,7 +64,7 @@ function PersonnelForm() {
       }
 
       try {
-        await postWithAuth("/api/create_personnel/", {
+        await postWithAuth("api/create_personnel/", {
           agent: {
             username: formValues.username,
             email: formValues.email,
@@ -135,7 +135,7 @@ function PersonnelForm() {
     };
     const fetchGroups = async () => {
       try {
-        const res = await fetchWithAuth("/api/groups/");
+        const res = await fetchWithAuth("api/groups/");
     
       
         
