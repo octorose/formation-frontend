@@ -3,7 +3,7 @@
 const refreshToken = async (refreshToken:any) => {
     const api = process.env.API_URL;
   try {
-    const response = await fetch(`http://localhost:8000/api/token/refresh/`, {
+    const response = await fetch(`http://120.0.0.1:8000/api/token/refresh/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

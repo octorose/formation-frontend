@@ -17,7 +17,7 @@ export default function Home() {
       <Provide />
       <Why />
       <Network />
-      <Clientsay />
+      {/* <Clientsay /> */}
       <Newsletter />
     </main>
   );

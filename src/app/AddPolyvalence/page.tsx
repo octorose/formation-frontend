@@ -18,4 +18,4 @@ function page() {
   );
 }
 
-export default withAuth(page);
+export default withAuth(page, ["RH", "Superviseur"]);

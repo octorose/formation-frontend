@@ -21,7 +21,7 @@ export const GoogleGeminiEffect = ({
   className?: string;
 }) => {
   return (
-    <div className={cn("sticky top-80", className)}>
+    <div className={cn("sticky top-50", className)}>
       <p className="text-lg md:text-7xl font-normal pb-4 text-center bg-clip-text text-transparent bg-black">
         {title || `Built By Hatim`}
       </p>
@@ -32,7 +32,7 @@ export const GoogleGeminiEffect = ({
         <button onClick={()=>{
          window.location.href = "/Signin";
         }} className="  border-2 border-slate-800 font-bold bg-white rounded-full md:px-4 md:py-2 px-2 py-1 md:mt-24 mt-8 z-30 md:text-lg text-black text-sm  w-1/5 mx-auto ">
-          Get Started
+          Cliquez ici pour commencer
         </button>
       </div>
       <svg

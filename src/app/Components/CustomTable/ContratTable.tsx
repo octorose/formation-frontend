@@ -57,7 +57,7 @@ function ContratTable({ endpoint, searchResults }: { endpoint: string; searchRes
 
   const updateContrat = async (contrat: any) => {
     try {
-      await putWithAuth(`/api/contrats/update/${contrat.id}/`, {
+      await putWithAuth(`api/contrats/update/${contrat.id}/`, {
         type_contrat: editFormData.type_contrat,
         date_creation_contrat: editFormData.date_creation_contrat,
         duree_contrat: editFormData.duree_contrat,
@@ -113,7 +113,7 @@ function ContratTable({ endpoint, searchResults }: { endpoint: string; searchRes
   const handleDelete = async () => {
     try {
       if (deleteNameInput === contratToDelete?.agent?.nom) {
-        const response = await deleteWithAuth(`/api/contrats/delete/${contratToDelete.id}/`);
+        const response = await deleteWithAuth(`api/contrats/delete/${contratToDelete.id}/`);
 
         if (!response || response.status === 204) {
           Toast.fire({

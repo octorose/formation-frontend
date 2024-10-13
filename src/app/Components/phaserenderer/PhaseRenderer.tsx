@@ -13,7 +13,10 @@ interface Supervisors {
   agent: Agent;
   
 }
-
+interface Ligne {
+  id: number;
+  name: string;
+}
 interface PhaseRendererProps {
   fields: any;
   editMode: boolean[];
@@ -21,6 +24,7 @@ interface PhaseRendererProps {
   setCandidatetoEdit: (value: any) => void;
   handleEdit: (index: number, key: string) => void;
   lignes?: Lignes[] | null;
+  ligne?: Ligne | null;
   Supervisors?: Supervisors[] | null;
 }
 
@@ -31,6 +35,7 @@ function PhaseRenderer({
   setCandidatetoEdit,
   handleEdit,
   lignes,
+  ligne,
   Supervisors,
 }: PhaseRendererProps) {
   const handleInputChange = (
@@ -124,13 +129,34 @@ function PhaseRenderer({
                   </option>
                 ))}
               </select>
-            ) : editMode[index] ? (
-              <input
-                type="text"
-                value={flattenData(CandidatetoEdit)[key]}
-                onChange={(e) => handleInputChange(e, key)}
+            ) : editMode[index] && key === "ligne" ? (
+              <select
+                value={flattenData(CandidatetoEdit)["ligne"]}
+                onChange={(e: any) => handleInputChange(e, key)}
                 className="w-full"
-              />
+              >
+                {lignes?.map((supervisor) => (
+                  <option key={supervisor.id} value={supervisor.id}>
+                    {supervisor.name}
+                  </option>
+                ))}
+              </select>
+            ) : // <input
+            //   type="text"
+            //   value={flattenData(CandidatetoEdit)[key]}
+            //   onChange={(e) => handleInputChange(e, key)}
+            //   className="w-full"
+            // />
+            editMode[index] ? (
+              <div>
+                <p>{key}</p>
+                <input
+                  type="text"
+                  value={flattenData(CandidatetoEdit)[key]}
+                  onChange={(e) => handleInputChange(e, key)}
+                  className="w-full"
+                />
+              </div>
             ) : (
               <div className="flex flex-row items-center text-black justify-between">
                 {key === "lignes" ? (

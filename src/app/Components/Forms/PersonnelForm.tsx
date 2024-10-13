@@ -1,15 +1,21 @@
 "use client"
 
-import React, { use } from 'react'
+import React, { use, useEffect } from 'react'
 import DefaultLayout from '../Layout/DefaultLayout';
 import { PlusIcon } from 'lucide-react';
 import Swal from 'sweetalert2';
-import { postWithAuth } from '@/utils/api';
+import { fetchWithAuth, postWithAuth } from '@/utils/api';
 import { calculateAge } from '@/utils/calculateAge';
 import { validateCINLength } from '@/utils/cinValidation';
 import { validatePhoneNumber } from '@/utils/phoneValidation';
+import { group } from 'console';
 
 function PersonnelForm() {
+  const [groups, setGroups] = React.useState([]);
+  useEffect(() => {
+    fetchGroups();
+  }
+  , []);
     const [formValues, setFormValues] = React.useState({
       nom: "",
       username: "",
@@ -20,6 +26,7 @@ function PersonnelForm() {
       addresse: "",
       numerotel: "",
       date_naissance: "",
+      group_id: "",
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -57,7 +64,7 @@ function PersonnelForm() {
       }
 
       try {
-        await postWithAuth("/api/create_personnel/", {
+        await postWithAuth("api/create_personnel/", {
           agent: {
             username: formValues.username,
             email: formValues.email,
@@ -71,6 +78,7 @@ function PersonnelForm() {
             role: "Personnel",
           },
           poste:null,
+          group_id: formValues.group_id,
           etat: "Candidat",
         });
         
@@ -85,6 +93,7 @@ function PersonnelForm() {
           numerotel: "",
           date_naissance: "",
           // poste:null,
+          group_id: "",
         });
 
         const Toast = Swal.mixin({
@@ -124,12 +133,23 @@ function PersonnelForm() {
         });
       }
     };
+    const fetchGroups = async () => {
+      try {
+        const res = await fetchWithAuth("api/groups/");
+    
+      
+        
+        setGroups(res);
+      } catch (error) {
+        console.error("Failed to fetch groups", error);
+      }
+    }
   return (
     <DefaultLayout importexport={false}>
       <div className="flex items-center justify-center bg-gradient-to-br">
         <div className="w-full max-w-20xl p-10 bg-white shadow-lg rounded-lg">
           <h1 className="text-2xl font-bold text-center text-blue-800 mb-8">
-            Ajouter Personnel 
+            Ajouter un candidat
           </h1>
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -161,20 +181,20 @@ function PersonnelForm() {
                   required
                 />
               </div>
-                <div className="form-group">
-                    <label htmlFor="username" className="block text-gray-700">
-                    Username
-                    </label>
-                    <input
-                    type="text"
-                    className="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
-                    id="username"
-                    name="username"
-                    value={formValues.username}
-                    onChange={handleChange}
-                    required
-                    />
-                </div>
+              <div className="form-group">
+                <label htmlFor="username" className="block text-gray-700">
+                  Nom d&lsquo;utilisateur
+                </label>
+                <input
+                  type="text"
+                  className="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
+                  id="username"
+                  name="username"
+                  value={formValues.username}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
               <div className="form-group">
                 <label htmlFor="email" className="block text-gray-700">
                   Email
@@ -191,7 +211,7 @@ function PersonnelForm() {
               </div>
               <div className="form-group">
                 <label htmlFor="password" className="block text-gray-700">
-                  Password
+                  Mot de passe
                 </label>
                 <input
                   type="password"
@@ -260,13 +280,39 @@ function PersonnelForm() {
                   required
                 />
               </div>
+              <div className="form-group">
+                <label htmlFor="group" className="block text-gray-700">
+                  Groupe
+                </label>
+                <select
+                  id="group"
+                  name="group"
+                  value={formValues.group_id}
+                  onChange={(e) => {
+                    setFormValues((prevState) => ({
+                      ...prevState,
+                      group_id: e.target.value,
+                    }));
+                    // console.log(e.target.value);
+                    
+                  }}
+                  className="mt-1 px-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
+                >
+                  <option value="">Choisir un groupe</option>
+                  {groups.map((group: any) => (
+                    <option key={group.id} value={group.id}>
+                      {group.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
             <button
               type="submit"
               className="bg-graydark mt-6 w-full py-3 dark:bg-gray-100 shadow-md flex items-center justify-center px-6 rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:bg-gray-700"
             >
               {" "}
-              <PlusIcon /> Ajouter Personnel
+              <PlusIcon /> Ajouter Candidat
             </button>
           </form>
         </div>

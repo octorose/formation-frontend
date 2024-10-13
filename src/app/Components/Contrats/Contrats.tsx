@@ -24,7 +24,7 @@ const Contrats = () => {
 
     const fetchData = async () => {
       try {
-        const response = await fetchWithAuth("/api/contrats/");
+        const response = await fetchWithAuth("api/contrats/");
         // If response is already a JavaScript object, set it directly
         setContrats(response.results);
       } catch (error) {
@@ -59,13 +59,13 @@ const Contrats = () => {
               onResults={handleSearchResults}
               onLoading={handleLoading}
               onError={handleError}
-              endpoint="/api/contrats-search"
+              endpoint="api/contrats-search"
             />
           </div>
         </div>
 
         <ContratTable
-           endpoint="/api/contrats/"
+           endpoint="api/contrats/"
            searchResults={searchResults}
          />
 

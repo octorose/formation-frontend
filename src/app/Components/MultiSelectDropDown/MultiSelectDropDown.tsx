@@ -23,7 +23,7 @@ const MultiSelectDropDown: React.FC<MultiSelectDropDownProps> = ({
 
   useEffect(() => {
     const selectedNames = options
-      .filter((option) => selectedOptions.includes(option.id))
+      .filter((option) => selectedOptions?.includes(option.id))
       .map((option) => option.name);
       console.log(selectedNames);
       
@@ -63,7 +63,7 @@ const MultiSelectDropDown: React.FC<MultiSelectDropDownProps> = ({
                   type="checkbox"
                   name={formFieldName}
                   value={option.id}
-                  checked={selectedOptions.includes(option.id)}
+                  checked={selectedOptions?.includes(option.id)}
                   onChange={handleCheckboxChange}
                   className="cursor-pointer"
                 />

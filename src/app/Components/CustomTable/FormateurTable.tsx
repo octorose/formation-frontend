@@ -39,6 +39,10 @@ interface Agent {
 }
 
 interface FormateurData {
+  count: number;
+  next: string;
+  previous: string;
+  results: any[];
   agent: Agent;
   isAffecteur: boolean;
   id: number;
@@ -81,7 +85,7 @@ function FormateursTable({
   const [filteredData, setFilteredData] = useState<FormateurData[]>([]);
   const [FormateurNameToDelete, setFormateurNameToDelete] = useState();
   const [FormateurtoEdit, setFormateurtoEdit] = useState({} as any);
-  const totalPages = Math.ceil(data2.length / perpage);
+  const totalPages = Math.ceil((data2 as any)?.count / perpage);
   const { alert, setAlert } = useAlert();
   const { alert: alert2, setAlert: setAlert2 } = useAlert();
   const handleEdit = (index: any) => {
@@ -148,9 +152,9 @@ function FormateursTable({
     try {
       setIsLoading(true);
       const fetchedData = await fetchWithAuth(
-        `api/formateurs/?page=${currentPage}`
+        `api/formateurs?page=${currentPage}`
       );
-      setData(fetchedData.results);
+      setData(fetchedData);
       console.log(fetchedData.results);
       setIsLoading(false);
     } catch (error) {
@@ -160,11 +164,9 @@ function FormateursTable({
   
   const filterData = () => {
     const role = getRoleFromToken();
-    if (role === "Superviseur") {
-      setFilteredData(data2.filter((formateur) => formateur.Type === "Pratique"));
-    } else if (role === "ResponsableEcoleFormation") {
-      setFilteredData(data2.filter((formateur) => formateur.Type === "Theorique"));
-    }
+    //@ts-ignore
+      setFilteredData(data2.results)
+    
   };
   
   useEffect(() => {
@@ -240,7 +242,7 @@ const filteredHeaders = headers.filter(header =>
             <table className="w-9/12">
               <thead className="rounded-t-xl rounded-b-xl">
                 <tr className="rounded-lg h-12 flex-shrink-0 bg-ft-gray-dark-blue rounded-t-xl rounded-b-xl">
-                {filteredHeaders?.map((header, index) => (
+                  {filteredHeaders?.map((header, index) => (
                     <TableHeader
                       key={index}
                       header={header}
@@ -248,150 +250,148 @@ const filteredHeaders = headers.filter(header =>
                       totalHeaders={filteredHeaders.length}
                     />
                   ))}
-                  </tr>
+                </tr>
               </thead>
               <tbody>
-                {searchResults !== undefined && searchResults.length > 0 ? (
-                  searchResults?.map((item: any) => (
-                    <tr
-                      key={item.id}
-                      className="p-2 py-5 text-center rounded-t-lg rounded-b-lg border-b-2 text-base cursor-pointer text-neutral-900"
-                    >
-                      <td
-                        onClick={() => {
-                          setAlert((prev) => ({ ...prev, isOpen: true }));
-                          setFormateurtoEdit(item);
-                        }}
+                {searchResults !== undefined && searchResults.length > 0
+                  ? searchResults?.map((item: any) => (
+                      <tr
+                        key={item.id}
+                        className="p-2 py-5 text-center rounded-t-lg rounded-b-lg border-b-2 text-base cursor-pointer text-neutral-900"
                       >
-                        {item.agent["nom"]}
-                      </td>
-                      <td
-                        onClick={() => {
-                          setAlert((prev) => ({ ...prev, isOpen: true }));
-                          setFormateurtoEdit(item);
-                        }}
+                        <td
+                          onClick={() => {
+                            setAlert((prev) => ({ ...prev, isOpen: true }));
+                            setFormateurtoEdit(item);
+                          }}
+                        >
+                          {item.agent["nom"]}
+                        </td>
+                        <td
+                          onClick={() => {
+                            setAlert((prev) => ({ ...prev, isOpen: true }));
+                            setFormateurtoEdit(item);
+                          }}
+                        >
+                          {item.agent["prenom"]}
+                        </td>
+                        <td
+                          onClick={() => {
+                            setAlert((prev) => ({ ...prev, isOpen: true }));
+                            setFormateurtoEdit(item);
+                          }}
+                        >
+                          {item.agent["cin"]}
+                        </td>
+                        <td
+                          onClick={() => {
+                            setAlert((prev) => ({ ...prev, isOpen: true }));
+                            setFormateurtoEdit(item);
+                          }}
+                        >
+                          {item.agent["numerotel"]}
+                        </td>
+                        <td
+                          onClick={() => {
+                            setAlert((prev) => ({ ...prev, isOpen: true }));
+                            setFormateurtoEdit(item);
+                          }}
+                        >
+                          {item.Type}
+                        </td>
+
+                        <td
+                          onClick={() => {
+                            setAlert((prev) => ({ ...prev, isOpen: true }));
+                            setFormateurtoEdit(item);
+                          }}
+                        >
+                          {item.isAffecteur ? (
+                            <p className="text-green-600">Oui</p>
+                          ) : (
+                            <p className="text-red">Non</p>
+                          )}
+                        </td>
+
+                        <button
+                          onClick={() => {
+                            setAlert2((prev) => ({ ...prev, isOpen: true }));
+                            setFormateurtoEdit(item);
+                          }}
+                        >
+                          <TrashIcon className="w-5 text-red-600" />
+                        </button>
+                      </tr>
+                    ))
+                  : filteredData?.map((item: any) => (
+                      <tr
+                        key={item.id}
+                        className="p-2 py-5 text-center rounded-t-lg rounded-b-lg border-b-2 text-base cursor-pointer text-neutral-900"
                       >
-                        {item.agent["prenom"]}
-                      </td>
-                      <td
-                        onClick={() => {
-                          setAlert((prev) => ({ ...prev, isOpen: true }));
-                          setFormateurtoEdit(item);
-                        }}
-                      >
-                        {item.agent["cin"]}
-                      </td>
-                      <td
-                        onClick={() => {
-                          setAlert((prev) => ({ ...prev, isOpen: true }));
-                          setFormateurtoEdit(item);
-                        }}
-                      >
-                        {item.agent["numerotel"]}
-                      </td>
-                      <td
-                        onClick={() => {
-                          setAlert((prev) => ({ ...prev, isOpen: true }));
-                          setFormateurtoEdit(item);
-                        }}
-                      >
-                        {item.Type}
-                      </td>
-                      {role === "Superviseur" && (
-                      <td
-                        onClick={() => {
-                          setAlert((prev) => ({ ...prev, isOpen: true }));
-                          setFormateurtoEdit(item);
-                        }}
-                      >
-                        {item.isAffecteur ? (
-                          <p className="text-green-600">Oui</p>
-                        ) : (
-                          <p className="text-red-600">Non</p>
-                        )}
-                      </td>
-                      )}
-                      <button
-                        onClick={() => {
-                          setAlert2((prev) => ({ ...prev, isOpen: true }));
-                          setFormateurNameToDelete(item);
-                        }}
-                      >
-                        <TrashIcon className="w-5 text-red-600" />
-                      </button>
-                    </tr>
-                  ))
-                ) : (
-                  filteredData?.map((item: any) => (
-                    <tr
-                      key={item.id}
-                      className="p-2 py-5 text-center rounded-t-lg rounded-b-lg border-b-2 text-base cursor-pointer text-neutral-900"
-                    >
-                      <td
-                        onClick={() => {
-                          setAlert((prev) => ({ ...prev, isOpen: true }));
-                          setFormateurtoEdit(item);
-                        }}
-                      >
-                        {item.agent["nom"]}
-                      </td>
-                      <td
-                        onClick={() => {
-                          setAlert((prev) => ({ ...prev, isOpen: true }));
-                          setFormateurtoEdit(item);
-                        }}
-                      >
-                        {item.agent["prenom"]}
-                      </td>
-                      <td
-                        onClick={() => {
-                          setAlert((prev) => ({ ...prev, isOpen: true }));
-                          setFormateurtoEdit(item);
-                        }}
-                      >
-                        {item.agent["cin"]}
-                      </td>
-                      <td
-                        onClick={() => {
-                          setAlert((prev) => ({ ...prev, isOpen: true }));
-                          setFormateurtoEdit(item);
-                        }}
-                      >
-                        {item.agent["numerotel"]}
-                      </td>
-                      <td
-                        onClick={() => {
-                          setAlert((prev) => ({ ...prev, isOpen: true }));
-                          setFormateurtoEdit(item);
-                        }}
-                      >
-                        {item.Type}
-                      </td>
-                      {role === "Superviseur" && (
-                      <td
-                        onClick={() => {
-                          setAlert((prev) => ({ ...prev, isOpen: true }));
-                          setFormateurtoEdit(item);
-                        }}
-                      >
-                        {item.isAffecteur ? (
-                          <p className="text-green-600">Oui</p>
-                        ) : (
-                          <p className="text-red-600">Non</p>
-                        )}
-                      </td>
-                      )}
-                      <button
-                        onClick={() => {
-                          setAlert2((prev) => ({ ...prev, isOpen: true }));
-                          setFormateurtoEdit(item);
-                        }}
-                      >
-                        <TrashIcon className="w-5 text-red-600" />
-                      </button>
-                    </tr>
-                  ))
-                )}
+                        <td
+                          onClick={() => {
+                            setAlert((prev) => ({ ...prev, isOpen: true }));
+                            setFormateurtoEdit(item);
+                          }}
+                        >
+                          {item.agent["nom"]}
+                        </td>
+                        <td
+                          onClick={() => {
+                            setAlert((prev) => ({ ...prev, isOpen: true }));
+                            setFormateurtoEdit(item);
+                          }}
+                        >
+                          {item.agent["prenom"]}
+                        </td>
+                        <td
+                          onClick={() => {
+                            setAlert((prev) => ({ ...prev, isOpen: true }));
+                            setFormateurtoEdit(item);
+                          }}
+                        >
+                          {item.agent["cin"]}
+                        </td>
+                        <td
+                          onClick={() => {
+                            setAlert((prev) => ({ ...prev, isOpen: true }));
+                            setFormateurtoEdit(item);
+                          }}
+                        >
+                          {item.agent["numerotel"]}
+                        </td>
+                        <td
+                          onClick={() => {
+                            setAlert((prev) => ({ ...prev, isOpen: true }));
+                            setFormateurtoEdit(item);
+                          }}
+                        >
+                          {item.Type}
+                        </td>
+
+                        <td
+                          onClick={() => {
+                            setAlert((prev) => ({ ...prev, isOpen: true }));
+                            setFormateurtoEdit(item);
+                          }}
+                        >
+                          {item.isAffecteur ? (
+                            <p className="text-green-600">Oui</p>
+                          ) : (
+                            <p className="text-red">Non</p>
+                          )}
+                        </td>
+
+                        <button
+                          onClick={() => {
+                            setAlert2((prev) => ({ ...prev, isOpen: true }));
+                            setFormateurtoEdit(item);
+                          }}
+                        >
+                          <TrashIcon className="w-5 text-red-600" />
+                        </button>
+                      </tr>
+                    ))}
               </tbody>
             </table>
           </div>
@@ -415,12 +415,12 @@ const filteredHeaders = headers.filter(header =>
           setAlert((prev) => ({ ...prev, isOpen: false }));
         }}
         alertTitle={
-          "Edit " + FormateurtoEdit?.agent?.nom + " Details" ||
+          "Modifier Les Informations de " + FormateurtoEdit?.agent?.nom ||
           "Formateur" + "Details"
         }
-        alertDescription={"Edit "}
-        submitBtnName={"Submit"}
-        cancelBtnName="Cancel"
+        alertDescription={"Modifier "}
+        submitBtnName={"Confirmer"}
+        cancelBtnName="Annuler"
         type="success"
         onClose={() => {
           setAlert((prev) => ({ ...prev, isOpen: false }));
@@ -440,20 +440,15 @@ const filteredHeaders = headers.filter(header =>
         onCancel={() => {
           setAlert2((prev) => ({ ...prev, isOpen: false }));
         }}
-        alertTitle={"Delete Formateur"}
-        alertDescription={
-          `If You are sure type the Formateurs Name "` +
-          FormateurtoEdit?.agent?.nom +
-          `" to confirm your request`
-        }
-        submitBtnName={"Delete"}
-        cancelBtnName="Cancel"
+        alertTitle={"Supprimer Formateur"}
+        alertDescription={`Veuillez taper le nom de Formateur "${FormateurtoEdit?.agent?.nom}" pour confirmer votre demande`}
+        submitBtnName={"Supprimer"}
+        cancelBtnName="Annuler"
         type="error"
         onClose={() => {
           setAlert2((prev) => ({ ...prev, isOpen: false }));
         }}
       >
-      
         <div className="p-4">
           <div className="flex flex-col">
             <label htmlFor="deleteName" className="text-sm font-medium">
@@ -462,8 +457,7 @@ const filteredHeaders = headers.filter(header =>
             <input
               id="deleteName"
               type="text"
-             
-              onChange={(event) => handleDeleteInputChange(event, 'Nom')}
+              onChange={(event) => handleDeleteInputChange(event, "Nom")}
               className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               placeholder={`Tapez "${FormateurtoEdit?.agent?.nom}"`}
             />

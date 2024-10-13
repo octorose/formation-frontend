@@ -94,13 +94,13 @@ function LigneForm() {
     <div className="flex items-center flex-col justify-center bg-gradient-to-br">
       <div className="w-full max-w-2xl p-10 bg-white shadow-lg rounded-lg">
         <h1 className="text-2xl font-bold text-center text-blue-800 mb-8">
-          Ajouter Ligne
+          Ajouter Une Ligne
         </h1>
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 gap-6">
             <div className="form-group">
               <label htmlFor="name" className="block text-gray-700">
-                Nom de la Ligne
+                Nom De Ligne
               </label>
               <input
                 type="text"
@@ -124,7 +124,7 @@ function LigneForm() {
                 onChange={handleChange}
                 required
               >
-                <option value="">Sélectionner un superviseur</option>
+                <option value="">Sélectionner Un Superviseur</option>
                 {supervisors.map((supervisor) => (
                   <option key={supervisor.id} value={supervisor.id}>
                     {supervisor.agent.nom}
@@ -137,7 +137,7 @@ function LigneForm() {
             type="submit"
             className="bg-graydark mt-6 w-full py-3 shadow-md flex items-center justify-center px-6 rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:bg-gray-700"
           >
-            <PlusIcon /> Ajouter Ligne
+            <PlusIcon /> Ajouter La Ligne
           </button>
         </form>
       </div>

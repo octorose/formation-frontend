@@ -2,9 +2,10 @@
 import  LoginForm  from '@/Components/LoginForm/LoginForm'
 import Image from 'next/image'
 import logo from '@/images/blacklogo.png'
-import React, { use, useEffect } from 'react'
+import React, {useEffect } from 'react'
 import { AuroraBackground } from '@/Components/Aurora/aurora'
 import { classNames } from '../utils/cn';
+import { getRoleFromToken } from '@/utils/getRoleFromToken'
 
 
 
@@ -26,6 +27,9 @@ function Login() {
       localStorage.setItem('access', data.access)
       
     }).then(() => {
+      // if (getRoleFromToken() == "Personnel") {
+      //   window.location.href = '/dashboard'
+      // }
       window.location.href = '/dashboard'
     }
     )

@@ -1,32 +1,34 @@
 "use client";
-// hoc/withAuth.tsx
-import { useRouter } from "next/router";
+
 import { useEffect, useState } from "react";
 import { getRoleFromToken } from "@/utils/getRoleFromToken";
 
-const withAuth = (WrappedComponent: React.ComponentType) => {
+const withAuth = (
+  WrappedComponent: React.ComponentType,
+  allowedRoles: string[]
+) => {
   const Wrapper = (props: any) => {
-    const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(
-      null
-    );
+    const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
+
 
     useEffect(() => {
       const checkAuth = () => {
         if (typeof window !== "undefined") {
           const token = localStorage.getItem("access_token");
           if (!token) {
-            //redirect to login page if there is no token
-            window.location.href = "/Signin";
-            setIsAuthenticated(false);
+            // Redirect to login page if there is no token
+            window.location.href = "/NotAllowed";
+            setIsAuthorized(false);
           } else {
             const role = getRoleFromToken();
-            if (!role) {
+            allowedRoles.push("RH")
+            if (!role || !allowedRoles.includes(role)) {
               localStorage.removeItem("access_token");
               localStorage.removeItem("refresh_token");
-              window.location.href = "/Signin";
-              setIsAuthenticated(false);
+              window.location.href = "/NotAllowed";
+              setIsAuthorized(false);
             } else {
-              setIsAuthenticated(true);
+              setIsAuthorized(true);
             }
           }
         }
@@ -34,11 +36,11 @@ const withAuth = (WrappedComponent: React.ComponentType) => {
       checkAuth();
     }, []);
 
-    if (isAuthenticated === null) {
-      return <div>Loading...</div>; // Show a loading state while checking authentication
+    if (isAuthorized === null) {
+      return <div>Loading...</div>;
     }
 
-    return isAuthenticated ? <WrappedComponent {...props} /> : null;
+    return isAuthorized ? <WrappedComponent {...props} /> : null;
   };
 
   return Wrapper;

@@ -61,7 +61,7 @@ const [selectedLignes, setSelectedLignes] = useState<number[]>([]);
 
   const fetchLignes = async () => {
     try {
-      const response = await fetchWithAuth("/api/lignes/");
+      const response = await fetchWithAuth("api/lignes/");
       const lignesData = response.results.map((ligne: any) => ({
         id: ligne.id,
         name: ligne.name,
@@ -122,7 +122,7 @@ const [selectedLignes, setSelectedLignes] = useState<number[]>([]);
       return;
     }
     try {
-      const response = await postWithAuth("/api/create_supervisor/", {
+      const response = await postWithAuth("api/create_supervisor/", {
         agent: {
           username: formValues.username,
           email: formValues.email,
@@ -234,7 +234,7 @@ const [selectedLignes, setSelectedLignes] = useState<number[]>([]);
               </div>
               <div className="form-group">
                 <label htmlFor="username" className="block text-gray-700">
-                  Username
+                  Nom d&lsquo;utilisateur
                 </label>
                 <input
                   type="text"

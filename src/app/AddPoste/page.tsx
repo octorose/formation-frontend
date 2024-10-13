@@ -7,10 +7,9 @@ import withAuth from '@/utils/HOC/withAuth';
 function page() {
     return (
       <>  
-    
           <PosteForm />
       </>
     )
   }
   
-  export default withAuth(page);
+  export default withAuth(page,['Method']);

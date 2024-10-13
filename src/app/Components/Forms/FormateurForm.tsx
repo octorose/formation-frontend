@@ -1,17 +1,20 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import DefaultLayout from "../Layout/DefaultLayout";
 import { PlusIcon } from "lucide-react";
 import Swal from "sweetalert2";
-import { postWithAuth } from "@/utils/api";
+import { fetchWithAuth, postWithAuth } from "@/utils/api";
 import { calculateAge } from "@/utils/calculateAge";
 import { validateCINLength } from "@/utils/cinValidation";
 import { getRoleFromToken } from "@/utils/getRoleFromToken";
 import { validatePhoneNumber } from "@/utils/phoneValidation";
 
 function FormateurForm() {
-  const [formValues, setFormValues] = React.useState({
+  const [ligneOptions, setLigneOptions] = useState<
+    { id: number; name: string }[]
+  >([]);
+    const [formValues, setFormValues] = React.useState({
     nom: "",
     username: "",
     prenom: "",
@@ -22,12 +25,43 @@ function FormateurForm() {
     numerotel: "",
     date_naissance: "",
     isAffecteur: false,
-    Type: "",
+    Type: "Pratique",
+    lignes: [] as number[],
   });
-
+  const [selectedLignes, setSelectedLignes] = useState<number[]>([]);
+    const handleLigneChange = (ligneId: number) => {
+      if (selectedLignes.includes(ligneId)) {
+        setSelectedLignes(selectedLignes.filter((id) => id !== ligneId));
+        setFormValues((prevValues) => ({
+          ...prevValues,
+          lignes: selectedLignes.filter((id) => id !== ligneId),
+        }));
+      } else {
+        setSelectedLignes([...selectedLignes, ligneId]);
+        setFormValues((prevValues) => ({
+          ...prevValues,
+          lignes: [...selectedLignes, ligneId],
+        }));
+      }
+    };
   const role = getRoleFromToken();
+ const fetchLignes = async () => {
+   try {
+     const response = await fetchWithAuth("api/lignes/");
+     const lignesData = response.results.map((ligne: any) => ({
+       id: ligne.id,
+       name: ligne.name,
+     }));
+     console.log(response);
 
+     setLigneOptions(lignesData);
+   } catch (error) {
+     console.error("Failed to fetch lignes", error);
+     // Handle error if needed
+   }
+ };
   useEffect(() => {
+    fetchLignes();
     if (role === "Superviseur") {
       setFormValues((prevState) => ({
         ...prevState,
@@ -92,6 +126,7 @@ function FormateurForm() {
         },
         isAffecteur: formValues.isAffecteur,
         Type: formValues.Type,
+        lignes: selectedLignes,
       });
 
       setFormValues({
@@ -106,6 +141,7 @@ function FormateurForm() {
         date_naissance: "",
         isAffecteur: false,
         Type: "",
+        lignes: [],
       });
 
       Swal.fire({
@@ -141,7 +177,9 @@ function FormateurForm() {
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="form-group">
-                <label htmlFor="nom" className="block text-gray-700">Nom</label>
+                <label htmlFor="nom" className="block text-gray-700">
+                  Nom
+                </label>
                 <input
                   type="text"
                   className="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
@@ -153,7 +191,9 @@ function FormateurForm() {
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="prenom" className="block text-gray-700">Prenom</label>
+                <label htmlFor="prenom" className="block text-gray-700">
+                  Prenom
+                </label>
                 <input
                   type="text"
                   className="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
@@ -165,7 +205,9 @@ function FormateurForm() {
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="username" className="block text-gray-700">Username</label>
+                <label htmlFor="username" className="block text-gray-700">
+                  Username
+                </label>
                 <input
                   type="text"
                   className="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
@@ -177,7 +219,9 @@ function FormateurForm() {
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="email" className="block text-gray-700">Email</label>
+                <label htmlFor="email" className="block text-gray-700">
+                  Email
+                </label>
                 <input
                   type="email"
                   className="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
@@ -189,7 +233,9 @@ function FormateurForm() {
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="password" className="block text-gray-700">Password</label>
+                <label htmlFor="password" className="block text-gray-700">
+                  Password
+                </label>
                 <input
                   type="password"
                   className="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
@@ -201,7 +247,9 @@ function FormateurForm() {
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="cin" className="block text-gray-700">CIN</label>
+                <label htmlFor="cin" className="block text-gray-700">
+                  CIN
+                </label>
                 <input
                   type="text"
                   className="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
@@ -215,7 +263,9 @@ function FormateurForm() {
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="addresse" className="block text-gray-700">Adresse</label>
+                <label htmlFor="addresse" className="block text-gray-700">
+                  Adresse
+                </label>
                 <input
                   type="text"
                   className="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
@@ -227,7 +277,9 @@ function FormateurForm() {
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="numerotel" className="block text-gray-700">Numéro de téléphone</label>
+                <label htmlFor="numerotel" className="block text-gray-700">
+                  Numéro de téléphone
+                </label>
                 <input
                   type="number"
                   className="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
@@ -239,7 +291,9 @@ function FormateurForm() {
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="date_naissance" className="block text-gray-700">Date de naissance</label>
+                <label htmlFor="date_naissance" className="block text-gray-700">
+                  Date de naissance
+                </label>
                 <input
                   type="date"
                   className="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
@@ -251,33 +305,64 @@ function FormateurForm() {
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="Type" className="block text-gray-700">Type</label>
+                <label htmlFor="Type" className="block text-gray-700">
+                  Type
+                </label>
                 <select
-                  className="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
+                  className="mt-1 px-4 block w-full rounded-md border-gray-300 shadow-sm  focus:border-blue-500 focus:ring-blue-500 h-12"
                   id="Type"
                   name="Type"
-                  value={formValues.Type}
+                  value={
+                    role == "Superviseur"
+                      ? "Pratique"
+                      : role == "ResponsableEcoleFormation"
+                      ? "Theorique"
+                      : formValues.Type
+                  }
                   onChange={handleChange}
                   required
-                  disabled={role !== "Supervisor"}
+                  disabled={role !== "RH"}
                 >
                   <option value="Pratique">Pratique</option>
                   <option value="Theorique">Theorique</option>
                 </select>
               </div>
-              {role === "Superviseur" && (
-                <div>
-                  <label htmlFor="isAffecteur" className="ml-2 text-gray-700">Affecteur</label>
-                  <input
-                    type="checkbox"
-                    className="block w-1/12 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
-                    id="isAffecteur"
-                    name="isAffecteur"
-                    checked={formValues.isAffecteur}
-                    onChange={handleChange}
-                  />
+              {formValues.Type === "Pratique" && (
+                <div className="form-group">
+                  <label htmlFor="lignes" className="block text-gray-700">
+                    Lignes
+                </label>
+                <div className="mt-1 p-4 flex gap-5  w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12">
+                  {ligneOptions.map((ligne) => (
+                    <div key={ligne.id} className=" ">
+                      <input
+                        type="checkbox"
+                        id={`ligne-${ligne.id}`}
+                        name={`lignes`}
+                        value={ligne.id.toString()}
+                        checked={selectedLignes.includes(ligne.id)}
+                        onChange={() => handleLigneChange(ligne.id)}
+                        className="mr-2"
+                      />
+                      <label htmlFor={`ligne-${ligne.id}`}>{ligne.name}</label>
+                    </div>
+                  ))}
                 </div>
+              </div>
               )}
+              <div>
+                <label htmlFor="isAffecteur" className="ml-2 text-gray-700">
+                  Affecteur
+                </label>
+                <input
+                  type="checkbox"
+                  className="block w-1/12 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-12"
+                  id="isAffecteur"
+                  name="isAffecteur"
+                  checked={formValues.isAffecteur}
+                  onChange={handleChange}
+                />
+              </div>
             </div>
             <button
               type="submit"

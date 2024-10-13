@@ -1,4 +1,3 @@
-
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 interface TokenResponse {
@@ -7,7 +6,7 @@ interface TokenResponse {
 }
 
 const refreshToken = async (refreshToken: string) => {
-  const response = await fetch(`${API_URL}/api/token/refresh/`, {
+  const response = await fetch(`${API_URL}api/token/refresh/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -171,6 +170,54 @@ const deleteWithAuth = async (
   }
 };
 
+const patchWithAuth = async (
+  url: string,
+  data: any,
+  options: FetchOptions = {}
+): Promise<any> => {
+  try {
+    const accessToken = localStorage.getItem("access_token");
+    const response = await fetch(`${API_URL}${url}`, {
+      ...options,
+      method: "PATCH",
+      headers: {
+        ...options.headers,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (response.status === 401) {
+      const newAccessToken = await refreshToken(
+        localStorage.getItem("refresh_token") as string
+      );
+      const newResponse = await fetch(`${API_URL}${url}`, {
+        ...options,
+        method: "PATCH",
+        headers: {
+          ...options.headers,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${newAccessToken}`,
+        },
+        body: JSON.stringify(data),
+      });
+      if (!newResponse.ok) {
+        throw new Error("Failed to fetch data");
+      }
+      return newResponse.json();
+    }
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch data");
+    }
+
+    return response.json();
+  } catch (error: any) {
+    throw new Error(`PATCH request failed: ${(error as Error).message}`);
+  }
+};
+
 const putWithAuth = async (
   url: string,
   data: any,
@@ -184,7 +231,7 @@ const putWithAuth = async (
       headers: {
         ...options.headers,
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${accessToken}`,
+        Authorization: `Bearer ${accessToken}`,
       },
       body: JSON.stringify(data),
     });
@@ -199,7 +246,7 @@ const putWithAuth = async (
         headers: {
           ...options.headers,
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${newAccessToken}`,
+          Authorization: `Bearer ${newAccessToken}`,
         },
         body: JSON.stringify(data),
       });
@@ -220,4 +267,10 @@ const putWithAuth = async (
   }
 };
 
-export { fetchWithAuth, postWithAuth, deleteWithAuth, putWithAuth };
+export {
+  fetchWithAuth,
+  postWithAuth,
+  deleteWithAuth,
+  putWithAuth,
+  patchWithAuth,
+};

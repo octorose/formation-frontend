@@ -8,21 +8,35 @@ import {
   SelectValue,
 } from "../ui/select";
 import Loader from "../common/Loader";
-import { fetchWithAuth } from "@/utils/api";
+import { fetchWithAuth, patchWithAuth } from "@/utils/api";
 import { getRoleIdFromToken } from "@/utils/getRoleIdFromToken";
 import { Agent } from "@/interfaces/Agent";
 import Image from "next/image";
 import useAlert from "@/Hooks/useAlert";
 import { SearchIcon } from "lucide-react";
+import Modal from "../GlobalModal/Modal";
+import { on } from "events";
+import { getRoleFromToken } from "@/utils/getRoleFromToken";
+import { log } from "console";
 
 interface ProductionLine {
   id: string;
   name: string;
 }
-
+interface Affectation {
+  id: number;
+  agent: Agent;
+  poste: number;
+  ligne: number;
+}
+interface payload {
+  poste: string;
+  ligne: string;
+}
 function Affectation() {
   const [searchQuery, setSearchQuery] = useState("");
   const { alert, setAlert } = useAlert();
+  const { alert: alert2, setAlert: setAlert2 } = useAlert();
   const [Enformation, setEnformation] = useState<Agent[]>([]);
   const [productionLines, setProductionLines] = useState<ProductionLine[]>([]);
   const [operators, setOperators] = useState([]);
@@ -30,10 +44,17 @@ function Affectation() {
   const [EnformationLoading, setEnformationLoading] = useState(false);
   const [operatorsLoading, setOperatorsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [postes, setPostes] = useState([]);
+  const [payload, setPayload] = useState<payload>({ poste: "", ligne: "" });
+  const [operatortoAffect, setOperatorToAffect] = useState<Affectation>();
+  const [candidattoAssigne, setCandidattoAssigne] = useState<Affectation>();
 
   useEffect(() => {
     fetchLignes();
     fetchEnformation();
+    if (getRoleFromToken() === "RH") {
+      fetchLignesRH();
+    }
   }, []);
 
   useEffect(() => {
@@ -42,14 +63,11 @@ function Affectation() {
     }
   }, [productionline]);
 
-  const fetchLignes = async () => {
+  const fetchLignesRH = async () => {
     setEnformationLoading(true);
     setError("");
     try {
-      const response = await fetchWithAuth(
-        `api/supervisor-lignes/${getRoleIdFromToken()}/`
-      );
-      console.log("fetchLignes response:", response); // Log the full response for debugging
+      const response = await fetchWithAuth(`api/lignes/`);
       if (response && response.results && Array.isArray(response.results)) {
         setProductionLines(response.results);
         if (response.results.length > 0) {
@@ -65,13 +83,74 @@ function Affectation() {
       setEnformationLoading(false);
     }
   };
+  const fetchLignes = async () => {
+    setEnformationLoading(true);
+    setError("");
+    try {
+      console.log(getRoleIdFromToken());
 
+      const response = await fetchWithAuth(
+        `api/formateur-lignes/${getRoleIdFromToken()}/`
+      );
+      if (response && response.lignes && Array.isArray(response.lignes)) {
+        setProductionLines(response.lignes);
+        if (response.lignes.length > 0) {
+          setProductionLine(response.lignes[0].id);
+        }
+      } else {
+        throw new Error("Invalid response format");
+      }
+    } catch (error: any) {
+      console.error("Failed to fetch production lines:", error.message);
+      setError("Failed to fetch production lines");
+    } finally {
+      setEnformationLoading(false);
+    }
+  };
+
+  const AssigneCandidat = async () => {
+    setEnformationLoading(true);
+    setOperatorsLoading(true);
+    setError("");
+    try {
+      const response = await patchWithAuth(
+        `api/personnel/${candidattoAssigne?.id}/update-to-operator/`,
+        payload
+      );
+      setOperators(response);
+    } catch (error: any) {
+      console.error("Failed to fetch operators:", error.message);
+      console.log("fetchOperators error response:", error.response);
+      setError("Failed to fetch operators");
+    } finally {
+      fetchEnformation();
+      fetchOperators();
+      setOperatorsLoading(false);
+      setEnformationLoading(false);
+    }
+  };
+
+  const fetchPostesByLigne = async () => {
+    setError("");
+    try {
+      const response = await fetchWithAuth(`api/posts/${payload.ligne}/`);
+      console.log("fetchPostesByLigne response:", response);
+      setPostes(response);
+    } catch (error: any) {
+      console.error("Failed to fetch operators:", error.message);
+      console.log("fetchOperators error response:", error.response);
+      setError("Failed to fetch operators");
+    }
+  };
+  useEffect(() => {
+    fetchPostesByLigne();
+  }, [payload.ligne]);
   const fetchEnformation = async () => {
     setEnformationLoading(true);
     setError("");
     try {
       const response = await fetchWithAuth(`api/En-Formation/`);
-      console.log("fetchEnformation response:", response); // Log the full response for debugging
+      console.log("fetchEnformation response:", response);
       setEnformation(response);
     } catch (error: any) {
       console.error("Failed to fetch candidates in formation:", error.message);
@@ -88,8 +167,6 @@ function Affectation() {
       const response = await fetchWithAuth(
         `api/line-operateurs/${productionline}/`
       );
-
-      console.log("piwpiw");
       setOperators(response);
     } catch (error: any) {
       console.error("Failed to fetch operators:", error.message);
@@ -117,7 +194,7 @@ function Affectation() {
               onValueChange={(value) => setProductionLine(value)}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Sélectionnez une ligne de production" />
+                <SelectValue placeholder= {productionline ? productionLines.find(line => line.id === productionline)?.name : "Sélectionnez une ligne de production"} />
               </SelectTrigger>
               <SelectContent>
                 {productionLines.map((line: ProductionLine) => (
@@ -139,6 +216,10 @@ function Affectation() {
               <div
                 key={operator.id}
                 className="flex items-center justify-between p-4 bg-white rounded-lg "
+                onClick={() => {
+                  setCandidattoAssigne(operator);
+                  setAlert2((prev) => ({ ...prev, isOpen: true }));
+                }}
               >
                 <div className="flex items-center gap-4 w-full">
                   <Image
@@ -225,6 +306,10 @@ function Affectation() {
               <div
                 key={operator.id}
                 className="flex items-center justify-between p-4 bg-white rounded-lg shadow-md"
+                onClick={() => {
+                  setCandidattoAssigne(operator);
+                  setAlert((prev) => ({ ...prev, isOpen: true }));
+                }}
               >
                 <div className="flex items-center gap-4 w-full">
                   <Image
@@ -267,6 +352,117 @@ function Affectation() {
           )}
         </div>
       </div>
+      <Modal
+        isOpen={alert.isOpen}
+        onSubmit={() => {
+          AssigneCandidat();
+        }}
+        onCancel={() => {
+          setAlert((prev) => ({ ...prev, isOpen: false }));
+        }}
+        alertTitle={"Affectation de " + candidattoAssigne?.agent.nom}
+        alertDescription={"Ajouter "}
+        submitBtnName={"Ajouter"}
+        cancelBtnName="Annuler"
+        type="success"
+        onClose={() => {
+          setAlert((prev) => ({ ...prev, isOpen: false }));
+        }}
+      >
+        <div className="flex items-center gap-4">
+          <div className="flex-col ">
+            <label htmlFor="production-line">Ligne</label>
+            <div className="z-50">
+              <select
+                className="w-full p-2 border border-gray-300 rounded-lg"
+                onChange={(e) => {
+                  setPayload({ ...payload, ligne: e.target.value });
+                }}
+              >
+                <option value="">Sélectionnez une ligne de production</option>
+                {productionLines.map((line: ProductionLine) => (
+                  <option key={line.id} value={line.id}>
+                    {line.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <div>
+              <label htmlFor="production-line">Poste</label>
+              <select
+                className="w-full p-2 border border-gray-300 rounded-lg"
+                onChange={(e) => {
+                  setPayload({ ...payload, poste: e.target.value });
+                }}
+                disabled={!payload.ligne}
+              >
+                <option value="">Sélectionnez un poste</option>
+                {postes.map((poste: any) => (
+                  <option key={poste.id} value={poste.id}>
+                    {poste.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+      </Modal>
+      <Modal
+        isOpen={alert2.isOpen}
+        onSubmit={() => {
+          AssigneCandidat();
+        }}
+        onCancel={() => {
+          setAlert2((prev) => ({ ...prev, isOpen: false }));
+        }}
+        alertTitle={"Affectation de " + candidattoAssigne?.agent.nom}
+        alertDescription={"Ajouter "}
+        submitBtnName={"Ajouter"}
+        cancelBtnName="Annuler"
+        type="success"
+        onClose={() => {
+          setAlert2((prev) => ({ ...prev, isOpen: false }));
+        }}
+      >
+        <div className="flex items-center gap-4">
+          <div className="flex-col ">
+            <label htmlFor="production-line">Ligne</label>
+            <select
+              className="w-full p-2 border border-gray-300 rounded-lg"
+              onChange={(e) => {
+                setPayload({ ...payload, ligne: e.target.value });
+              }}
+            >
+              <option value="">Sélectionnez une ligne de production</option>
+              {productionLines.map((line: ProductionLine) => (
+                <option key={line.id} value={line.id}>
+                  {line.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex items-center gap-4">
+            <div>
+              <label htmlFor="production-line">Poste</label>
+              <select
+                className="w-full p-2 border border-gray-300 rounded-lg"
+                onChange={(e) => {
+                  setPayload({ ...payload, poste: e.target.value });
+                }}
+              >
+                <option value="">Sélectionnez un poste</option>
+                {postes.map((poste: any) => (
+                  <option key={poste.id} value={poste.id}>
+                    {poste.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

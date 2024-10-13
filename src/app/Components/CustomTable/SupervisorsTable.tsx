@@ -90,13 +90,14 @@ function SupervisorsTable({
     nom: SupervisortoEdit?.agent?.nom,
     prenom: SupervisortoEdit?.agent?.prenom,
     lignes: SupervisortoEdit?.ligne_name,
-    contract: "we need it from ichraq's code",
   };
 
   const fetchData = async () => {
     const response: ApiResponse<Superviseur> = await fetchWithAuth(
       `${endpoint}?page=${currentPage}`
     );
+    console.log(response);
+    
     setSupervisors(response.results);
     setTotalSupervisors(response.count);
   };
@@ -162,7 +163,7 @@ function SupervisorsTable({
   };
    const fetchLignes = async () => {
      try {
-       const response = await fetchWithAuth("/api/lignes/");
+       const response = await fetchWithAuth("api/lignes/");
        const lignesData = response.results.map((ligne: any) => ({
          id: ligne.id,
          name: ligne.name,
@@ -179,7 +180,7 @@ function SupervisorsTable({
   return (
     <div className="rounded-sm bg-transparent px-5 pb-2.5 pt-6 dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
       <div className="flex flex-col">
-        <div className="grid grid-cols-3 rounded-sm text-black dark:text-white bg-gray-2 dark:bg-meta-4 sm:grid-cols-5">
+        <div className="grid grid-cols-3 rounded-sm text-black dark:text-white bg-gray-2 dark:bg-meta-4 sm:grid-cols-4">
           <div className="p-2.5 xl:p-5">
             <h5 className="text-sm font-medium uppercase xsm:text-base">Nom</h5>
           </div>
@@ -193,11 +194,7 @@ function SupervisorsTable({
               Ligne Names
             </h5>
           </div>
-          <div className="p-2.5 text-center xl:p-5">
-            <h5 className="text-sm font-medium uppercase xsm:text-base">
-              Contract
-            </h5>
-          </div>
+          
           <div className="hidden p-2.5 text-center sm:block xl:p-5">
             <h5 className="text-sm font-medium uppercase xsm:text-base">
               Actions
@@ -208,7 +205,7 @@ function SupervisorsTable({
           <>
             {searchResults.map((supervisor: Superviseur, key: number) => (
               <div
-                className={`grid grid-cols-3 sm:grid-cols-5 text-base ${
+                className={`grid grid-cols-3 sm:grid-cols-4 text-base ${
                   key === supervisors.length - 1
                     ? ""
                     : "border-b border-stroke dark:border-strokedark"
@@ -232,11 +229,7 @@ function SupervisorsTable({
                     {supervisor.lignes.map((ligne) => ligne.name).join(", ")}
                   </p>
                 </div>
-                <div className="flex items-center justify-center p-2.5 xl:p-5">
-                  <p className="text-black dark:text-white">
-                    we need it from ichraq&apos;s code
-                  </p>
-                </div>
+                
                 <div className="hidden items-center justify-center gap-4 p-2.5 sm:flex xl:p-5">
                   <button
                     className="text-black dark:text-white"
@@ -264,7 +257,7 @@ function SupervisorsTable({
           <>
             {supervisors.map((supervisor: Superviseur, key: number) => (
               <div
-                className={`grid grid-cols-3 sm:grid-cols-5 text-base ${
+                className={`grid grid-cols-3 sm:grid-cols-4 text-base ${
                   key === supervisors.length - 1
                     ? ""
                     : "border-b border-stroke dark:border-strokedark"
@@ -288,11 +281,7 @@ function SupervisorsTable({
                     {supervisor.lignes.map((ligne) => ligne.name).join(", ")}
                   </p>
                 </div>
-                <div className="flex items-center justify-center p-2.5 xl:p-5">
-                  <p className="text-black dark:text-white">
-                    we need it from ichraq&apos;s code
-                  </p>
-                </div>
+
                 <div className="hidden items-center justify-center gap-4 p-2.5 sm:flex xl:p-5">
                   <button
                     className="text-black dark:text-white"
